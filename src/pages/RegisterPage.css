@@ -90,7 +90,8 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
-  margin-right: 10px; /* 오른쪽 버튼과의 간격 */
+  flex-grow: 0 !important;
+  margin-right: 10px;
 }
 
 .submit-button:disabled {
@@ -110,6 +111,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-grow: 0 !important;
 }
 
 .button-secondary:hover {

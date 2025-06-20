@@ -212,9 +212,9 @@ a {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  flex-shrink: 1;
+  flex-shrink: 1 !important;
   min-width: 0;
-  max-width: 200px;
-  display: inline-block;
-  vertical-align: middle;
+  max-width: 150px !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
 }
