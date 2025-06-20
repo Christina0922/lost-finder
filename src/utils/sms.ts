@@ -1,11 +1,9 @@
 // 백엔드 API를 통한 SMS 발송 유틸리티
 // API 키는 서버에만 저장되어 보안이 보장됩니다.
 
-const API_BASE_URL = 'http://localhost:5000';
-
 export const sendSMS = async (to: string, message: string): Promise<boolean> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/send-sms`, {
+    const response = await fetch(`/api/send-sms`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -30,7 +28,7 @@ export const sendSMS = async (to: string, message: string): Promise<boolean> => 
 
 export const sendVerificationCode = async (phone: string, code: string): Promise<boolean> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/send-verification`, {
+    const response = await fetch(`/api/send-verification`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -56,7 +54,7 @@ export const sendVerificationCode = async (phone: string, code: string): Promise
 // 서버 상태 확인
 export const checkServerHealth = async (): Promise<boolean> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/health`);
+    const response = await fetch(`/api/health`);
     const result = await response.json();
     console.log('🔧 서버 상태:', result);
     return result.status === 'OK';
