@@ -208,7 +208,7 @@ a {
   background-color: #5a6268;
 }
 
-.header-welcome {
+.user-nav .header-welcome {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
