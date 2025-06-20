@@ -1,18 +1,12 @@
 {
-  "name": "lost-finder-monorepo",
+  "name": "lost-finder-root",
   "private": true,
-  "workspaces": [
-    "client",
-    "server"
-  ],
   "scripts": {
-    "dev": "concurrently \"npm:start --prefix server\" \"npm:start --prefix client\"",
-    "server": "npm start --prefix server",
     "client": "npm start --prefix client",
-    "build": "npm run build --prefix client",
-    "install-all": "npm install && npm install --prefix client && npm install --prefix server"
+    "server": "npm start --prefix server",
+    "dev": "concurrently npm:server npm:client"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^7.0.0"
   }
-}
+} 

@@ -2,6 +2,9 @@
 
 # dependencies
 /node_modules
+node_modules/
+**/node_modules/
+**/node_modules/**
 /.pnp
 .pnp.js
 
@@ -25,3 +28,7 @@ yarn-error.log*
 # Server
 server/node_modules
 server/.env
+
+# Client
+client/node_modules
+client/.env
