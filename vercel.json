@@ -2,13 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "server/package.json",
+      "src": "server/server.js",
       "use": "@vercel/node"
     },
     {
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
+        "workDirectory": ".",
         "distDir": "build"
       }
     }
@@ -20,7 +21,7 @@
     },
     {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "destination": "index.html"
     }
   ]
 } 
