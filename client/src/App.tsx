@@ -9,7 +9,7 @@ import LoginPage from './pages/LoginPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import EditPage from './pages/EditPage';
-import { sendVerificationCode, getSetupGuide, checkServerHealth } from './utils/sms';
+import { checkServerHealth, sendVerificationCode } from './utils/api';
 import './App.css';
 
 // 사용자 정보 타입을 정의합니다.
@@ -184,16 +184,19 @@ const App: React.FC = () => {
   // 서버 상태 확인
   useEffect(() => {
     const checkServer = async () => {
-      const isConnected = await checkServerHealth();
-      setServerStatus(isConnected ? 'connected' : 'disconnected');
-      
-      if (!isConnected) {
+      try {
+        await checkServerHealth();
+        setServerStatus('connected');
+      } catch (error) {
+        setServerStatus('disconnected');
         console.log('⚠️ 백엔드 서버에 연결할 수 없습니다.');
-        console.log('📋 설정 가이드:', getSetupGuide());
       }
     };
     
     checkServer();
+    const intervalId = setInterval(checkServer, 30000);
+
+    return () => clearInterval(intervalId);
   }, []);
 
   useEffect(() => {
@@ -242,26 +245,20 @@ const App: React.FC = () => {
   };
 
   const handleSendVerificationCode = async (phone: string): Promise<boolean> => {
-    const userExists = users.some(user => user.phoneNumber === phone);
-    if (userExists) {
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      setVerificationCodes(prev => ({ ...prev, [phone]: code }));
-      
-      console.log(`[중요] 프론트엔드에서 생성하고 검증에 사용할 실제 인증번호는 [ ${code} ] 입니다.`);
-
-      // 실제 SMS 발송
-      const smsResult = await sendVerificationCode(phone, code);
-      
-      if (smsResult) {
-        console.log(`✅ 인증번호 발송 완료: ${phone}`);
-        console.log(`🔧 Twilio 설정이 안 되어 있다면:`, getSetupGuide());
-      } else {
-        console.error(`❌ SMS 발송 실패: ${phone}`);
-      }
-      
-      return true;
+    if (!phone) {
+      alert("휴대폰 번호를 입력해주세요.");
+      return false;
     }
-    return false;
+
+    try {
+      await sendVerificationCode(phone);
+      alert("인증번호가 발송되었습니다. (개발 모드에서는 콘솔 확인)");
+      return true;
+    } catch (error) {
+      console.error(error);
+      alert("인증번호 발송에 실패했습니다.");
+      return false;
+    }
   };
 
   const handleVerifyAndResetPassword = (phone: string, code: string): string | null => {
