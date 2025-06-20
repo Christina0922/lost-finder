@@ -3,7 +3,7 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || '';
 // SMS 발송 API
 export const sendSMS = async (phone: string, message: string) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/send-sms`, {
+    const response = await fetch(`${API_BASE_URL}/api/send-sms`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -27,7 +27,7 @@ export const sendSMS = async (phone: string, message: string) => {
 // 인증번호 발송 API
 export const sendVerificationCode = async (phone: string, code?: string) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/send-verification`, {
+    const response = await fetch(`${API_BASE_URL}/api/send-verification`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -51,7 +51,7 @@ export const sendVerificationCode = async (phone: string, code?: string) => {
 // 서버 상태 확인 API
 export const checkServerHealth = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/health`);
+    const response = await fetch(`${API_BASE_URL}/api/health`);
     const data = await response.json();
     
     if (!response.ok) {
