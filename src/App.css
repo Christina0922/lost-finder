@@ -212,7 +212,6 @@ a {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 150px; /* 화면 크기에 맞게 조절 가능 */
-  display: inline-block;
-  vertical-align: middle;
+  flex-shrink: 1;
+  min-width: 0;
 }

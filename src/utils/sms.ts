@@ -54,7 +54,8 @@ export const sendVerificationCode = async (phone: string, code: string): Promise
 // 서버 상태 확인
 export const checkServerHealth = async (): Promise<boolean> => {
   try {
-    const response = await fetch('/api/health');
+    // 캐시 문제를 피하기 위해 현재 시간을 쿼리 파라미터로 추가
+    const response = await fetch(`/api/health?t=${new Date().getTime()}`);
     if (!response.ok) {
       return false;
     }
