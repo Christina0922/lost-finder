@@ -90,7 +90,6 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
-  flex-grow: 1; /* 버튼이 공간을 채우도록 */
   margin-right: 10px; /* 오른쪽 버튼과의 간격 */
 }
 
@@ -111,7 +110,6 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex-grow: 1; /* 버튼이 공간을 채우도록 */
 }
 
 .button-secondary:hover {

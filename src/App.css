@@ -214,4 +214,7 @@ a {
   text-overflow: ellipsis;
   flex-shrink: 1;
   min-width: 0;
+  max-width: 200px;
+  display: inline-block;
+  vertical-align: middle;
 }
