@@ -25,7 +25,7 @@ if (accountSid && authToken && fromNumber) {
 }
 
 // SMS 발송 API
-app.post('/api/send-sms', async (req, res) => {
+app.post('/send-sms', async (req, res) => {
   try {
     const { phone, message } = req.body;
     
@@ -73,7 +73,7 @@ app.post('/api/send-sms', async (req, res) => {
 });
 
 // 인증번호 발송 API
-app.post('/api/send-verification', async (req, res) => {
+app.post('/send-verification', async (req, res) => {
   try {
     const { phone, code: requestCode } = req.body;
     
@@ -124,7 +124,7 @@ app.post('/api/send-verification', async (req, res) => {
 });
 
 // 서버 상태 확인
-app.get('/api/health', (req, res) => {
+app.get('/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
