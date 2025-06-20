@@ -132,4 +132,13 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-module.exports = app; 
+module.exports = app;
+
+// 서버 시작
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🚀 서버가 포트 ${PORT}에서 실행 중입니다.`);
+    console.log(`📡 API 엔드포인트: http://localhost:${PORT}/api`);
+    console.log(`🏥 상태 확인: http://localhost:${PORT}/api/health`);
+  });
+} 
