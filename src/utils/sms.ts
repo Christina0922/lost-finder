@@ -54,12 +54,14 @@ export const sendVerificationCode = async (phone: string, code: string): Promise
 // 서버 상태 확인
 export const checkServerHealth = async (): Promise<boolean> => {
   try {
-    const response = await fetch(`/api/health`);
-    const result = await response.json();
-    console.log('🔧 서버 상태:', result);
-    return result.status === 'OK';
+    const response = await fetch('/api/health');
+    if (!response.ok) {
+      return false;
+    }
+    const data = await response.json();
+    return data.status === 'OK';
   } catch (error) {
-    console.error('❌ 서버 연결 실패:', error);
+    console.error('Server health check failed:', error);
     return false;
   }
 };
