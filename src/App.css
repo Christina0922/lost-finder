@@ -207,3 +207,12 @@ a {
 .logout-button:hover {
   background-color: #5a6268;
 }
+
+.header-welcome {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px; /* 화면 크기에 맞게 조절 가능 */
+  display: inline-block;
+  vertical-align: middle;
+}

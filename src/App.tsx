@@ -127,7 +127,7 @@ const Header: React.FC<{
                 </div>
               )}
             </div>
-            <span className="welcome-message">{currentUser.email}님 환영합니다!</span>
+            <span className="header-welcome">{currentUser.email}님 환영합니다!</span>
             <button onClick={onLogout} className="logout-button">로그아웃</button>
           </div>
         ) : (
