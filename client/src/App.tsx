@@ -67,10 +67,10 @@ const Header: React.FC<{
 
   return (
     <header className="app-header">
-      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div className="header-left">
         <button
           className="refresh-button"
-          style={{ marginRight: '16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '22px' }}
+          style={{ background: 'none', border: 'none', cursor: 'pointer' }}
           title="새로고침"
           onClick={() => window.location.reload()}
         >
@@ -82,7 +82,7 @@ const Header: React.FC<{
           <span className="server-status-text">{currentStatus.text}</span>
         </div>
       </div>
-      <nav>
+      <nav className="header-right">
         {currentUser ? (
           <div className="user-nav">
             {currentUser.isTemporaryPassword && (

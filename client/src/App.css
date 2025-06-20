@@ -81,12 +81,27 @@ a {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 30px;
+  padding: 0 15px;
   background-color: #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   border-bottom: 1px solid #e0e0e0;
-  flex-wrap: wrap;
-  gap: 10px;
+  height: 60px;
+  gap: 8px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.header-right {
+  min-width: 0;
+}
+
+.refresh-button {
+  font-size: 22px;
 }
 
 .logo {
@@ -147,20 +162,30 @@ a {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 20px;
+  font-size: 24px;
   position: relative;
+  padding: 0;
 }
 
 .notification-count {
   position: absolute;
-  top: -5px;
-  right: -8px;
+  top: 0;
+  right: 0;
+  transform: translate(40%, -40%);
   background-color: #e74c3c;
   color: white;
   border-radius: 50%;
-  padding: 2px 6px;
-  font-size: 10px;
+  padding: 2px;
+  font-size: 12px;
   font-weight: bold;
+  line-height: 1;
+  min-width: 18px;
+  height: 18px;
+  text-align: center;
+  border: 2px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .notification-dropdown {
@@ -254,11 +279,20 @@ a {
 /* --- 반응형 스타일 --- */
 @media (max-width: 768px) {
   .app-header {
-    padding: 10px 15px;
+    padding: 0 8px;
+    gap: 4px;
+  }
+
+  .header-left {
+    gap: 4px;
+  }
+
+  .refresh-button {
+    font-size: 20px;
   }
 
   .logo {
-    font-size: 20px;
+    font-size: 18px;
   }
   
   /* 작은 화면에서는 환영 메시지 숨기기 */
@@ -276,6 +310,19 @@ a {
   }
 
   .nav-link {
+    padding: 6px 8px;
+    font-size: 14px;
+  }
+
+  .server-status {
+    margin-left: 4px;
+  }
+
+  .user-nav {
+    gap: 4px;
+  }
+
+  .logout-button {
     padding: 6px 8px;
     font-size: 14px;
   }
