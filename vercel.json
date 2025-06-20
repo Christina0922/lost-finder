@@ -2,9 +2,8 @@
   "version": 2,
   "builds": [
     {
-      "src": "server/package.json",
-      "use": "@vercel/node",
-      "config": { "includeFiles": ["server.js"] }
+      "src": "server/server.js",
+      "use": "@vercel/node"
     },
     {
       "src": "package.json",
@@ -21,7 +20,7 @@
     },
     {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "destination": "index.html"
     }
   ]
 } 
