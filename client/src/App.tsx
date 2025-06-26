@@ -47,40 +47,24 @@ const Header: React.FC<{
   currentUser: User | null; 
   notifications: Notification[]; 
   onLogout: () => void;
-  serverStatus: 'checking' | 'connected' | 'disconnected';
-}> = ({ currentUser, notifications, onLogout, serverStatus }) => {
+  theme: 'light' | 'dark';
+  setTheme: (t: 'light' | 'dark') => void;
+  alertMode: 'vibrate' | 'melody' | 'silent';
+  setAlertMode: (m: 'vibrate' | 'melody' | 'silent') => void;
+}> = ({ currentUser, notifications, onLogout, theme, setTheme, alertMode, setAlertMode }) => {
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const unreadNotifications = notifications.filter(n => !n.read && n.userId === currentUser?.id);
 
   const handleNotificationClick = (itemId: number) => {
     window.location.href = `/detail/${itemId}`;
   };
-  
-  const serverStatusInfo = {
-    connected: { icon: '🟢', text: '서버 연결됨', className: 'status-connected' },
-    disconnected: { icon: '🔴', text: '서버 연결 안됨', className: 'status-disconnected' },
-    checking: { icon: '🟡', text: '서버 확인 중', className: 'status-checking' },
-  };
-
-  const currentStatus = serverStatusInfo[serverStatus];
 
   return (
     <header className="app-header">
       <div className="header-left">
-        <button
-          className="refresh-button"
-          style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-          title="새로고침"
-          onClick={() => window.location.reload()}
-        >
-          🔄
-        </button>
         <a href="/" className="logo">LostFinder</a>
-        <div className={`server-status ${currentStatus.className}`}>
-          {currentStatus.icon}
-          <span className="server-status-text">{currentStatus.text}</span>
-        </div>
       </div>
       <nav className="header-right">
         {currentUser ? (
@@ -123,13 +107,70 @@ const Header: React.FC<{
                 </div>
               )}
             </div>
-            <span className="header-welcome">{currentUser.email}님 환영합니다!</span>
             <button onClick={onLogout} className="logout-button">로그아웃</button>
+            <div className="settings-container" style={{ position: 'relative', display: 'inline-block' }}>
+              <button className="settings-gear" onClick={() => setShowSettings(v => !v)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', marginRight: 0 }} title="설정">
+                ⚙️
+              </button>
+              {showSettings && (
+                <div className="settings-dropdown" style={{ position: 'absolute', right: 0, top: 36, background: '#fff', border: '1px solid #ddd', borderRadius: 6, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', minWidth: 220, zIndex: 1000, padding: 16 }}>
+                  <div style={{ fontWeight: 'bold', marginBottom: 8 }}>설정</div>
+                  <div style={{ marginBottom: 12 }}>
+                    <span style={{ marginRight: 8 }}>🌗 테마:</span>
+                    <button onClick={() => setTheme('light')} style={{ fontWeight: theme === 'light' ? 'bold' : 'normal', marginRight: 4 }}>화이트</button>
+                    <button onClick={() => setTheme('dark')} style={{ fontWeight: theme === 'dark' ? 'bold' : 'normal' }}>다크</button>
+                  </div>
+                  <div>
+                    <span style={{ marginRight: 8 }}>🔔 알림:</span>
+                    <div className="alert-modes">
+                      <label>
+                        <input type="radio" name="alertMode" checked={alertMode === 'vibrate'} onChange={() => setAlertMode('vibrate')} /> 진동
+                      </label>
+                      <label>
+                        <input type="radio" name="alertMode" checked={alertMode === 'melody'} onChange={() => setAlertMode('melody')} /> 멜로디
+                      </label>
+                      <label>
+                        <input type="radio" name="alertMode" checked={alertMode === 'silent'} onChange={() => setAlertMode('silent')} /> 무음
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         ) : (
           <div className="guest-nav">
             <Link to="/login" className="nav-link">로그인</Link>
             <Link to="/signup" className="nav-link">회원가입</Link>
+            <div className="settings-container" style={{ position: 'relative', display: 'inline-block' }}>
+              <button className="settings-gear" onClick={() => setShowSettings(v => !v)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', marginRight: 0 }} title="설정">
+                ⚙️
+              </button>
+              {showSettings && (
+                <div className="settings-dropdown" style={{ position: 'absolute', right: 0, top: 36, background: '#fff', border: '1px solid #ddd', borderRadius: 6, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', minWidth: 220, zIndex: 1000, padding: 16 }}>
+                  <div style={{ fontWeight: 'bold', marginBottom: 8 }}>설정</div>
+                  <div style={{ marginBottom: 12 }}>
+                    <span style={{ marginRight: 8 }}>🌗 테마:</span>
+                    <button onClick={() => setTheme('light')} style={{ fontWeight: theme === 'light' ? 'bold' : 'normal', marginRight: 4 }}>화이트</button>
+                    <button onClick={() => setTheme('dark')} style={{ fontWeight: theme === 'dark' ? 'bold' : 'normal' }}>다크</button>
+                  </div>
+                  <div>
+                    <span style={{ marginRight: 8 }}>🔔 알림:</span>
+                    <div className="alert-modes">
+                      <label>
+                        <input type="radio" name="alertMode" checked={alertMode === 'vibrate'} onChange={() => setAlertMode('vibrate')} /> 진동
+                      </label>
+                      <label>
+                        <input type="radio" name="alertMode" checked={alertMode === 'melody'} onChange={() => setAlertMode('melody')} /> 멜로디
+                      </label>
+                      <label>
+                        <input type="radio" name="alertMode" checked={alertMode === 'silent'} onChange={() => setAlertMode('silent')} /> 무음
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </nav>
@@ -179,25 +220,13 @@ const App: React.FC = () => {
   });
 
   const [verificationCodes, setVerificationCodes] = useState<{ [phone: string]: string }>({});
-  const [serverStatus, setServerStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
 
-  // 서버 상태 확인
-  useEffect(() => {
-    const checkServer = async () => {
-      try {
-        await checkServerHealth();
-        setServerStatus('connected');
-      } catch (error) {
-        setServerStatus('disconnected');
-        console.log('⚠️ 백엔드 서버에 연결할 수 없습니다.');
-      }
-    };
-    
-    checkServer();
-    const intervalId = setInterval(checkServer, 30000);
-
-    return () => clearInterval(intervalId);
-  }, []);
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    return (localStorage.getItem('theme') as 'light' | 'dark') || 'light';
+  });
+  const [alertMode, setAlertMode] = useState<'vibrate' | 'melody' | 'silent'>(() => {
+    return (localStorage.getItem('alertMode') as 'vibrate' | 'melody' | 'silent') || 'melody';
+  });
 
   useEffect(() => {
     localStorage.setItem('users', JSON.stringify(users));
@@ -214,6 +243,16 @@ const App: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('notifications', JSON.stringify(notifications));
   }, [notifications]);
+
+  useEffect(() => {
+    document.body.classList.remove('theme-light', 'theme-dark');
+    document.body.classList.add(`theme-${theme}`);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  useEffect(() => {
+    localStorage.setItem('alertMode', alertMode);
+  }, [alertMode]);
 
   const handleSignup = (email: string, pass: string, phone: string): boolean => {
     if (users.find(u => u.email === email)) {
@@ -381,7 +420,15 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      <Header currentUser={currentUser} notifications={notifications} onLogout={handleLogout} serverStatus={serverStatus} />
+      <Header
+        currentUser={currentUser}
+        notifications={notifications}
+        onLogout={handleLogout}
+        theme={theme}
+        setTheme={setTheme}
+        alertMode={alertMode}
+        setAlertMode={setAlertMode}
+      />
       <main className="app-main">
         <Routes>
           <Route path="/" element={<MainPage currentUser={currentUser} />} />

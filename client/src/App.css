@@ -7,6 +7,11 @@ body {
   color: #333;
 }
 
+body.theme-dark {
+  background-color: #181a1b;
+  color: #e0e0e0;
+}
+
 .App {
   max-width: 800px;
   margin: 0 auto;
@@ -73,7 +78,7 @@ a {
 
 /* General App Styles */
 .app-main {
-  padding: 20px;
+  padding: 10px;
 }
 
 /* Header Styles */
@@ -85,7 +90,7 @@ a {
   background-color: #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   border-bottom: 1px solid #e0e0e0;
-  height: 60px;
+  height: 80px;
   gap: 8px;
 }
 
@@ -98,14 +103,17 @@ a {
 
 .header-right {
   min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .refresh-button {
-  font-size: 22px;
+  font-size: 26px;
 }
 
 .logo {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: bold;
   color: #4a4a4a;
   text-decoration: none;
@@ -114,9 +122,10 @@ a {
 .nav-link {
   color: #555;
   text-decoration: none;
-  padding: 8px 15px;
+  padding: 10px 18px;
   border-radius: 5px;
   transition: background-color 0.3s, color 0.3s;
+  font-size: 16px;
 }
 
 .nav-link:hover {
@@ -326,4 +335,64 @@ a {
     padding: 6px 8px;
     font-size: 14px;
   }
+}
+
+.theme-dark .app-header {
+  background-color: #23272a;
+  color: #e0e0e0;
+  border-bottom: 1px solid #333;
+}
+
+.theme-dark .logo {
+  color: #e0e0e0;
+}
+
+.theme-dark .nav-link {
+  color: #e0e0e0;
+}
+
+.theme-dark .nav-link:hover {
+  background-color: #333;
+  color: #fff;
+}
+
+.theme-dark .user-nav .header-welcome {
+  color: #e0e0e0;
+  background-color: #444;
+}
+
+.theme-dark .notification-dropdown,
+.theme-dark .settings-dropdown {
+  background-color: #23272a;
+  color: #e0e0e0;
+  border: 1px solid #333;
+}
+
+.theme-dark .notification-dropdown li:hover {
+  background-color: #333;
+}
+
+.theme-dark .settings-gear {
+  color: #e0e0e0;
+}
+
+.theme-dark .logout-button {
+  background-color: #444;
+  color: #e0e0e0;
+}
+
+.theme-dark .logout-button:hover {
+  background-color: #666;
+}
+
+.settings-container {
+  display: flex;
+  align-items: center;
+}
+
+.settings-dropdown .alert-modes {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 4px;
 }
