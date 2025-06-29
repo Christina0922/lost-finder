@@ -1,6 +1,14 @@
 const express = require('express');
 const cors = require('cors');
 const twilio = require('twilio');
+const { 
+  registerUser, 
+  findUserByPhone, 
+  findUserByEmail, 
+  findUserByUsername, 
+  updatePassword,
+  getAllUsers 
+} = require('./database');
 require('dotenv').config();
 
 const app = express();
@@ -26,6 +34,129 @@ if (accountSid && authToken && fromNumber) {
 
 // API 라우터 설정
 const apiRouter = express.Router();
+
+// 사용자 등록 API
+apiRouter.post('/register', async (req, res) => {
+  try {
+    const { username, email, phone, password } = req.body;
+    
+    if (!username || !email || !phone || !password) {
+      return res.status(400).json({ 
+        success: false, 
+        error: '모든 필드를 입력해주세요.' 
+      });
+    }
+
+    const user = await registerUser({ username, email, phone, password });
+    
+    console.log(`✅ 사용자 등록 성공: ${username} (${email})`);
+    res.json({ 
+      success: true, 
+      message: '회원가입이 완료되었습니다.',
+      user: { id: user.id, username: user.username, email: user.email, phone: user.phone }
+    });
+  } catch (error) {
+    console.error('❌ 사용자 등록 실패:', error.message);
+    res.status(400).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// 로그인 API
+apiRouter.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    
+    if (!username || !password) {
+      return res.status(400).json({ 
+        success: false, 
+        error: '사용자명과 비밀번호를 입력해주세요.' 
+      });
+    }
+
+    const user = await findUserByUsername(username);
+    
+    if (user.password !== password) {
+      return res.status(401).json({ 
+        success: false, 
+        error: '비밀번호가 일치하지 않습니다.' 
+      });
+    }
+
+    console.log(`✅ 로그인 성공: ${username}`);
+    res.json({ 
+      success: true, 
+      message: '로그인이 완료되었습니다.',
+      user: { id: user.id, username: user.username, email: user.email, phone: user.phone }
+    });
+  } catch (error) {
+    console.error('❌ 로그인 실패:', error.message);
+    res.status(401).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// 비밀번호 찾기 - 전화번호 확인 API
+apiRouter.post('/forgot-password', async (req, res) => {
+  try {
+    const { phone } = req.body;
+    
+    if (!phone) {
+      return res.status(400).json({ 
+        success: false, 
+        error: '전화번호를 입력해주세요.' 
+      });
+    }
+
+    const user = await findUserByPhone(phone);
+    
+    console.log(`✅ 비밀번호 찾기 요청: ${phone} (${user.username})`);
+    res.json({ 
+      success: true, 
+      message: '등록된 전화번호입니다. 인증번호를 발송합니다.',
+      user: { id: user.id, username: user.username, email: user.email, phone: user.phone }
+    });
+  } catch (error) {
+    console.error('❌ 비밀번호 찾기 실패:', error.message);
+    res.status(400).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// 비밀번호 재설정 API
+apiRouter.post('/reset-password', async (req, res) => {
+  try {
+    const { phone, newPassword } = req.body;
+    
+    if (!phone || !newPassword) {
+      return res.status(400).json({ 
+        success: false, 
+        error: '전화번호와 새 비밀번호를 입력해주세요.' 
+      });
+    }
+
+    const user = await findUserByPhone(phone);
+    const result = await updatePassword(user.id, newPassword);
+    
+    console.log(`✅ 비밀번호 재설정 성공: ${phone} (${user.username})`);
+    res.json({ 
+      success: true, 
+      message: result.message
+    });
+  } catch (error) {
+    console.error('❌ 비밀번호 재설정 실패:', error.message);
+    res.status(400).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
 
 // SMS 발송 API
 apiRouter.post('/send-sms', async (req, res) => {
@@ -133,6 +264,23 @@ apiRouter.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
     twilio: twilioClient ? 'configured' : 'development_mode'
   });
+});
+
+// 사용자 목록 조회 API (개발용)
+apiRouter.get('/users', async (req, res) => {
+  try {
+    const users = await getAllUsers();
+    res.json({ 
+      success: true, 
+      users 
+    });
+  } catch (error) {
+    console.error('❌ 사용자 목록 조회 실패:', error.message);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
 });
 
 // API 라우터를 /api 경로에 마운트
