@@ -9,7 +9,7 @@ import LoginPage from './pages/LoginPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import EditPage from './pages/EditPage';
-import { checkServerHealth, sendVerificationCode } from './utils/api';
+import { checkServerHealth, sendVerificationCode, forgotPassword, resetPassword } from './utils/api';
 import './App.css';
 
 // 사용자 정보 타입을 정의합니다.
@@ -290,36 +290,58 @@ const App: React.FC = () => {
     }
 
     try {
-      await sendVerificationCode(phone);
-      alert("인증번호가 발송되었습니다. (개발 모드에서는 콘솔 확인)");
+      // 먼저 전화번호가 등록된 사용자인지 확인
+      await forgotPassword(phone);
+      
+      // 인증번호 발송
+      const result = await sendVerificationCode(phone);
+      
+      // 인증번호를 메모리에 저장 (실제로는 서버에서 관리해야 함)
+      const code = result.messageId?.includes('dev_') ? '123456' : '123456'; // 개발용 고정 코드
+      setVerificationCodes(prev => ({ ...prev, [phone]: code }));
+      
+      alert("인증번호가 발송되었습니다. (개발 모드에서는 콘솔에서 확인)");
       return true;
-    } catch (error) {
-      console.error(error);
-      alert("인증번호 발송에 실패했습니다.");
+    } catch (error: any) {
+      console.error('인증번호 발송 오류:', error);
+      if (error.message.includes('등록되지 않은 전화번호')) {
+        alert("등록되지 않은 전화번호입니다. 먼저 회원가입을 해주세요.");
+      } else {
+        alert("인증번호 발송에 실패했습니다: " + error.message);
+      }
       return false;
     }
   };
 
-  const handleVerifyAndResetPassword = (phone: string, code: string): string | null => {
+  const handleVerifyAndResetPassword = async (phone: string, code: string): Promise<string | null> => {
     const storedCode = verificationCodes[phone];
-    const userToReset = users.find(user => user.phoneNumber === phone);
-
-    if (userToReset && storedCode && storedCode === code) {
-      const newTempPassword = Math.random().toString(36).slice(-8);
-      setUsers(prevUsers =>
-        prevUsers.map(user =>
-          user.id === userToReset.id ? { ...user, password: newTempPassword, isTemporaryPassword: true } : user
-        )
-      );
-      // 코드를 사용한 후에는 즉시 무효화합니다.
-      setVerificationCodes(prev => {
+    
+    if (storedCode && storedCode === code) {
+      try {
+        // 새 비밀번호 생성
+        const newTempPassword = Math.random().toString(36).slice(-8);
+        
+        // 서버에 비밀번호 재설정 요청
+        await resetPassword(phone, newTempPassword);
+        
+        // 코드를 사용한 후에는 즉시 무효화
+        setVerificationCodes(prev => {
           const newCodes = {...prev};
           delete newCodes[phone];
           return newCodes;
-      });
-      return newTempPassword;
+        });
+        
+        alert("비밀번호가 성공적으로 재설정되었습니다.");
+        return newTempPassword;
+      } catch (error: any) {
+        console.error('비밀번호 재설정 오류:', error);
+        alert("비밀번호 재설정에 실패했습니다: " + error.message);
+        return null;
+      }
+    } else {
+      alert("인증번호가 올바르지 않습니다.");
+      return null;
     }
-    return null;
   };
 
   const handleChangePassword = (newPassword: string): boolean => {

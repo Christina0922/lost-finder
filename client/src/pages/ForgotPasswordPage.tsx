@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './DetailPage.css'; // 스타일 재사용
 
 interface ForgotPasswordPageProps {
-  onResetPasswordByPhone: (phone: string, code: string) => string | null;
+  onResetPasswordByPhone: (phone: string, code: string) => Promise<string | null>;
   onSendVerificationCode: (phone: string) => Promise<boolean>;
 }
 
@@ -33,9 +33,9 @@ const ForgotPasswordPage: React.FC<ForgotPasswordPageProps> = ({ onResetPassword
     }, 1000);
   };
 
-  const handleVerifyAndReset = (event: React.FormEvent) => {
+  const handleVerifyAndReset = async (event: React.FormEvent) => {
     event.preventDefault();
-    const newTempPassword = onResetPasswordByPhone(phone, code);
+    const newTempPassword = await onResetPasswordByPhone(phone, code);
 
     if (newTempPassword) {
       setMessage('새로운 임시 비밀번호가 발급되었습니다. 이 비밀번호로 로그인 후 변경해주세요.');
