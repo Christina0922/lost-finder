@@ -114,11 +114,16 @@ apiRouter.post('/forgot-password', async (req, res) => {
 
     const user = await findUserByPhone(phone);
     
-    console.log(`✅ 비밀번호 찾기 요청: ${phone} (${user.username})`);
+    console.log(`✅ 비밀번호 찾기 요청: ${maskPhoneNumber(phone)} (${user.username})`);
     res.json({ 
       success: true, 
       message: '등록된 전화번호입니다. 인증번호를 발송합니다.',
-      user: { id: user.id, username: user.username, email: user.email, phone: user.phone }
+      user: { 
+        id: user.id, 
+        username: user.username, 
+        email: maskEmail(user.email), 
+        phone: maskPhoneNumber(user.phone) 
+      }
     });
   } catch (error) {
     console.error('❌ 비밀번호 찾기 실패:', error.message);
@@ -128,6 +133,34 @@ apiRouter.post('/forgot-password', async (req, res) => {
     });
   }
 });
+
+// 이메일 마스킹 함수
+function maskEmail(email) {
+  if (!email) return email;
+  const [local, domain] = email.split('@');
+  if (local.length <= 2) return email;
+  return `${local.substring(0, 2)}***@${domain}`;
+}
+
+// 핸드폰 번호 마스킹 함수
+function maskPhoneNumber(phone) {
+  if (!phone) return phone;
+  
+  // +82로 시작하는 경우 (한국 번호)
+  if (phone.startsWith('+82')) {
+    return phone.replace(/(\+82\d{1,2})\d{3,4}(\d{4})/, '$1****$2');
+  }
+  
+  // 일반적인 전화번호 형식
+  if (phone.length >= 10) {
+    const start = phone.substring(0, 3);
+    const end = phone.substring(phone.length - 4);
+    return `${start}****${end}`;
+  }
+  
+  // 짧은 번호는 그대로 반환
+  return phone;
+}
 
 // 비밀번호 재설정 API
 apiRouter.post('/reset-password', async (req, res) => {

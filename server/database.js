@@ -148,10 +148,35 @@ function getAllUsers() {
       if (err) {
         reject(new Error('사용자 목록 조회 중 오류가 발생했습니다.'));
       } else {
-        resolve(rows);
+        // 핸드폰 번호 마스킹 처리
+        const maskedUsers = rows.map(user => ({
+          ...user,
+          phone: maskPhoneNumber(user.phone)
+        }));
+        resolve(maskedUsers);
       }
     });
   });
+}
+
+// 핸드폰 번호 마스킹 함수
+function maskPhoneNumber(phone) {
+  if (!phone) return phone;
+  
+  // +82로 시작하는 경우 (한국 번호)
+  if (phone.startsWith('+82')) {
+    return phone.replace(/(\+82\d{1,2})\d{3,4}(\d{4})/, '$1****$2');
+  }
+  
+  // 일반적인 전화번호 형식
+  if (phone.length >= 10) {
+    const start = phone.substring(0, 3);
+    const end = phone.substring(phone.length - 4);
+    return `${start}****${end}`;
+  }
+  
+  // 짧은 번호는 그대로 반환
+  return phone;
 }
 
 module.exports = {
