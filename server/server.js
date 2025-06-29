@@ -24,8 +24,11 @@ if (accountSid && authToken && fromNumber) {
   console.log('⚠️ Twilio 환경변수가 설정되지 않았습니다. 개발 모드로 실행됩니다.');
 }
 
+// API 라우터 설정
+const apiRouter = express.Router();
+
 // SMS 발송 API
-app.post('/send-sms', async (req, res) => {
+apiRouter.post('/send-sms', async (req, res) => {
   try {
     const { phone, message } = req.body;
     
@@ -73,7 +76,7 @@ app.post('/send-sms', async (req, res) => {
 });
 
 // 인증번호 발송 API
-app.post('/send-verification', async (req, res) => {
+apiRouter.post('/send-verification', async (req, res) => {
   try {
     const { phone, code: requestCode } = req.body;
     
@@ -124,13 +127,16 @@ app.post('/send-verification', async (req, res) => {
 });
 
 // 서버 상태 확인
-app.get('/health', (req, res) => {
+apiRouter.get('/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
     twilio: twilioClient ? 'configured' : 'development_mode'
   });
 });
+
+// API 라우터를 /api 경로에 마운트
+app.use('/api', apiRouter);
 
 module.exports = app;
 
