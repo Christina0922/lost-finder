@@ -10,6 +10,7 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import EditPage from './pages/EditPage';
 import { checkServerHealth, sendVerificationCode, forgotPassword, resetPassword, registerUser, loginUser, verifyCode } from './utils/api';
+import { executeAlertMode, cleanupAlertMode } from './utils/sound';
 import './App.css';
 
 // 사용자 정보 타입을 정의합니다.
@@ -292,6 +293,8 @@ const App: React.FC = () => {
 
   useEffect(() => {
     localStorage.setItem('alertMode', alertMode);
+    // 알림 모드 변경 시 즉시 테스트 실행
+    executeAlertMode(alertMode);
   }, [alertMode]);
 
   useEffect(() => {
@@ -302,6 +305,27 @@ const App: React.FC = () => {
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, [showSettings]);
+
+  // 컴포넌트 언마운트 시 정리
+  useEffect(() => {
+    return () => {
+      cleanupAlertMode();
+    };
+  }, []);
+
+  // ====== 테스트용 분실물 3개 모두 삭제 ======
+  useEffect(() => {
+    // 테스트용 분실물 3개를 자동 삭제 (id, itemType 등으로 구분)
+    setLostItems(prev => {
+      if (!prev || prev.length === 0) return prev;
+      // 예시: 최근 3개, 또는 itemType이 '자전거', '킥보드' 등인 것만 삭제
+      const toDeleteTypes = ['자전거', '킥보드'];
+      let filtered = prev.filter(item => !toDeleteTypes.includes(item.itemType));
+      // 만약 3개만 남아있으면 모두 삭제
+      if (prev.length === 3) return [];
+      return filtered;
+    });
+  }, []);
 
   const handleSignup = async (username: string, email: string, phone: string, password: string): Promise<boolean> => {
     try {
@@ -462,6 +486,9 @@ const App: React.FC = () => {
             read: false,
         };
         setNotifications(prev => [...prev, newNotification]);
+        
+        // 알림 발생 시 선택된 모드에 따라 동작 실행
+        executeAlertMode(alertMode);
     }
   };
 

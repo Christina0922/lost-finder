@@ -143,4 +143,31 @@
 /* 버튼 hover/active 상태 명확히 */
 .submit-button:active, .button-secondary:active {
   filter: brightness(0.92);
+}
+
+/* 분실물 등록하기 타이틀 강조 */
+.form-container-wrapper h1,
+.form-container h1 {
+  font-size: 2.1rem;
+  font-weight: 900;
+  color: #ffd600 !important;
+  text-shadow: none;
+  margin-bottom: 24px;
+  text-align: center;
+  letter-spacing: 1px;
+  border-bottom: 2px solid #ffd600;
+  padding-bottom: 6px;
+}
+
+@media (max-width: 600px) {
+  .form-container-wrapper h1,
+  .form-container h1 {
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+    padding-bottom: 4px;
+  }
+}
+
+h1 {
+  color: #ffd600 !important;
 } 

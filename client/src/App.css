@@ -121,9 +121,11 @@ a:hover, .nav-link:hover {
 }
 
 .logo {
-  font-size: 28px;
-  font-weight: bold;
-  color: #4a4a4a;
+  font-size: 32px;
+  font-weight: 900;
+  color: #ffe082;
+  text-shadow: 1px 2px 8px #222, 0 1px 0 #fff;
+  letter-spacing: 1px;
   text-decoration: none;
 }
 
@@ -442,14 +444,14 @@ a:hover, .nav-link:hover {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  min-width: 240px;
-  max-width: 320px;
+  min-width: 260px;
+  max-width: 340px;
   background: #fff;
   color: #222;
   border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 1.5px 6px rgba(0,0,0,0.10);
-  padding: 18px 18px 14px 18px;
+  padding: 22px 20px 18px 20px;
   position: absolute;
   right: 0;
   top: 40px;
@@ -460,8 +462,9 @@ a:hover, .nav-link:hover {
 .settings-dropdown .settings-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 0;
+  gap: 10px;
+  min-height: 38px;
+  padding: 0;
 }
 
 .settings-dropdown .settings-row label,
@@ -525,109 +528,66 @@ input:focus, textarea:focus, select:focus {
   background: #232b43;
 }
 
-/* 설정 드롭다운 각 row를 3등분: 아이콘-텍스트-컨트롤 */
+/* 알림 라디오 버튼 한 줄 배치 및 정렬 개선 */
 .settings-row {
-  display: grid;
-  grid-template-columns: 32px 1fr auto;
+  display: flex;
   align-items: center;
-  gap: 0 8px;
-  min-height: 36px;
-  padding: 0 0 0 0;
+  gap: 10px;
+  min-height: 38px;
+  padding: 0;
 }
 .settings-icon {
-  justify-self: center;
   font-size: 20px;
+  margin-right: 2px;
 }
 .settings-label {
-  justify-self: center;
   font-size: 15px;
-  color: inherit;
+  font-weight: 500;
+  min-width: 40px;
+  margin-right: 0;
+  white-space: nowrap;
+}
+.alert-modes {
+  display: flex;
+  flex-direction: row;
+  gap: 18px;
+  align-items: center;
+  margin-left: 0;
+}
+.alert-modes label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  font-size: 15px;
   font-weight: 500;
 }
 .settings-controls {
-  justify-self: end;
   display: flex;
+  align-items: center;
   gap: 8px;
 }
-.settings-link {
-  font-weight: bold;
-  color: #007bff;
-  text-decoration: none;
-  font-size: 15px;
-  padding: 2px 0 2px 0;
-}
-.theme-dark .settings-link {
-  color: #4da3ff;
-}
-.settings-link:hover {
-  text-decoration: underline;
-}
-
-/* 모바일 최적화: 설정 드롭다운 */
 @media (max-width: 600px) {
-  .settings-dropdown {
-    min-width: 220px;
-    max-width: 90vw;
-    padding: 12px 8px 10px 8px;
-    right: 8px !important;
-    top: 48px !important;
-    border-radius: 10px;
-  }
   .settings-row {
-    min-height: 32px;
-    gap: 6px;
-  }
-  .settings-icon {
-    font-size: 18px;
+    flex-direction: row;
+    gap: 8px;
+    min-height: 36px;
   }
   .settings-label {
     font-size: 14px;
-    font-weight: 500;
+    min-width: 36px;
   }
-  .settings-controls {
-    gap: 6px;
+  .alert-modes {
+    gap: 10px;
   }
-  .settings-link {
+  .alert-modes label {
     font-size: 14px;
-    padding: 2px 0;
-  }
-  .settings-dropdown button {
-    font-size: 14px;
-    height: 32px;
-    min-width: 56px;
-    padding: 0 10px;
-  }
-  .settings-dropdown label {
-    font-size: 14px;
-    padding: 4px 6px;
-    border-radius: 6px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
+    gap: 3px;
   }
   .settings-dropdown input[type="radio"] {
     width: 18px;
     height: 18px;
     margin-right: 2px;
-  }
-  /* 로그인 폼 모바일 최적화 */
-  .login-form, .auth-form {
-    max-width: 95vw !important;
-    padding: 18px 8px 18px 8px !important;
-    margin: 0 auto !important;
-    border-radius: 10px !important;
-  }
-  .login-form input, .auth-form input {
-    font-size: 15px;
-    padding: 8px 10px;
-  }
-  .login-form button, .auth-form button {
-    font-size: 15px;
-    height: 36px;
-    min-width: 80px;
-  }
-  .form-container, .login-form, .auth-form {
-    padding: 12px 4px 12px 4px !important;
   }
 }
 
@@ -685,4 +645,46 @@ input, button, .submit-button {
 }
 .theme-dark .submit-button:hover {
   background: #00c6ad;
+}
+
+/* 로그인 타이틀 더 선명하게 */
+.form-container-wrapper h1 {
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: #ffe082;
+  text-shadow: 1px 2px 8px #222, 0 1px 0 #fff;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+/* 로그인 폼 입력란 폭 통일 및 가운데 정렬 */
+.login-form {
+  max-width: 340px;
+  margin: 0 auto;
+}
+.login-form .form-group input[type="text"],
+.login-form .form-group input[type="password"] {
+  width: 100%;
+  max-width: 340px;
+  min-width: 120px;
+  margin: 0 auto;
+  display: block;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .logo {
+    font-size: 22px;
+  }
+  .form-container-wrapper h1 {
+    font-size: 1.4rem;
+  }
+  .login-form {
+    max-width: 98vw;
+  }
+  .login-form .form-group input[type="text"],
+  .login-form .form-group input[type="password"] {
+    max-width: 98vw;
+    min-width: 0;
+  }
 }
