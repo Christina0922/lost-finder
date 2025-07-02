@@ -120,4 +120,27 @@
 
 .button-secondary:hover {
   background-color: #5a6268;
+}
+
+@media (max-width: 600px) {
+  .form-container {
+    padding: 14px 4px 14px 4px !important;
+    border-radius: 10px !important;
+  }
+  .form-container input[type="text"],
+  .form-container textarea,
+  .form-container input[type="file"] {
+    min-height: 40px;
+    font-size: 15px;
+    padding: 8px 10px;
+  }
+  .submit-button, .button-secondary {
+    min-height: 40px;
+    font-size: 15px;
+  }
+}
+
+/* 버튼 hover/active 상태 명확히 */
+.submit-button:active, .button-secondary:active {
+  filter: brightness(0.92);
 } 

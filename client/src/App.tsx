@@ -114,8 +114,20 @@ const Header: React.FC<{
                 ⚙️
               </button>
               {showSettings && (
-                <div className="settings-dropdown">
-                  <div style={{ fontWeight: 'bold', marginBottom: 8 }}>설정</div>
+                <div className={"settings-dropdown" + (window.innerWidth <= 600 ? " mobile" : "")}
+                  style={{ position: 'absolute', right: 0, top: 36, zIndex: 2000 }}
+                  onClick={e => e.stopPropagation()}
+                >
+                  <button
+                    className="settings-close-btn"
+                    style={{ position: 'absolute', top: 8, right: 8, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: 'inherit', zIndex: 10 }}
+                    onClick={() => setShowSettings(false)}
+                    aria-label="닫기"
+                    type="button"
+                  >
+                    ×
+                  </button>
+                  <div style={{ fontWeight: 'bold', marginBottom: 8, textAlign: 'center' }}>설정</div>
                   {currentUser && (
                     <div className="settings-row">
                       <span className="settings-icon" role="img" aria-label="비밀번호">🔑</span>
@@ -161,8 +173,20 @@ const Header: React.FC<{
                 ⚙️
               </button>
               {showSettings && (
-                <div className="settings-dropdown">
-                  <div style={{ fontWeight: 'bold', marginBottom: 8 }}>설정</div>
+                <div className={"settings-dropdown" + (window.innerWidth <= 600 ? " mobile" : "")}
+                  style={{ position: 'absolute', right: 0, top: 36, zIndex: 2000 }}
+                  onClick={e => e.stopPropagation()}
+                >
+                  <button
+                    className="settings-close-btn"
+                    style={{ position: 'absolute', top: 8, right: 8, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: 'inherit', zIndex: 10 }}
+                    onClick={() => setShowSettings(false)}
+                    aria-label="닫기"
+                    type="button"
+                  >
+                    ×
+                  </button>
+                  <div style={{ fontWeight: 'bold', marginBottom: 8, textAlign: 'center' }}>설정</div>
                   <div style={{ marginBottom: 12 }}>
                     <span style={{ marginRight: 8 }}>🌗 테마:</span>
                     <button onClick={() => setTheme('light')} style={{ fontWeight: theme === 'light' ? 'bold' : 'normal', marginRight: 4 }}>화이트</button>
@@ -242,6 +266,8 @@ const App: React.FC = () => {
     return (localStorage.getItem('alertMode') as 'vibrate' | 'melody' | 'silent') || 'melody';
   });
 
+  const [showSettings, setShowSettings] = useState(false);
+
   useEffect(() => {
     localStorage.setItem('users', JSON.stringify(users));
   }, [users]);
@@ -267,6 +293,15 @@ const App: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('alertMode', alertMode);
   }, [alertMode]);
+
+  useEffect(() => {
+    if (!showSettings) return;
+    const handleClick = (e: MouseEvent) => {
+      setShowSettings(false);
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [showSettings]);
 
   const handleSignup = async (username: string, email: string, phone: string, password: string): Promise<boolean> => {
     try {

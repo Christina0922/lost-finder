@@ -448,12 +448,13 @@ a:hover, .nav-link:hover {
   color: #222;
   border: 1px solid #ddd;
   border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 1.5px 6px rgba(0,0,0,0.10);
   padding: 18px 18px 14px 18px;
   position: absolute;
   right: 0;
   top: 40px;
   z-index: 2000;
+  background: rgba(255,255,255,0.98);
 }
 
 .settings-dropdown .settings-row {
@@ -560,4 +561,128 @@ input:focus, textarea:focus, select:focus {
 }
 .settings-link:hover {
   text-decoration: underline;
+}
+
+/* 모바일 최적화: 설정 드롭다운 */
+@media (max-width: 600px) {
+  .settings-dropdown {
+    min-width: 220px;
+    max-width: 90vw;
+    padding: 12px 8px 10px 8px;
+    right: 8px !important;
+    top: 48px !important;
+    border-radius: 10px;
+  }
+  .settings-row {
+    min-height: 32px;
+    gap: 6px;
+  }
+  .settings-icon {
+    font-size: 18px;
+  }
+  .settings-label {
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .settings-controls {
+    gap: 6px;
+  }
+  .settings-link {
+    font-size: 14px;
+    padding: 2px 0;
+  }
+  .settings-dropdown button {
+    font-size: 14px;
+    height: 32px;
+    min-width: 56px;
+    padding: 0 10px;
+  }
+  .settings-dropdown label {
+    font-size: 14px;
+    padding: 4px 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+  .settings-dropdown input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 2px;
+  }
+  /* 로그인 폼 모바일 최적화 */
+  .login-form, .auth-form {
+    max-width: 95vw !important;
+    padding: 18px 8px 18px 8px !important;
+    margin: 0 auto !important;
+    border-radius: 10px !important;
+  }
+  .login-form input, .auth-form input {
+    font-size: 15px;
+    padding: 8px 10px;
+  }
+  .login-form button, .auth-form button {
+    font-size: 15px;
+    height: 36px;
+    min-width: 80px;
+  }
+  .form-container, .login-form, .auth-form {
+    padding: 12px 4px 12px 4px !important;
+  }
+}
+
+/* 드롭다운 바깥 클릭 시 닫힘을 위한 힌트 클래스 (JS에서 활용 가능) */
+.settings-dropdown.mobile {
+  touch-action: manipulation;
+}
+
+/* 드롭다운 X(닫기) 버튼 */
+.settings-close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #333;
+  opacity: 0.7;
+  z-index: 10;
+  transition: opacity 0.2s;
+}
+.settings-close-btn:hover {
+  opacity: 1;
+  color: #e74c3c;
+}
+.theme-dark .settings-close-btn {
+  color: #fff;
+}
+
+/* 입력창/버튼 터치 영역 확대 */
+input, button, .submit-button {
+  min-height: 40px;
+  font-size: 15px;
+}
+
+/* 폰트 일관성 */
+.settings-label, .settings-link, .settings-dropdown label, .settings-dropdown button {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* 다크모드 대비 강화 */
+.theme-dark input, .theme-dark textarea, .theme-dark select {
+  background: #232b43;
+  color: #fff;
+  border: 1px solid #444;
+}
+.theme-dark .form-container, .theme-dark .login-form, .theme-dark .auth-form {
+  background: #232b43;
+  color: #fff;
+}
+.theme-dark .submit-button {
+  background: #00b894;
+  color: #fff;
+}
+.theme-dark .submit-button:hover {
+  background: #00c6ad;
 }

@@ -39,7 +39,7 @@ function LoginPage({ onLogin }: LoginPageProps) {
   return (
     <div className="form-container-wrapper">
       <h1>로그인</h1>
-      <form onSubmit={handleSubmit} className="form-container">
+      <form onSubmit={handleSubmit} className="form-container login-form">
         <div className="form-group">
           <label htmlFor="username">사용자명</label>
           <input
