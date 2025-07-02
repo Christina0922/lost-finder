@@ -2,6 +2,7 @@
   "name": "lost-finder-root",
   "private": true,
   "scripts": {
+    "start": "concurrently npm:server npm:client",
     "client": "npm start --prefix client",
     "server": "npm start --prefix server",
     "dev": "concurrently npm:server npm:client"

@@ -1,10 +1,10 @@
 body {
   margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Segoe UI', 'Pretendard', 'Apple SD Gothic Neo', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f4f7f9;
-  color: #333;
+  background-color: #1a2236;
+  color: #f5f6fa;
 }
 
 body.theme-dark {
@@ -22,23 +22,29 @@ h1, h2, h3 {
   color: #2c3e50;
 }
 
-button {
-  background-color: #3498db;
-  color: white;
+button, .submit-button {
+  background: linear-gradient(90deg, #00c6ad 60%, #00b894 100%);
+  color: #fff;
   border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
+  border-radius: 6px;
+  padding: 12px 24px;
+  font-weight: bold;
   cursor: pointer;
-  font-size: 16px;
-  margin: 5px;
+  transition: background 0.2s;
 }
 
-button:hover {
-  background-color: #2980b9;
+button:hover, .submit-button:hover {
+  background: linear-gradient(90deg, #00b894 60%, #00c6ad 100%);
 }
 
-a {
+a, .nav-link {
+  color: #00c6ad;
   text-decoration: none;
+  font-weight: 500;
+}
+
+a:hover, .nav-link:hover {
+  color: #ffb400;
 }
 
 .App-logo {
@@ -87,7 +93,7 @@ a {
   justify-content: space-between;
   align-items: center;
   padding: 0 15px;
-  background-color: #ffffff;
+  background-color: #232b43;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   border-bottom: 1px solid #e0e0e0;
   height: 80px;
@@ -106,6 +112,8 @@ a {
   display: flex;
   align-items: center;
   gap: 12px;
+  position: relative;
+  z-index: 10;
 }
 
 .refresh-button {
@@ -154,6 +162,8 @@ a {
   display: flex;
   align-items: center;
   gap: 12px;
+  position: relative;
+  z-index: 10;
 }
 
 .user-nav .header-welcome {
@@ -429,11 +439,125 @@ a {
 }
 
 .settings-dropdown {
-  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 240px;
+  max-width: 320px;
+  background: #fff;
   color: #222;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  padding: 18px 18px 14px 18px;
+  position: absolute;
+  right: 0;
+  top: 40px;
+  z-index: 2000;
 }
 
-.theme-dark .settings-dropdown {
-  background-color: #23272a !important;
-  color: #fff !important;
+.settings-dropdown .settings-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.settings-dropdown .settings-row label,
+.settings-dropdown .settings-row span {
+  min-width: 60px;
+  font-size: 15px;
+  white-space: nowrap;
+  color: inherit;
+}
+
+.settings-dropdown .settings-row .alert-modes {
+  display: flex;
+  gap: 10px;
+}
+
+.settings-dropdown .settings-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+  color: #007bff;
+  text-decoration: none;
+  font-size: 15px;
+  padding: 2px 0 2px 0;
+}
+
+.theme-dark .settings-dropdown .settings-link {
+  color: #4da3ff;
+}
+
+.settings-dropdown .settings-link:hover {
+  text-decoration: underline;
+}
+
+.app-header, .form-container-wrapper, .form-container, .card, .main-content {
+  background: #232b43;
+  color: #f5f6fa;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+}
+
+input, textarea, select {
+  background: #232b43;
+  color: #f5f6fa;
+  border: 1.5px solid #00c6ad;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #ffb400;
+  background: #1a2236;
+}
+
+.notification-bell, .settings-gear {
+  color: #00c6ad;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #232b43;
+}
+
+/* 설정 드롭다운 각 row를 3등분: 아이콘-텍스트-컨트롤 */
+.settings-row {
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  align-items: center;
+  gap: 0 8px;
+  min-height: 36px;
+  padding: 0 0 0 0;
+}
+.settings-icon {
+  justify-self: center;
+  font-size: 20px;
+}
+.settings-label {
+  justify-self: center;
+  font-size: 15px;
+  color: inherit;
+  font-weight: 500;
+}
+.settings-controls {
+  justify-self: end;
+  display: flex;
+  gap: 8px;
+}
+.settings-link {
+  font-weight: bold;
+  color: #007bff;
+  text-decoration: none;
+  font-size: 15px;
+  padding: 2px 0 2px 0;
+}
+.theme-dark .settings-link {
+  color: #4da3ff;
+}
+.settings-link:hover {
+  text-decoration: underline;
 }

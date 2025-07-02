@@ -10,6 +10,7 @@ const {
   getAllUsers 
 } = require('./database');
 require('dotenv').config();
+const coolsms = require('coolsms-node-sdk').default;
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -32,22 +33,35 @@ if (accountSid && authToken && fromNumber) {
   console.log('⚠️ Twilio 환경변수가 설정되지 않았습니다. 개발 모드로 실행됩니다.');
 }
 
+const coolsmsApiKey = process.env.COOLSMS_API_KEY;
+const coolsmsApiSecret = process.env.COOLSMS_API_SECRET;
+const coolsmsFrom = process.env.COOLSMS_FROM_NUMBER;
+const messageService = new coolsms(coolsmsApiKey, coolsmsApiSecret);
+
+console.log('✅ CoolSMS 클라이언트 초기화 완료');
+
 // API 라우터 설정
 const apiRouter = express.Router();
+
+const verificationCodes = {};
+
+// 번호를 국제번호로 변환하는 함수 (010 -> 010, 010-xxxx-xxxx -> 010xxxxxxxx)
+function toKoreanPhone(phone) {
+  return phone.replace(/[^0-9]/g, '');
+}
 
 // 사용자 등록 API
 apiRouter.post('/register', async (req, res) => {
   try {
     const { username, email, phone, password } = req.body;
-    
+    const normalizedPhone = toKoreanPhone(phone);
     if (!username || !email || !phone || !password) {
       return res.status(400).json({ 
         success: false, 
         error: '모든 필드를 입력해주세요.' 
       });
     }
-
-    const user = await registerUser({ username, email, phone, password });
+    const user = await registerUser({ username, email, phone: normalizedPhone, password });
     
     console.log(`✅ 사용자 등록 성공: ${username} (${email})`);
     res.json({ 
@@ -104,17 +118,16 @@ apiRouter.post('/login', async (req, res) => {
 apiRouter.post('/forgot-password', async (req, res) => {
   try {
     const { phone } = req.body;
-    
+    const normalizedPhone = toKoreanPhone(phone);
     if (!phone) {
       return res.status(400).json({ 
         success: false, 
         error: '전화번호를 입력해주세요.' 
       });
     }
-
-    const user = await findUserByPhone(phone);
+    const user = await findUserByPhone(normalizedPhone);
     
-    console.log(`✅ 비밀번호 찾기 요청: ${maskPhoneNumber(phone)} (${user.username})`);
+    console.log(`✅ 비밀번호 찾기 요청: ${maskPhoneNumber(normalizedPhone)} (${user.username})`);
     res.json({ 
       success: true, 
       message: '등록된 전화번호입니다. 인증번호를 발송합니다.',
@@ -122,7 +135,7 @@ apiRouter.post('/forgot-password', async (req, res) => {
         id: user.id, 
         username: user.username, 
         email: maskEmail(user.email), 
-        phone: maskPhoneNumber(user.phone) 
+        phone: maskPhoneNumber(normalizedPhone) 
       }
     });
   } catch (error) {
@@ -166,18 +179,17 @@ function maskPhoneNumber(phone) {
 apiRouter.post('/reset-password', async (req, res) => {
   try {
     const { phone, newPassword } = req.body;
-    
+    const normalizedPhone = toKoreanPhone(phone);
     if (!phone || !newPassword) {
       return res.status(400).json({ 
         success: false, 
         error: '전화번호와 새 비밀번호를 입력해주세요.' 
       });
     }
-
-    const user = await findUserByPhone(phone);
+    const user = await findUserByPhone(normalizedPhone);
     const result = await updatePassword(user.id, newPassword);
     
-    console.log(`✅ 비밀번호 재설정 성공: ${phone} (${user.username})`);
+    console.log(`✅ 비밀번호 재설정 성공: ${normalizedPhone} (${user.username})`);
     res.json({ 
       success: true, 
       message: result.message
@@ -191,44 +203,28 @@ apiRouter.post('/reset-password', async (req, res) => {
   }
 });
 
-// SMS 발송 API
+// SMS 발송 API (CoolSMS)
 apiRouter.post('/send-sms', async (req, res) => {
   try {
     const { phone, message } = req.body;
-    
+    const toPhone = toKoreanPhone(phone);
     if (!phone || !message) {
       return res.status(400).json({ 
         success: false, 
         error: '휴대폰 번호와 메시지가 필요합니다.' 
       });
     }
-
-    if (twilioClient) {
-      // 실제 SMS 발송
-      const result = await twilioClient.messages.create({
-        body: message,
-        from: fromNumber,
-        to: phone
-      });
-      
-      console.log(`✅ SMS 발송 성공: ${phone} - SID: ${result.sid}`);
-      res.json({ 
-        success: true, 
-        messageId: result.sid,
-        message: 'SMS가 성공적으로 발송되었습니다.'
-      });
-    } else {
-      // 개발용 시뮬레이션
-      console.log(`📱 [개발용 SMS 시뮬레이션]`);
-      console.log(`📞 수신자: ${phone}`);
-      console.log(`💬 메시지: ${message}`);
-      
-      res.json({ 
-        success: true, 
-        messageId: 'dev_' + Date.now(),
-        message: '개발 모드: SMS 시뮬레이션 완료 (콘솔에서 확인)'
-      });
-    }
+    const result = await messageService.sendOne({
+      to: toPhone,
+      from: coolsmsFrom,
+      text: message
+    });
+    console.log(`✅ SMS 발송 성공: ${toPhone} - groupId: ${result.groupId}`);
+    res.json({ 
+      success: true, 
+      messageId: result.groupId,
+      message: 'SMS가 성공적으로 발송되었습니다.'
+    });
   } catch (error) {
     console.error('❌ SMS 발송 실패:', error);
     res.status(500).json({ 
@@ -239,47 +235,32 @@ apiRouter.post('/send-sms', async (req, res) => {
   }
 });
 
-// 인증번호 발송 API
+// 인증번호 발송 API (CoolSMS)
 apiRouter.post('/send-verification', async (req, res) => {
   try {
     const { phone, code: requestCode } = req.body;
-    
+    const normalizedPhone = toKoreanPhone(phone);
     if (!phone) {
       return res.status(400).json({ 
         success: false, 
         error: '휴대폰 번호가 필요합니다.' 
       });
     }
-
     const code = requestCode || Math.floor(100000 + Math.random() * 900000).toString();
+    // 인증번호를 서버 메모리에 저장
+    verificationCodes[normalizedPhone] = code;
     const message = `[LostFinder] 인증번호: ${code}\n\n이 인증번호를 입력해주세요.`;
-
-    if (twilioClient) {
-      // 실제 SMS 발송
-      const result = await twilioClient.messages.create({
-        body: message,
-        from: fromNumber,
-        to: phone
-      });
-      
-      console.log(`✅ 인증번호 발송 성공: ${phone} - 코드: ${code}`);
-      res.json({ 
-        success: true, 
-        messageId: result.sid,
-        message: '인증번호가 발송되었습니다.'
-      });
-    } else {
-      // 개발용 시뮬레이션
-      console.log(`📱 [개발용 인증번호 시뮬레이션]`);
-      console.log(`📞 수신자: ${phone}`);
-      console.log(`🔐 인증번호: ${code}`);
-      
-      res.json({ 
-        success: true, 
-        messageId: 'dev_' + Date.now(),
-        message: '개발 모드: 인증번호 시뮬레이션 완료 (콘솔에서 확인)'
-      });
-    }
+    const result = await messageService.sendOne({
+      to: normalizedPhone,
+      from: coolsmsFrom,
+      text: message
+    });
+    console.log(`✅ 인증번호 발송 성공: ${normalizedPhone} - 코드: ${code}`);
+    res.json({ 
+      success: true, 
+      messageId: result.groupId,
+      message: '인증번호가 발송되었습니다.'
+    });
   } catch (error) {
     console.error('❌ 인증번호 발송 실패:', error);
     res.status(500).json({ 
@@ -287,6 +268,19 @@ apiRouter.post('/send-verification', async (req, res) => {
       error: '인증번호 발송 중 오류가 발생했습니다.',
       details: error.message
     });
+  }
+});
+
+// 인증번호 검증 API
+apiRouter.post('/verify-code', (req, res) => {
+  const { phone, code } = req.body;
+  const normalizedPhone = toKoreanPhone(phone);
+  console.log('인증번호 검증 요청:', normalizedPhone, '입력 코드:', code, '저장 코드:', verificationCodes[normalizedPhone]);
+  if (verificationCodes[normalizedPhone] === code) {
+    delete verificationCodes[normalizedPhone]; // 인증 성공 시 코드 삭제
+    return res.json({ success: true, message: '인증 성공!' });
+  } else {
+    return res.status(400).json({ success: false, error: '인증번호가 올바르지 않습니다.' });
   }
 });
 
@@ -318,6 +312,15 @@ apiRouter.get('/users', async (req, res) => {
 
 // API 라우터를 /api 경로에 마운트
 app.use('/api', apiRouter);
+
+// 전역 에러 핸들러 (모든 에러를 JSON으로 반환)
+app.use((err, req, res, next) => {
+  console.error('서버 에러:', err);
+  res.status(500).json({
+    success: false,
+    error: err.message || '서버 내부 오류가 발생했습니다.'
+  });
+});
 
 module.exports = app;
 

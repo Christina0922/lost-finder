@@ -9,12 +9,13 @@ import LoginPage from './pages/LoginPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import EditPage from './pages/EditPage';
-import { checkServerHealth, sendVerificationCode, forgotPassword, resetPassword } from './utils/api';
+import { checkServerHealth, sendVerificationCode, forgotPassword, resetPassword, registerUser, loginUser, verifyCode } from './utils/api';
 import './App.css';
 
 // 사용자 정보 타입을 정의합니다.
 export interface User {
   id: number;
+  username: string;
   email: string;
   password: string;
   phoneNumber?: string;
@@ -113,23 +114,36 @@ const Header: React.FC<{
                 ⚙️
               </button>
               {showSettings && (
-                <div className="settings-dropdown" style={{ position: 'absolute', right: 0, top: 36, background: '#fff', border: '1px solid #ddd', borderRadius: 6, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', minWidth: 220, zIndex: 1000, padding: 16 }}>
+                <div className="settings-dropdown">
                   <div style={{ fontWeight: 'bold', marginBottom: 8 }}>설정</div>
-                  <div style={{ marginBottom: 12 }}>
-                    <span style={{ marginRight: 8 }}>🌗 테마:</span>
-                    <button onClick={() => setTheme('light')} style={{ fontWeight: theme === 'light' ? 'bold' : 'normal', marginRight: 4 }}>화이트</button>
-                    <button onClick={() => setTheme('dark')} style={{ fontWeight: theme === 'dark' ? 'bold' : 'normal' }}>다크</button>
+                  {currentUser && (
+                    <div className="settings-row">
+                      <span className="settings-icon" role="img" aria-label="비밀번호">🔑</span>
+                      <span className="settings-label">비밀번호 변경</span>
+                      <Link to="/change-password" className="settings-link" style={{ marginLeft: 'auto' }}>
+                        변경하기
+                      </Link>
+                    </div>
+                  )}
+                  <div className="settings-row">
+                    <span className="settings-icon" role="img" aria-label="테마">🌗</span>
+                    <span className="settings-label">테마</span>
+                    <div className="settings-controls" style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+                      <button onClick={() => setTheme('light')} style={{ fontWeight: theme === 'light' ? 'bold' : 'normal' }}>화이트</button>
+                      <button onClick={() => setTheme('dark')} style={{ fontWeight: theme === 'dark' ? 'bold' : 'normal' }}>다크</button>
+                    </div>
                   </div>
-                  <div>
-                    <span style={{ marginRight: 8 }}>🔔 알림:</span>
-                    <div className="alert-modes">
-                      <label>
+                  <div className="settings-row">
+                    <span className="settings-icon" role="img" aria-label="알림">🔔</span>
+                    <span className="settings-label">알림</span>
+                    <div className="settings-controls" style={{ marginLeft: 'auto', display: 'flex', gap: 10 }}>
+                      <label style={{ margin: 0 }}>
                         <input type="radio" name="alertMode" checked={alertMode === 'vibrate'} onChange={() => setAlertMode('vibrate')} /> 진동
                       </label>
-                      <label>
+                      <label style={{ margin: 0 }}>
                         <input type="radio" name="alertMode" checked={alertMode === 'melody'} onChange={() => setAlertMode('melody')} /> 멜로디
                       </label>
-                      <label>
+                      <label style={{ margin: 0 }}>
                         <input type="radio" name="alertMode" checked={alertMode === 'silent'} onChange={() => setAlertMode('silent')} /> 무음
                       </label>
                     </div>
@@ -147,7 +161,7 @@ const Header: React.FC<{
                 ⚙️
               </button>
               {showSettings && (
-                <div className="settings-dropdown" style={{ position: 'absolute', right: 0, top: 36, background: '#fff', border: '1px solid #ddd', borderRadius: 6, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', minWidth: 220, zIndex: 1000, padding: 16 }}>
+                <div className="settings-dropdown">
                   <div style={{ fontWeight: 'bold', marginBottom: 8 }}>설정</div>
                   <div style={{ marginBottom: 12 }}>
                     <span style={{ marginRight: 8 }}>🌗 테마:</span>
@@ -254,21 +268,44 @@ const App: React.FC = () => {
     localStorage.setItem('alertMode', alertMode);
   }, [alertMode]);
 
-  const handleSignup = (email: string, pass: string, phone: string): boolean => {
-    if (users.find(u => u.email === email)) {
-      alert('이미 가입된 이메일입니다.');
+  const handleSignup = async (username: string, email: string, phone: string, password: string): Promise<boolean> => {
+    try {
+      // 서버에 회원가입 요청
+      const result = await registerUser({ username, email, phone, password });
+      
+      // 성공 시 로컬 상태도 업데이트
+      const newUser: User = { 
+        id: result.user.id, 
+        username: result.user.username,
+        email: result.user.email, 
+        password: password, 
+        phoneNumber: result.user.phone 
+      };
+      setUsers(prev => [...prev, newUser]);
+      setCurrentUser(newUser);
+      
+      alert('회원가입 성공! 바로 로그인됩니다.');
+      return true;
+    } catch (error: any) {
+      console.error('회원가입 오류:', error);
+      alert(error.message || '회원가입에 실패했습니다.');
       return false;
     }
-    const newUser: User = { id: Date.now(), email, password: pass, phoneNumber: phone };
-    setUsers([...users, newUser]);
-    setCurrentUser(newUser);
-    alert('회원가입 성공! 바로 로그인됩니다.');
-    return true;
   };
 
-  const handleLogin = (email: string, pass: string): boolean => {
-    const user = users.find(u => u.email === email && u.password === pass);
-    if (user) {
+  const handleLogin = async (username: string, password: string): Promise<boolean> => {
+    try {
+      // 서버에 로그인 요청
+      const result = await loginUser({ username, password });
+      
+      // 성공 시 로컬 상태 업데이트
+      const user: User = { 
+        id: result.user.id, 
+        username: result.user.username,
+        email: result.user.email, 
+        password: password, 
+        phoneNumber: result.user.phone 
+      };
       setCurrentUser(user);
       
       // 임시 비밀번호 사용자인 경우 비밀번호 변경 페이지로 리디렉션
@@ -279,8 +316,11 @@ const App: React.FC = () => {
       }
       
       return true;
+    } catch (error: any) {
+      console.error('로그인 오류:', error);
+      alert(error.message || '로그인에 실패했습니다.');
+      return false;
     }
-    return false;
   };
 
   const handleSendVerificationCode = async (phone: string): Promise<boolean> => {
@@ -314,32 +354,18 @@ const App: React.FC = () => {
   };
 
   const handleVerifyAndResetPassword = async (phone: string, code: string): Promise<string | null> => {
-    const storedCode = verificationCodes[phone];
-    
-    if (storedCode && storedCode === code) {
-      try {
-        // 새 비밀번호 생성
-        const newTempPassword = Math.random().toString(36).slice(-8);
-        
-        // 서버에 비밀번호 재설정 요청
-        await resetPassword(phone, newTempPassword);
-        
-        // 코드를 사용한 후에는 즉시 무효화
-        setVerificationCodes(prev => {
-          const newCodes = {...prev};
-          delete newCodes[phone];
-          return newCodes;
-        });
-        
-        alert("비밀번호가 성공적으로 재설정되었습니다.");
-        return newTempPassword;
-      } catch (error: any) {
-        console.error('비밀번호 재설정 오류:', error);
-        alert("비밀번호 재설정에 실패했습니다: " + error.message);
-        return null;
-      }
-    } else {
-      alert("인증번호가 올바르지 않습니다.");
+    try {
+      // 서버에 인증번호 검증 요청
+      await verifyCode(phone, code);
+
+      // 인증 성공 시 임시 비밀번호 발급
+      const newTempPassword = Math.random().toString(36).slice(-8);
+      await resetPassword(phone, newTempPassword);
+
+      alert("비밀번호가 성공적으로 재설정되었습니다.");
+      return newTempPassword;
+    } catch (error: any) {
+      alert(error.message || "인증번호가 올바르지 않습니다.");
       return null;
     }
   };

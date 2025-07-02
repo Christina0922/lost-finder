@@ -40,13 +40,14 @@ function initDatabase() {
 function registerUser(userData) {
   return new Promise((resolve, reject) => {
     const { username, email, phone, password } = userData;
+    const normalizedPhone = phone.replace(/-/g, '');
     
     const sql = `
       INSERT INTO users (username, email, phone, password)
       VALUES (?, ?, ?, ?)
     `;
     
-    db.run(sql, [username, email, phone, password], function(err) {
+    db.run(sql, [username, email, normalizedPhone, password], function(err) {
       if (err) {
         if (err.message.includes('UNIQUE constraint failed')) {
           if (err.message.includes('username')) {
@@ -74,9 +75,10 @@ function registerUser(userData) {
 // 전화번호로 사용자 찾기
 function findUserByPhone(phone) {
   return new Promise((resolve, reject) => {
-    const sql = 'SELECT * FROM users WHERE phone = ?';
+    const normalizedPhone = phone.replace(/-/g, '');
+    const sql = 'SELECT * FROM users WHERE REPLACE(phone, "-", "") = ?';
     
-    db.get(sql, [phone], (err, row) => {
+    db.get(sql, [normalizedPhone], (err, row) => {
       if (err) {
         reject(new Error('사용자 검색 중 오류가 발생했습니다.'));
       } else if (!row) {
