@@ -12,7 +12,6 @@ import EditPage from './pages/EditPage';
 import SuccessStoriesPage from './pages/SuccessStoriesPage';
 import { sendVerificationCode, forgotPassword, resetPassword, registerUser, loginUser, verifyCode } from './utils/api';
 import { executeAlertMode, cleanupAlertMode } from './utils/sound';
-import { UserProvider } from './lib/useUser';
 import './App.css';
 
 // 사용자 정보 타입을 정의합니다.
@@ -148,10 +147,10 @@ const Header: React.FC<{
                       <button onClick={() => setTheme('dark')} style={{ fontWeight: theme === 'dark' ? 'bold' : 'normal' }}>다크</button>
                     </div>
                   </div>
-                  <div className="settings-row">
+                  <div className="settings-row" style={{ alignItems: 'center', display: 'flex' }}>
                     <span className="settings-icon" role="img" aria-label="알림">🔔</span>
-                    <span className="settings-label">알림</span>
-                    <div className="settings-controls" style={{ marginLeft: 'auto', display: 'flex', gap: 10 }}>
+                    <span className="settings-label" style={{ marginRight: 8 }}>알림</span>
+                    <div className="settings-controls" style={{ display: 'flex', gap: 10 }}>
                       <label style={{ margin: 0 }}>
                         <input type="radio" name="alertMode" checked={alertMode === 'vibrate'} onChange={() => setAlertMode('vibrate')} /> 진동
                       </label>
@@ -195,9 +194,9 @@ const Header: React.FC<{
                     <button onClick={() => setTheme('light')} style={{ fontWeight: theme === 'light' ? 'bold' : 'normal', marginRight: 4 }}>화이트</button>
                     <button onClick={() => setTheme('dark')} style={{ fontWeight: theme === 'dark' ? 'bold' : 'normal' }}>다크</button>
                   </div>
-                  <div>
+                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
                     <span style={{ marginRight: 8 }}>🔔 알림:</span>
-                    <div className="alert-modes">
+                    <div className="alert-modes" style={{ display: 'flex', gap: 10 }}>
                       <label>
                         <input type="radio" name="alertMode" checked={alertMode === 'vibrate'} onChange={() => setAlertMode('vibrate')} /> 진동
                       </label>
@@ -525,56 +524,54 @@ const App: React.FC = () => {
   };
 
   return (
-    <UserProvider>
-      <Router>
-        <Header
-          currentUser={currentUser}
-          notifications={notifications}
-          onLogout={handleLogout}
-          theme={theme}
-          setTheme={setTheme}
-          alertMode={alertMode}
-          setAlertMode={setAlertMode}
-        />
-        <main className="app-main">
-          <Routes>
-            <Route path="/" element={<MainPage currentUser={currentUser} />} />
-            <Route path="/register" element={<RegisterPage onAddItem={handleAddItem} currentUser={currentUser} />} />
-            <Route
-              path="/list"
-              element={<ListPage items={lostItems} currentUser={currentUser} onDeleteItem={handleDeleteItem} />}
-            />
-            <Route
-              path="/detail/:id"
-              element={<DetailPage items={lostItems} users={users} currentUser={currentUser} onAddComment={handleAddComment} onDeleteComment={handleDeleteComment} onMarkAsRead={handleMarkAsRead} onDeleteItem={handleDeleteItem} />}
-            />
-            <Route
-              path="/edit/:id"
-              element={<EditPage items={lostItems} currentUser={currentUser} onUpdateItem={handleUpdateItem} />}
-            />
-            <Route path="/signup" element={<SignupPage onSignup={handleSignup} />} />
-            <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
-            <Route
-              path="/forgot-password"
-              element={
-                <ForgotPasswordPage 
-                  onSendVerificationCode={handleSendVerificationCode}
-                  onResetPasswordByPhone={handleVerifyAndResetPassword} 
-                />
-              }
-            />
-            <Route
-              path="/change-password"
-              element={<ChangePasswordPage currentUser={currentUser} onChangePassword={handleChangePassword} />}
-            />
-            <Route
-              path="/success-stories"
-              element={<SuccessStoriesPage />}
-            />
-          </Routes>
-        </main>
-      </Router>
-    </UserProvider>
+    <Router>
+      <Header
+        currentUser={currentUser}
+        notifications={notifications}
+        onLogout={handleLogout}
+        theme={theme}
+        setTheme={setTheme}
+        alertMode={alertMode}
+        setAlertMode={setAlertMode}
+      />
+      <main className="app-main">
+        <Routes>
+          <Route path="/" element={<MainPage currentUser={currentUser} />} />
+          <Route path="/register" element={<RegisterPage onAddItem={handleAddItem} currentUser={currentUser} />} />
+          <Route
+            path="/list"
+            element={<ListPage items={lostItems} currentUser={currentUser} onDeleteItem={handleDeleteItem} />}
+          />
+          <Route
+            path="/detail/:id"
+            element={<DetailPage items={lostItems} users={users} currentUser={currentUser} onAddComment={handleAddComment} onDeleteComment={handleDeleteComment} onMarkAsRead={handleMarkAsRead} onDeleteItem={handleDeleteItem} />}
+          />
+          <Route
+            path="/edit/:id"
+            element={<EditPage items={lostItems} currentUser={currentUser} onUpdateItem={handleUpdateItem} />}
+          />
+          <Route path="/signup" element={<SignupPage onSignup={handleSignup} />} />
+          <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+          <Route
+            path="/forgot-password"
+            element={
+              <ForgotPasswordPage 
+                onSendVerificationCode={handleSendVerificationCode}
+                onResetPasswordByPhone={handleVerifyAndResetPassword} 
+              />
+            }
+          />
+          <Route
+            path="/change-password"
+            element={<ChangePasswordPage currentUser={currentUser} onChangePassword={handleChangePassword} />}
+          />
+          <Route
+            path="/success-stories"
+            element={<SuccessStoriesPage />}
+          />
+        </Routes>
+      </main>
+    </Router>
   );
 }
 
