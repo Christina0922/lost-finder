@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./SuccessStoriesPage.css";
 import AdminOnly from "../components/AdminOnly";
+import { useUser } from '../lib/useUser';
 
 interface Story {
   name: string;

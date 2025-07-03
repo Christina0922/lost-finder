@@ -1,5 +1,5 @@
-// lib/useUser.ts (모킹용 - Firebase 연동 전까지 사용)
-import { useState, useEffect, createContext, useContext } from 'react';
+// lib/useUser.tsx (모킹용 - Firebase 연동 전까지 사용)
+import React, { useState, useEffect, createContext, useContext } from 'react';
 
 interface User {
   uid: string;
