@@ -149,16 +149,16 @@ const Header: React.FC<{
                   </div>
                   <div className="settings-row" style={{ alignItems: 'center', display: 'flex' }}>
                     <span className="settings-icon" role="img" aria-label="알림">🔔</span>
-                    <span className="settings-label" style={{ marginRight: 8 }}>알림</span>
-                    <div className="settings-controls" style={{ display: 'flex', gap: 10 }}>
-                      <label style={{ margin: 0 }}>
-                        <input type="radio" name="alertMode" checked={alertMode === 'vibrate'} onChange={() => setAlertMode('vibrate')} /> 진동
+                    <span className="settings-label" style={{ marginRight: 8, whiteSpace: 'nowrap', minWidth: 40 }}>알림</span>
+                    <div className="settings-controls" style={{ display: 'flex', gap: 10, flexWrap: 'nowrap', whiteSpace: 'nowrap', alignItems: 'center' }}>
+                      <label style={{ margin: 0, padding: '4px 8px', fontSize: 16, minWidth: 60, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
+                        <input type="radio" name="alertMode" checked={alertMode === 'vibrate'} onChange={() => setAlertMode('vibrate')} style={{ width: 18, height: 18, marginRight: 4 }} /> 진동
                       </label>
-                      <label style={{ margin: 0 }}>
-                        <input type="radio" name="alertMode" checked={alertMode === 'melody'} onChange={() => setAlertMode('melody')} /> 멜로디
+                      <label style={{ margin: 0, padding: '4px 8px', fontSize: 16, minWidth: 60, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
+                        <input type="radio" name="alertMode" checked={alertMode === 'melody'} onChange={() => setAlertMode('melody')} style={{ width: 18, height: 18, marginRight: 4 }} /> 멜로디
                       </label>
-                      <label style={{ margin: 0 }}>
-                        <input type="radio" name="alertMode" checked={alertMode === 'silent'} onChange={() => setAlertMode('silent')} /> 무음
+                      <label style={{ margin: 0, padding: '4px 8px', fontSize: 16, minWidth: 60, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
+                        <input type="radio" name="alertMode" checked={alertMode === 'silent'} onChange={() => setAlertMode('silent')} style={{ width: 18, height: 18, marginRight: 4 }} /> 무음
                       </label>
                     </div>
                   </div>
@@ -194,17 +194,17 @@ const Header: React.FC<{
                     <button onClick={() => setTheme('light')} style={{ fontWeight: theme === 'light' ? 'bold' : 'normal', marginRight: 4 }}>화이트</button>
                     <button onClick={() => setTheme('dark')} style={{ fontWeight: theme === 'dark' ? 'bold' : 'normal' }}>다크</button>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
-                    <span style={{ marginRight: 8 }}>🔔 알림:</span>
-                    <div className="alert-modes" style={{ display: 'flex', gap: 10 }}>
-                      <label>
-                        <input type="radio" name="alertMode" checked={alertMode === 'vibrate'} onChange={() => setAlertMode('vibrate')} /> 진동
+                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12, flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
+                    <span style={{ marginRight: 8, whiteSpace: 'nowrap', minWidth: 40 }}>🔔 알림:</span>
+                    <div className="alert-modes" style={{ display: 'flex', gap: 10, flexWrap: 'nowrap', whiteSpace: 'nowrap', alignItems: 'center' }}>
+                      <label style={{ margin: 0, padding: '4px 8px', fontSize: 16, minWidth: 60, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
+                        <input type="radio" name="alertMode" checked={alertMode === 'vibrate'} onChange={() => setAlertMode('vibrate')} style={{ width: 18, height: 18, marginRight: 4 }} /> 진동
                       </label>
-                      <label>
-                        <input type="radio" name="alertMode" checked={alertMode === 'melody'} onChange={() => setAlertMode('melody')} /> 멜로디
+                      <label style={{ margin: 0, padding: '4px 8px', fontSize: 16, minWidth: 60, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
+                        <input type="radio" name="alertMode" checked={alertMode === 'melody'} onChange={() => setAlertMode('melody')} style={{ width: 18, height: 18, marginRight: 4 }} /> 멜로디
                       </label>
-                      <label>
-                        <input type="radio" name="alertMode" checked={alertMode === 'silent'} onChange={() => setAlertMode('silent')} /> 무음
+                      <label style={{ margin: 0, padding: '4px 8px', fontSize: 16, minWidth: 60, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
+                        <input type="radio" name="alertMode" checked={alertMode === 'silent'} onChange={() => setAlertMode('silent')} style={{ width: 18, height: 18, marginRight: 4 }} /> 무음
                       </label>
                     </div>
                   </div>
