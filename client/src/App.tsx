@@ -9,6 +9,7 @@ import LoginPage from './pages/LoginPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import EditPage from './pages/EditPage';
+import SuccessStoriesPage from './pages/SuccessStoriesPage';
 import { checkServerHealth, sendVerificationCode, forgotPassword, resetPassword, registerUser, loginUser, verifyCode } from './utils/api';
 import { executeAlertMode, cleanupAlertMode } from './utils/sound';
 import './App.css';
@@ -569,6 +570,10 @@ const App: React.FC = () => {
           <Route
             path="/change-password"
             element={<ChangePasswordPage currentUser={currentUser} onChangePassword={handleChangePassword} />}
+          />
+          <Route
+            path="/success-stories"
+            element={<SuccessStoriesPage />}
           />
         </Routes>
       </main>

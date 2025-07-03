@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './MainPage.css';
 import { User } from '../App';
+import BottomBanner from '../components/BottomBanner';
 
 interface MainPageProps {
   currentUser: User | null;
@@ -17,6 +18,9 @@ const MainPage: React.FC<MainPageProps> = ({ currentUser }) => {
         <Link to="/register" className="main-button">분실물 등록하기</Link>
         <Link to="/list" className="main-button">분실물 목록 보기</Link>
       </div>
+      
+      {/* ✅ 하단 배너 삽입 */}
+      <BottomBanner />
     </div>
   );
 };

@@ -36,4 +36,84 @@
 
 .main-button:hover {
   background-color: #0056b3;
+}
+
+/* 하단 배너 스타일 */
+.bottom-banner {
+  margin-top: 40px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid #dee2e6;
+}
+
+.bottom-banner h3 {
+  color: #495057;
+  margin-bottom: 8px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.bottom-banner p {
+  color: #6c757d;
+  font-size: 14px;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.bottom-banner button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 0 8px;
+}
+
+.bottom-banner button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.bottom-banner .success-stories-btn {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.bottom-banner .success-stories-btn:hover {
+  background-color: #ffb300;
+}
+
+.bottom-banner .success-story {
+  font-size: 13px;
+  color: #059669; /* emerald-600 */
+  font-style: italic;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.bottom-banner .game-btn {
+  background-color: #ec4899; /* pink-500 */
+  color: white;
+}
+
+.bottom-banner .game-btn:hover {
+  background-color: #db2777; /* pink-600 */
+}
+
+.bottom-banner .game-story {
+  font-size: 13px;
+  color: #8b5cf6; /* violet-500 */
+  font-style: italic;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.bottom-banner .divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #dee2e6, transparent);
+  margin: 20px 0;
 } 
