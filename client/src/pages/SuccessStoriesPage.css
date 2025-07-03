@@ -125,6 +125,23 @@
   background-color: #0056b3;
 }
 
+.no-story-message {
+  color: #222;
+  font-weight: 700;
+  font-size: 1.08rem;
+  margin-bottom: 12px;
+}
+
+.story-divider {
+  border: 0;
+  border-top: 2px solid #e0e0e0;
+  margin: 28px 0 18px 0;
+  width: 100%;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 /* 반응형 디자인 */
 @media (max-width: 768px) {
   .success-stories-container {
@@ -143,4 +160,74 @@
   .story-content {
     font-size: 14px;
   }
+}
+
+/* 후기 입력폼, 버튼, 안내문, 리스트 모두 모바일에서 한 줄씩 세로 배치 */
+@media (max-width: 600px) {
+  .bg-gray-100.p-6.rounded-xl.shadow-md {
+    padding: 12px 6px !important;
+  }
+  form.space-y-4 {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  form.space-y-4 input,
+  form.space-y-4 textarea,
+  form.space-y-4 button {
+    width: 100% !important;
+    min-width: 0;
+    box-sizing: border-box;
+    font-size: 1rem;
+  }
+  .no-story-message {
+    font-size: 1rem;
+    padding: 0 2px;
+  }
+  .story-divider {
+    margin: 18px 0 12px 0;
+    max-width: 98vw;
+  }
+}
+
+.success-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 8px;
+}
+.success-input, .success-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 6px;
+  border: 1.5px solid #00bcd4;
+  font-size: 1.08rem;
+  background: #23293a;
+  color: #fff;
+  margin-bottom: 0;
+  box-sizing: border-box;
+}
+.success-input::placeholder, .success-textarea::placeholder {
+  color: #bcdffb;
+  opacity: 1;
+}
+.success-textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+.success-submit-btn {
+  width: 100%;
+  padding: 14px 0;
+  background: #2196f3;
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: background 0.2s;
+}
+.success-submit-btn:hover {
+  background: #1976d2;
 } 

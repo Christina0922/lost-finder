@@ -7,31 +7,34 @@ export default function BottomBanner() {
 
       {/* ✨ 감동 후기 섹션 */}
       <div>
-        <p className="text-lg font-semibold">✨ 감동 후기 모음</p>
-        <p className="text-sm text-gray-600">
-          앱을 통해 분실물을 다시 찾은 분들의 따뜻한 이야기를 곧 소개합니다.
+        <p className="text-lg font-semibold" style={{ textAlign: 'center', marginBottom: 8 }}>
+          ✨ 감동 후기 모음
+        </p>
+        <p className="text-sm text-gray-600" style={{ textAlign: 'center', marginBottom: 16 }}>
+          우리가 다시 만난 소중한 물건들, 그 이야기를 여기에 남겨주세요.
         </p>
         <Link to="/success-stories">
           <button className="mt-3 px-5 py-2 bg-yellow-400 text-black font-bold rounded-lg hover:bg-yellow-300">
             첫 번째 후기가 되어보세요
           </button>
         </Link>
-
-        {/* 🧠 후기 유도 문장 */}
-        <div className="mt-5 text-sm text-gray-800 font-medium leading-relaxed">
-          🙏 혹시 이 앱 덕분에 분실물을 찾으셨다면, 알려주세요.<br />
+        {/* 안내 메시지는 여기만! */}
+        <div className="important-message mt-4 mb-2" style={{ color: '#222', fontWeight: 700, fontSize: '1.05rem', lineHeight: 1.5, textAlign: 'center' }}>
+          �� 혹시 이 앱 덕분에 분실물을 찾으셨다면, 알려주세요.<br />
           당신의 이야기가 누군가에게 큰 희망이 될 수 있어요.
         </div>
+
+        {/* 후기/게임 구분선 - 중간에 확실히 보이게 hr로 */}
+        <hr style={{ border: '0', borderTop: '2.5px solid #bbb', margin: '28px 0 18px 0', width: '100%' }} />
       </div>
 
-      {/* 🔻 구분선 */}
-      <div className="border-t border-gray-300" />
-
-      {/* 🎮 게임 유도 섹션 */}
+      {/* �� 게임 유도 섹션 */}
       <div>
-        <p className="text-lg font-semibold">🎮 기다리는 동안 한 판 어떠세요?</p>
-        <p className="text-sm text-gray-600">
-          우리 엄마가 좋아하셔서 직접 만든 3매치 퍼즐 게임이에요.
+        <p className="text-lg font-semibold" style={{ textAlign: 'center', marginBottom: 8 }}>
+          �� 기다리는 동안 한 판 어떠세요?
+        </p>
+        <p className="text-sm text-gray-600" style={{ textAlign: 'center', marginBottom: 16 }}>
+          기다리는 동안, 우리 엄마가 정말 좋아하시는 퍼즐 게임 한 판 어때요?
         </p>
         <a
           href="https://3match-game-865e.vercel.app"
@@ -42,7 +45,8 @@ export default function BottomBanner() {
             퍼즐 맞추러 가기
           </button>
         </a>
+        {/* 여기에는 안내 메시지 없음! */}
       </div>
     </div>
   );
-} 
+}

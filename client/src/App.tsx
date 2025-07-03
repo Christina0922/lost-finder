@@ -10,7 +10,7 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import EditPage from './pages/EditPage';
 import SuccessStoriesPage from './pages/SuccessStoriesPage';
-import { checkServerHealth, sendVerificationCode, forgotPassword, resetPassword, registerUser, loginUser, verifyCode } from './utils/api';
+import { sendVerificationCode, forgotPassword, resetPassword, registerUser, loginUser, verifyCode } from './utils/api';
 import { executeAlertMode, cleanupAlertMode } from './utils/sound';
 import './App.css';
 
@@ -259,8 +259,6 @@ const App: React.FC = () => {
     }
   });
 
-  const [verificationCodes, setVerificationCodes] = useState<{ [phone: string]: string }>({});
-
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     return (localStorage.getItem('theme') as 'light' | 'dark') || 'light';
   });
@@ -395,10 +393,6 @@ const App: React.FC = () => {
       
       // 인증번호 발송
       const result = await sendVerificationCode(phone);
-      
-      // 인증번호를 메모리에 저장 (실제로는 서버에서 관리해야 함)
-      const code = result.messageId?.includes('dev_') ? '123456' : '123456'; // 개발용 고정 코드
-      setVerificationCodes(prev => ({ ...prev, [phone]: code }));
       
       alert("인증번호가 발송되었습니다. (개발 모드에서는 콘솔에서 확인)");
       return true;
