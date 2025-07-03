@@ -18,11 +18,15 @@
 }
 
 .main-title {
-  color: #111;
-  font-size: 2.3rem;
-  font-weight: 800;
-  margin-bottom: 18px;
-  letter-spacing: -1px;
+  color: #ffd600;
+  font-size: 2rem;
+  font-weight: 900;
+  margin-bottom: 12px;
+  text-shadow:
+    -1px -1px 0 #222,
+     1px -1px 0 #222,
+    -1px  1px 0 #222,
+     1px  1px 0 #222;
 }
 
 .main-desc {
