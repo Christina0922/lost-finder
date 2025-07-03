@@ -11,7 +11,7 @@ export default function BottomBanner() {
           ✨ 감동 후기 모음
         </p>
         <p className="text-sm text-gray-600" style={{ textAlign: 'center', marginBottom: 16 }}>
-          우리가 다시 만난 소중한 물건들, 그 이야기를 여기에 남겨주세요.
+          우리가 다시 만난 소중한 물건들<br />그 이야기를 여기에 남겨주세요
         </p>
         <Link to="/success-stories">
           <button className="mt-3 px-5 py-2 bg-yellow-400 text-black font-bold rounded-lg hover:bg-yellow-300">
@@ -31,7 +31,7 @@ export default function BottomBanner() {
       {/* 기다리는 동안 한 판 어떠세요? 게임 유도 섹션 */}
       <div>
         <p className="text-lg font-semibold" style={{ textAlign: 'center', marginBottom: 8 }}>
-          기다리는 동안 한 판 어떠세요?
+          {/* 문구 삭제 및 두 줄 안내문만 남김 */}
         </p>
         <p
           className="text-gray-600"
@@ -42,7 +42,7 @@ export default function BottomBanner() {
             lineHeight: 1.5,
           }}
         >
-          기다리는 동안, 잠시 머리를 식힐 수 있는 퍼즐 게임 한 판 어때요?
+          기다리는 동안, 잠시 머리를 식힐 수 있는<br />퍼즐 게임 한 판 어때요?
         </p>
         <a
           href="https://3match-game-865e.vercel.app"
