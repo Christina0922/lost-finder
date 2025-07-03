@@ -20,7 +20,7 @@ export default function BottomBanner() {
         </Link>
         {/* 안내 메시지는 여기만! */}
         <div className="important-message mt-4 mb-2" style={{ color: '#222', fontWeight: 700, fontSize: '1.05rem', lineHeight: 1.5, textAlign: 'center' }}>
-          �� 혹시 이 앱 덕분에 분실물을 찾으셨다면, 알려주세요.<br />
+          혹시 이 앱 덕분에 분실물을 찾으셨다면, 알려주세요.<br />
           당신의 이야기가 누군가에게 큰 희망이 될 수 있어요.
         </div>
 
@@ -28,13 +28,21 @@ export default function BottomBanner() {
         <hr style={{ border: '0', borderTop: '2.5px solid #bbb', margin: '28px 0 18px 0', width: '100%' }} />
       </div>
 
-      {/* �� 게임 유도 섹션 */}
+      {/* 기다리는 동안 한 판 어떠세요? 게임 유도 섹션 */}
       <div>
         <p className="text-lg font-semibold" style={{ textAlign: 'center', marginBottom: 8 }}>
-          �� 기다리는 동안 한 판 어떠세요?
+          기다리는 동안 한 판 어떠세요?
         </p>
-        <p className="text-sm text-gray-600" style={{ textAlign: 'center', marginBottom: 16 }}>
-          기다리는 동안, 우리 엄마가 정말 좋아하시는 퍼즐 게임 한 판 어때요?
+        <p
+          className="text-gray-600"
+          style={{
+            fontSize: "0.97rem",
+            marginBottom: 18,
+            color: "#555",
+            lineHeight: 1.5,
+          }}
+        >
+          기다리는 동안, 잠시 머리를 식힐 수 있는 퍼즐 게임 한 판 어때요?
         </p>
         <a
           href="https://3match-game-865e.vercel.app"
