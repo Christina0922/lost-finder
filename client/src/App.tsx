@@ -12,6 +12,7 @@ import EditPage from './pages/EditPage';
 import SuccessStoriesPage from './pages/SuccessStoriesPage';
 import { sendVerificationCode, forgotPassword, resetPassword, registerUser, loginUser, verifyCode } from './utils/api';
 import { executeAlertMode, cleanupAlertMode } from './utils/sound';
+import { UserProvider } from './lib/useUser';
 import './App.css';
 
 // 사용자 정보 타입을 정의합니다.
@@ -524,54 +525,56 @@ const App: React.FC = () => {
   };
 
   return (
-    <Router>
-      <Header
-        currentUser={currentUser}
-        notifications={notifications}
-        onLogout={handleLogout}
-        theme={theme}
-        setTheme={setTheme}
-        alertMode={alertMode}
-        setAlertMode={setAlertMode}
-      />
-      <main className="app-main">
-        <Routes>
-          <Route path="/" element={<MainPage currentUser={currentUser} />} />
-          <Route path="/register" element={<RegisterPage onAddItem={handleAddItem} currentUser={currentUser} />} />
-          <Route
-            path="/list"
-            element={<ListPage items={lostItems} currentUser={currentUser} onDeleteItem={handleDeleteItem} />}
-          />
-          <Route
-            path="/detail/:id"
-            element={<DetailPage items={lostItems} users={users} currentUser={currentUser} onAddComment={handleAddComment} onDeleteComment={handleDeleteComment} onMarkAsRead={handleMarkAsRead} onDeleteItem={handleDeleteItem} />}
-          />
-          <Route
-            path="/edit/:id"
-            element={<EditPage items={lostItems} currentUser={currentUser} onUpdateItem={handleUpdateItem} />}
-          />
-          <Route path="/signup" element={<SignupPage onSignup={handleSignup} />} />
-          <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
-          <Route
-            path="/forgot-password"
-            element={
-              <ForgotPasswordPage 
-                onSendVerificationCode={handleSendVerificationCode}
-                onResetPasswordByPhone={handleVerifyAndResetPassword} 
-              />
-            }
-          />
-          <Route
-            path="/change-password"
-            element={<ChangePasswordPage currentUser={currentUser} onChangePassword={handleChangePassword} />}
-          />
-          <Route
-            path="/success-stories"
-            element={<SuccessStoriesPage />}
-          />
-        </Routes>
-      </main>
-    </Router>
+    <UserProvider>
+      <Router>
+        <Header
+          currentUser={currentUser}
+          notifications={notifications}
+          onLogout={handleLogout}
+          theme={theme}
+          setTheme={setTheme}
+          alertMode={alertMode}
+          setAlertMode={setAlertMode}
+        />
+        <main className="app-main">
+          <Routes>
+            <Route path="/" element={<MainPage currentUser={currentUser} />} />
+            <Route path="/register" element={<RegisterPage onAddItem={handleAddItem} currentUser={currentUser} />} />
+            <Route
+              path="/list"
+              element={<ListPage items={lostItems} currentUser={currentUser} onDeleteItem={handleDeleteItem} />}
+            />
+            <Route
+              path="/detail/:id"
+              element={<DetailPage items={lostItems} users={users} currentUser={currentUser} onAddComment={handleAddComment} onDeleteComment={handleDeleteComment} onMarkAsRead={handleMarkAsRead} onDeleteItem={handleDeleteItem} />}
+            />
+            <Route
+              path="/edit/:id"
+              element={<EditPage items={lostItems} currentUser={currentUser} onUpdateItem={handleUpdateItem} />}
+            />
+            <Route path="/signup" element={<SignupPage onSignup={handleSignup} />} />
+            <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+            <Route
+              path="/forgot-password"
+              element={
+                <ForgotPasswordPage 
+                  onSendVerificationCode={handleSendVerificationCode}
+                  onResetPasswordByPhone={handleVerifyAndResetPassword} 
+                />
+              }
+            />
+            <Route
+              path="/change-password"
+              element={<ChangePasswordPage currentUser={currentUser} onChangePassword={handleChangePassword} />}
+            />
+            <Route
+              path="/success-stories"
+              element={<SuccessStoriesPage />}
+            />
+          </Routes>
+        </main>
+      </Router>
+    </UserProvider>
   );
 }
 

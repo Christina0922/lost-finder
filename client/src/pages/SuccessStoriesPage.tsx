@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./SuccessStoriesPage.css";
+import AdminOnly from "../components/AdminOnly";
 
 interface Story {
   name: string;
@@ -47,6 +48,14 @@ export default function SuccessStoriesPage() {
     setSubmitted(true);
 
     setTimeout(() => setSubmitted(false), 3000); // 3초 후 문구 사라짐
+  };
+
+  // ✅ 관리자용 후기 삭제 함수
+  const handleDelete = (index: number) => {
+    const updated = [...stories];
+    updated.splice(index, 1);
+    setStories(updated);
+    localStorage.setItem("successStories", JSON.stringify(updated));
   };
 
   return (
@@ -106,10 +115,20 @@ export default function SuccessStoriesPage() {
               key={index}
               className="bg-white p-4 rounded-xl shadow-md"
             >
-              <p className="text-sm text-gray-700 whitespace-pre-line">“{story.content}”</p>
+              <p className="text-sm text-gray-700 whitespace-pre-line">"{story.content}"</p>
               <p className="text-xs text-gray-400 text-right mt-2">
                 – {story.location}, {story.name}
               </p>
+              
+              {/* ✅ 관리자만 볼 수 있는 삭제 버튼 */}
+              <AdminOnly>
+                <button
+                  onClick={() => handleDelete(index)}
+                  className="mt-2 text-red-500 text-xs hover:text-red-700 transition-colors"
+                >
+                  삭제하기
+                </button>
+              </AdminOnly>
             </div>
           ))
         )}
