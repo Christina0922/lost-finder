@@ -1,6 +1,6 @@
 .main-container {
   text-align: center;
-  padding: 50px 20px;
+  padding: 0 !important;
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -173,7 +173,7 @@
   border-radius: 16px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.07);
   padding: 18px 18px 24px 18px;
-  margin: 2px auto 0 auto;        /* margin-top: 2px로 더 줄임 */
+  margin: 0 auto 0 auto;        /* margin-top: 0으로 완전히 붙임 */
   max-width: 420px;
   width: 100%;
   box-sizing: border-box;
