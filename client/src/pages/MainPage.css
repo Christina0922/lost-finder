@@ -1,7 +1,7 @@
 .main-container {
   text-align: center;
   padding-top: 8px !important;
-  padding-bottom: 8px !important;
+  padding-bottom: 2px !important;
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -174,7 +174,7 @@
   border-radius: 16px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.07);
   padding: 18px 18px 24px 18px;
-  margin: 8px auto 8px auto;        /* 위/아래 8px */
+  margin: 8px auto 2px auto;        /* margin-bottom: 2px */
   max-width: 420px;
   width: 100%;
   box-sizing: border-box;
