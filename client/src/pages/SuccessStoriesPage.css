@@ -18,22 +18,39 @@
 }
 
 .back-button {
-  background: #fffbe8; /* 연한 노랑 배경 */
-  border: 2px solid #ffd600; /* 진한 노랑 테두리 */
-  color: #ffb300; /* 진한 노랑 글씨 */
+  background: #ffd600;
+  border: 2px solid #ffd600;
+  color: #fff;
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
   padding: 8px 18px;
   border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(255, 214, 0, 0.18);
   transition: background 0.2s, color 0.2s, border 0.2s;
-  box-shadow: 0 2px 8px rgba(255, 214, 0, 0.08);
 }
 
 .back-button:hover {
-  background: #ffd600;
+  background: #ffb300;
   color: #fff;
   border: 2px solid #ffb300;
+}
+
+.write-story-btn {
+  background: #fffbe8;
+  border: 2px solid #ffd600;
+  color: #ffb300;
+  font-weight: bold;
+  border-radius: 8px;
+  padding: 8px 16px;
+  margin-left: 8px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.write-story-btn:hover {
+  background: #ffd600;
+  color: #fff;
 }
 
 .page-title {
