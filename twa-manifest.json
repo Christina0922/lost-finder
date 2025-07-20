@@ -15,10 +15,16 @@
   "startUrl": "/",
   "iconUrl": "https://lost-finder-client.vercel.app/logo512.png",
   "maskableIconUrl": "https://lost-finder-client.vercel.app/logo512.png",
+<<<<<<< HEAD
   "monochromeIconUrl": "https://lost-finder-client.vercel.app/monochrome-icon.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
     "path": "C:\\Users\\My PC\\Desktop\\lost-finder\\android.keystore",
+=======
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "Key store location: C:\\JDK 17\\jdk-24\\bin\\lostfinder-key.keystore",
+>>>>>>> 87df6ca26bdeae9e0eb53283339dc9ca2485bacf
     "alias": "lostfinder_key"
   },
   "appVersionName": "1",
