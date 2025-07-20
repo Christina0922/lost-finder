@@ -20,7 +20,7 @@ const sampleProducts: Product[] = [
     description: "가방·지갑·자전거, 분실 걱정 끝!",
     image: "https://via.placeholder.com/80x80/FF6B6B/FFFFFF?text=AirTag",
     price: "39,000원",
-    link: "https://link.coupang.com/a/cCIDpH", // 쿠팡 파트너스 제휴 링크
+    link: "https://link.coupang.com/a/cCIDpH",
     category: "분실방지"
   },
   {
@@ -29,7 +29,7 @@ const sampleProducts: Product[] = [
     description: "키 찾기, 한 번에! 실시간 위치 추적",
     image: "https://via.placeholder.com/80x80/4ECDC4/FFFFFF?text=Key",
     price: "15,900원",
-    link: "https://link.coupang.com/a/cCIDpH", // 쿠팡 파트너스 제휴 링크
+    link: "https://link.coupang.com/a/cCIDpH",
     category: "분실방지"
   },
   {
@@ -38,67 +38,49 @@ const sampleProducts: Product[] = [
     description: "카드 정보, 도난 걱정 없이 안전하게!",
     image: "https://via.placeholder.com/80x80/45B7D1/FFFFFF?text=Wallet",
     price: "29,800원",
-    link: "https://link.coupang.com/a/cCIDpH", // 쿠팡 파트너스 제휴 링크
+    link: "https://link.coupang.com/a/cCIDpH",
     category: "보안"
   }
 ];
 
 export default function BottomBanner() {
   const [currentProductIndex, setCurrentProductIndex] = useState(0);
-  const [isVisible, setIsVisible] = useState(true);
 
   // 5초마다 상품 변경
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentProductIndex((prev) => (prev + 1) % sampleProducts.length);
     }, 5000);
-
     return () => clearInterval(interval);
   }, []);
 
   const currentProduct = sampleProducts[currentProductIndex];
 
   return (
-    <div className="w-full bg-gray-100 px-4 py-6 mt-10 rounded-2xl shadow-md space-y-6 text-center">
-
+    <div className="w-full bg-gray-100 px-1 py-2 mt-2 rounded-2xl shadow-md space-y-2 text-center bottom-banner">
       {/* ✨ 감동 후기 섹션 */}
       <div>
-        <p className="text-lg font-semibold" style={{ textAlign: 'center', marginBottom: 8 }}>
+        <p className="text-lg font-semibold bottom-banner-title" style={{ textAlign: 'center', marginBottom: 8, marginTop: 0 }}>
           ✨ 감동 후기 모음
         </p>
-        <p className="text-sm text-gray-600" style={{ textAlign: 'center', marginBottom: 16 }}>
-          “찾았습니다!”<br />
-          작은 기적 같은 이야기, 지금 남겨주세요.
+        <p className="bottom-banner-desc" style={{ textAlign: 'center', marginBottom: 16 }}>
+          “찾으셨나요?”<br />
+          한 줄 후기를 남겨주세요.<br />
+          누군가에게 큰 힘이 됩니다.
         </p>
         <Link to="/success-stories">
           <button className="mt-3 px-5 py-2 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-400">
             감동 후기 보러가기
           </button>
         </Link>
-        {/* 감동 후기 안내 메시지 */}
-        <div className="important-message mt-4 mb-2 text-black font-bold text-base text-center">
-          “찾았다면, 한 줄만 남겨주세요.”<br />
-          작은 기적 같은 이야기, 누군가에게 큰 힘이 됩니다.
-        </div>
-
-        {/* 후기/게임 구분선 - 중간에 확실히 보이게 hr로 */}
-        <hr style={{ border: '0', borderTop: '2.5px solid #bbb', margin: '28px 0 18px 0', width: '100%' }} />
+        {/* 후기/게임 구분선 */}
+        <hr style={{ border: '0', borderTop: '1.5px solid #bdbdbd', margin: '12px 0 8px 0', width: '100%', background: '#fff' }} />
       </div>
 
-      {/* 기다리는 동안 한 판 어떠세요? 게임 유도 섹션 */}
+      {/* 퍼즐 게임 안내 */}
       <div>
-        <p className="text-lg font-semibold" style={{ textAlign: 'center', marginBottom: 8 }}>
-          {/* 문구 삭제 및 두 줄 안내문만 남김 */}
-        </p>
-        <p
-          className="text-gray-600"
-          style={{
-            fontSize: "0.97rem",
-            marginBottom: 18,
-            color: "#555",
-            lineHeight: 1.5,
-          }}
-        >
+        <p className="text-lg font-semibold" style={{ textAlign: 'center', marginBottom: 6 }}></p>
+        <p className="text-gray-600" style={{ fontSize: "0.97rem", marginBottom: 10, color: "#555", lineHeight: 1.5 }}>
           기다리는 동안, 잠시 머리를 식힐 수 있는<br />퍼즐 게임 한 판 어때요?
         </p>
         <a
@@ -106,33 +88,30 @@ export default function BottomBanner() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <button className="mt-3 px-5 py-2 bg-pink-500 text-white font-bold rounded-lg hover:bg-pink-400">
+          <button className="mt-2 px-4 py-2 bg-pink-500 text-white font-bold rounded-lg hover:bg-pink-400">
             퍼즐 맞추러 가기
           </button>
         </a>
-        {/* 여기에는 안내 메시지 없음! */}
       </div>
 
       {/* 게임/상품 구분선 */}
-      <hr style={{ border: '0', borderTop: '2.5px solid #bbb', margin: '28px 0 18px 0', width: '100%' }} />
+      <hr style={{ border: '0', borderTop: '2.5px solid #bbb', margin: '14px 0 8px 0', width: '100%' }} />
 
       {/* 🛍️ 추천 상품 섹션 - 자동 전환 */}
       <div className="relative">
         <p className="text-lg font-semibold text-center mb-2">
           🛍️ 추천 상품
         </p>
-        <p className="text-sm text-gray-600 text-center mb-4">
+        <p className="text-sm text-gray-600 text-center mb-3">
           분실물 걱정 줄이는 인기템 모아봤어요!
         </p>
-        
         {/* 상품 광고 카드 */}
-        <div className="mt-6 p-4 bg-yellow-100 border-2 border-yellow-400 rounded-xl text-base leading-relaxed shadow-md">
+        <div className="mt-3 p-2 bg-yellow-100 border-2 border-yellow-400 rounded-xl text-base leading-relaxed shadow-md mx-auto" style={{maxWidth:'340px',margin:'0 auto'}}>
           <div
             className="text-blue-700 font-extrabold text-center"
             style={{ color: '#1d4ed8', fontWeight: 800 }}
             dangerouslySetInnerHTML={{
-              __html: currentProduct.description
-                .replace(/<[^>]*>/g, '') // 모든 태그 제거
+              __html: currentProduct.description.replace(/<[^>]*>/g, '')
             }}
           />
           <br />
@@ -147,9 +126,8 @@ export default function BottomBanner() {
             </span>
           </a>
         </div>
-
         {/* 상품 인디케이터 */}
-        <div className="flex justify-center space-x-2 mt-4">
+        <div className="flex justify-center space-x-2 mt-2 mb-1" style={{gap:'6px'}}>
           {sampleProducts.map((_, index) => (
             <button
               key={index}

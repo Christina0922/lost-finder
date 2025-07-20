@@ -1,10 +1,14 @@
 body {
   margin: 0;
+  padding: 0;
   font-family: 'Segoe UI', 'Pretendard', 'Apple SD Gothic Neo', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #1a2236;
   color: #f5f6fa;
+  min-height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
 }
 
 body.theme-dark {
@@ -13,9 +17,11 @@ body.theme-dark {
 }
 
 .App {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  width: 100vw;
 }
 
 h1, h2, h3 {
@@ -95,6 +101,8 @@ a:hover, .nav-link:hover {
 /* General App Styles */
 .app-main {
   padding: 10px;
+  min-height: calc(100vh - 80px);
+  width: 100%;
 }
 
 /* Header Styles */
@@ -108,6 +116,10 @@ a:hover, .nav-link:hover {
   border-bottom: 1px solid #e0e0e0;
   height: 80px;
   gap: 8px;
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .header-left {
@@ -140,7 +152,8 @@ a:hover, .nav-link:hover {
 }
 
 .nav-link {
-  color: #555;
+  color: #fff !important;
+  background-color: #007bff;
   text-decoration: none;
   padding: 10px 18px;
   border-radius: 5px;
@@ -149,8 +162,8 @@ a:hover, .nav-link:hover {
 }
 
 .nav-link:hover {
-  background-color: #f0f0f0;
-  color: #000;
+  background-color: #0056b3;
+  color: #fff !important;
 }
 
 .guest-nav {
@@ -312,6 +325,12 @@ a:hover, .nav-link:hover {
   .app-header {
     padding: 0 8px;
     gap: 4px;
+    height: 70px;
+  }
+  
+  .app-main {
+    padding: 5px;
+    min-height: calc(100vh - 70px);
   }
 
   .header-left {
@@ -370,12 +389,13 @@ a:hover, .nav-link:hover {
 }
 
 .theme-dark .nav-link {
-  color: #f5f6fa;
+  color: #fff !important;
+  background-color: #007bff;
 }
 
 .theme-dark .nav-link:hover {
-  background-color: #333;
-  color: #fff;
+  background-color: #0056b3;
+  color: #fff !important;
 }
 
 .theme-dark .user-nav .header-welcome {
@@ -686,6 +706,22 @@ input, button, .submit-button {
   .logo {
     font-size: 22px;
   }
+  
+  .app-header {
+    height: 60px;
+    padding: 0 5px;
+  }
+  
+  .app-main {
+    padding: 3px;
+    min-height: calc(100vh - 60px);
+  }
+  
+  .nav-link {
+    padding: 4px 6px;
+    font-size: 12px;
+  }
+  
   .form-container-wrapper h1 {
     font-size: 1.4rem;
   }
@@ -696,5 +732,52 @@ input, button, .submit-button {
   .login-form .form-group input[type="password"] {
     max-width: 98vw;
     min-width: 0;
+  }
+}
+
+/* 모바일 전체 화면 최적화 */
+@media (max-width: 480px) {
+  .app-header {
+    height: 55px;
+    padding: 0 3px;
+  }
+  
+  .app-main {
+    padding: 2px;
+    min-height: calc(100vh - 55px);
+  }
+  
+  .logo {
+    font-size: 18px;
+  }
+  
+  .nav-link {
+    padding: 3px 5px;
+    font-size: 11px;
+  }
+  
+  .refresh-button {
+    font-size: 18px;
+  }
+}
+
+/* iOS Safari 전체 화면 지원 */
+@supports (-webkit-touch-callout: none) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  .app-header {
+    padding-top: calc(env(safe-area-inset-top) + 10px);
+  }
+}
+
+/* 안드로이드 Chrome 전체 화면 지원 */
+@media screen and (display-mode: fullscreen) {
+  .app-header {
+    padding-top: 10px;
   }
 }

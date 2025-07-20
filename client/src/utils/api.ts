@@ -58,6 +58,14 @@ export const registerUser = async (userData: {
       body: JSON.stringify({ ...userData, phone: normalizedPhone }),
     });
 
+    // 응답이 JSON인지 확인
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await response.text();
+      console.error('서버 응답이 JSON이 아닙니다:', text);
+      throw new Error('서버에서 잘못된 응답을 받았습니다. 잠시 후 다시 시도해주세요.');
+    }
+
     const data = await response.json();
     
     if (!response.ok) {
@@ -67,6 +75,9 @@ export const registerUser = async (userData: {
     return data;
   } catch (error) {
     console.error('회원가입 오류:', error);
+    if (error instanceof SyntaxError) {
+      throw new Error('서버 연결에 문제가 있습니다. 잠시 후 다시 시도해주세요.');
+    }
     throw error;
   }
 };
@@ -85,6 +96,14 @@ export const loginUser = async (credentials: {
       body: JSON.stringify(credentials),
     });
 
+    // 응답이 JSON인지 확인
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await response.text();
+      console.error('서버 응답이 JSON이 아닙니다:', text);
+      throw new Error('서버에서 잘못된 응답을 받았습니다. 잠시 후 다시 시도해주세요.');
+    }
+
     const data = await response.json();
     
     if (!response.ok) {
@@ -94,6 +113,9 @@ export const loginUser = async (credentials: {
     return data;
   } catch (error) {
     console.error('로그인 오류:', error);
+    if (error instanceof SyntaxError) {
+      throw new Error('서버 연결에 문제가 있습니다. 잠시 후 다시 시도해주세요.');
+    }
     throw error;
   }
 };
@@ -214,6 +236,15 @@ export const verifyCode = async (phone: string, code: string) => {
 export const checkServerHealth = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/health`);
+    
+    // 응답이 JSON인지 확인
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await response.text();
+      console.error('서버 응답이 JSON이 아닙니다:', text);
+      throw new Error('서버에서 잘못된 응답을 받았습니다.');
+    }
+    
     const data = await response.json();
     
     if (!response.ok) {
@@ -223,6 +254,9 @@ export const checkServerHealth = async () => {
     return data;
   } catch (error) {
     console.error('서버 상태 확인 오류:', error);
+    if (error instanceof SyntaxError) {
+      throw new Error('서버 연결에 문제가 있습니다. 서버가 실행 중인지 확인해주세요.');
+    }
     throw error;
   }
 };
