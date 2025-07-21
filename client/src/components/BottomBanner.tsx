@@ -57,11 +57,7 @@ export default function BottomBanner() {
   const currentProduct = sampleProducts[currentProductIndex];
 
   return (
-<<<<<<< HEAD
-    <div className="w-full bg-gray-100 px-1 py-2 mt-2 rounded-2xl shadow-md space-y-2 text-center bottom-banner">
-=======
     <div className="w-full bg-gray-100 px-2 py-3 mt-4 rounded-2xl shadow-md space-y-4 text-center bottom-banner">
->>>>>>> 87df6ca26bdeae9e0eb53283339dc9ca2485bacf
       {/* ✨ 감동 후기 섹션 */}
       <div>
         <p className="text-lg font-semibold bottom-banner-title" style={{ textAlign: 'center', marginBottom: 8, marginTop: 0 }}>
@@ -77,18 +73,13 @@ export default function BottomBanner() {
             감동 후기 보러가기
           </button>
         </Link>
-<<<<<<< HEAD
-        {/* 후기/게임 구분선 */}
-        <hr style={{ border: '0', borderTop: '1.5px solid #bdbdbd', margin: '12px 0 8px 0', width: '100%', background: '#fff' }} />
-=======
         {/* 감동 후기 안내 메시지 */}
         <div className="important-message mt-4 mb-2 text-black font-bold text-base text-center" style={{textAlign:'center', margin:'8px 0'}}>
-          “찾았다면, 한 줄만 남겨주세요.”<br />
+          "찾았다면, 한 줄만 남겨주세요."<br />
           기적 같은 이야기, 누군가에게 큰 힘이 됩니다.
         </div>
         {/* 후기/게임 구분선 */}
         <hr style={{ border: '0', borderTop: '2.5px solid #bbb', margin: '18px 0 10px 0', width: '100%' }} />
->>>>>>> 87df6ca26bdeae9e0eb53283339dc9ca2485bacf
       </div>
 
       {/* 퍼즐 게임 안내 */}
