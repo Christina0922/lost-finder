@@ -55,11 +55,23 @@
   font-size: 18px;
   margin-top: 0;
   margin-bottom: 10px;
+  color: #1a2236;
+  font-weight: 600;
 }
 
 .list-item-content p {
   margin-bottom: 15px;
   flex-grow: 1;
+  font-size: 15px;
+  color: #333;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.list-item-content p strong {
+  color: #1a2236;
+  font-weight: 600;
+  font-size: 15px;
 }
 
 .detail-button {

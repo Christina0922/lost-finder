@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { LostItem, User } from '../App';
+import type { LostItem, User } from '../App';
 import './RegisterPage.css';
 import { resizeAndCompressImage } from '../utils/image';
 

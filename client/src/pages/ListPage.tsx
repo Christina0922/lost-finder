@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { LostItem, User } from '../App'; // App.tsx에서 LostItem 타입을 가져옵니다.
+import type { LostItem, User } from '../App'; // App.tsx에서 LostItem 타입을 가져옵니다.
 import './ListPage.css';
 
 // ListPage가 받을 props의 타입을 정의합니다.

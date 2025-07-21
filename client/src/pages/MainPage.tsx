@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './MainPage.css';
-import { User } from '../App';
+import type { User } from '../App';
 import BottomBanner from '../components/BottomBanner';
 
 interface MainPageProps {

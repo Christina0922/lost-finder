@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { LostItem, User } from '../App';
+import type { LostItem, User } from '../App';
 import './RegisterPage.css'; // 등록 페이지와 동일한 스타일 사용
 import { resizeAndCompressImage } from '../utils/image';
 

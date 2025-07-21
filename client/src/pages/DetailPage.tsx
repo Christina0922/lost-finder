@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { LostItem, User } from '../App';
+import type { LostItem, User } from '../App';
+import MapComponent from '../components/MapComponent';
 import './DetailPage.css';
 
 // DetailPage가 받을 props 타입을 정의합니다.
@@ -75,7 +76,7 @@ const DetailPage: React.FC<DetailPageProps> = ({ items, users, currentUser, onAd
       <div className="item-content">
         <div className="item-images-container">
           {item.imageUrls && item.imageUrls.length > 0 ? (
-            item.imageUrls.map((url, index) => (
+            item.imageUrls.map((url: string, index: number) => (
               <img
                 key={index}
                 src={url}
@@ -96,11 +97,25 @@ const DetailPage: React.FC<DetailPageProps> = ({ items, users, currentUser, onAd
         </div>
       </div>
 
+      {/* 지도 섹션 추가 */}
+      <div className="map-section">
+        <h3>분실 위치</h3>
+        <MapComponent 
+          center={{ lat: 37.5665, lng: 126.9780 }}
+          zoom={13}
+          markers={[{
+            position: { lat: 37.5665, lng: 126.9780 },
+            title: item.itemType,
+            description: item.description
+          }]}
+        />
+      </div>
+
       <hr />
 
       <div className="comments-section">
         <h3>댓글</h3>
-        {item.comments.map(comment => (
+        {item.comments.map((comment: { id: number; authorId: number; text: string }) => (
           <div key={comment.id} className="comment-item">
             <p><strong>{getCommentAuthorEmail(comment.authorId)}:</strong> {comment.text}</p>
             {(currentUser?.id === comment.authorId || currentUser?.id === item.authorId) && (
