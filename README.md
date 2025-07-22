@@ -11,6 +11,7 @@
 - ✅ **실제 SMS 인증을 통한 비밀번호 재설정**
 - ✅ **임시 비밀번호 시스템**
 - ✅ **보안 강화 (API 키 서버 보관)**
+- ✅ **카카오맵 통합 (분실 위치 표시)**
 
 ## 설치 및 실행
 
@@ -26,6 +27,31 @@ npm start
 npm install
 npm start
 ```
+
+## 카카오맵 API 설정
+
+### 1. 카카오 개발자 계정 생성
+1. [카카오 개발자 사이트](https://developers.kakao.com/) 방문
+2. 카카오 계정으로 로그인
+3. 애플리케이션 생성
+
+### 2. 애플리케이션 설정
+1. **플랫폼** 탭에서 **Web 플랫폼** 등록
+2. **도메인** 설정에 다음 추가:
+   - `http://localhost:3000`
+   - `https://localhost:3000` (HTTPS 사용 시)
+   - `http://127.0.0.1:3000`
+
+### 3. API 키 설정
+1. **앱 키** 탭에서 **JavaScript 키** 복사
+2. 프로젝트 루트에 `.env` 파일 생성:
+```env
+REACT_APP_KAKAO_MAP_API_KEY=your_javascript_key_here
+```
+
+### 4. API 키 확인
+- [카카오 개발자 콘솔](https://developers.kakao.com/console/app)에서 JavaScript 키 확인
+- 도메인 설정이 올바른지 확인
 
 ## SMS 인증 설정 (플레이스토어 등록용)
 
@@ -49,11 +75,13 @@ TWILIO_FROM_NUMBER=+1234567890
 
 ```env
 REACT_APP_API_URL=http://localhost:5000
+REACT_APP_KAKAO_MAP_API_KEY=your_kakao_map_api_key_here
 ```
 
 ### 4. API 키 확인 방법
 - [Twilio Console](https://console.twilio.com/)에서 Account SID와 Auth Token 확인
 - [Phone Numbers](https://console.twilio.com/phone-numbers)에서 발신 번호 확인
+- [카카오 개발자 콘솔](https://developers.kakao.com/console/app)에서 JavaScript 키 확인
 
 ## 플레이스토어 등록 준비 완료 ✅
 
@@ -68,10 +96,12 @@ REACT_APP_API_URL=http://localhost:5000
 - ✅ 임시 비밀번호 후 강제 변경
 - ✅ 서버 상태 실시간 확인
 - ✅ 개발/프로덕션 모드 자동 전환
+- ✅ 카카오맵 통합 (분실 위치 시각화)
 
 ### 비용 정보
 - **무료 크레딧**: 1,000-1,500건 SMS 발송 가능
 - **추가 비용**: $0.0079/건 (약 10원)
+- **카카오맵**: 무료 (일일 사용량 제한 있음)
 
 ## 개발 모드
 환경변수가 설정되지 않은 경우, 서버에서 SMS 발송을 시뮬레이션합니다.
@@ -83,6 +113,7 @@ REACT_APP_API_URL=http://localhost:5000
 - TypeScript
 - React Router
 - LocalStorage
+- 카카오맵 API
 
 ### 백엔드
 - Node.js
@@ -104,6 +135,7 @@ git push heroku main
 
 # 프론트엔드 배포
 REACT_APP_API_URL=https://your-app-name.herokuapp.com
+REACT_APP_KAKAO_MAP_API_KEY=your_kakao_map_api_key
 npm run build
 ```
 
@@ -111,6 +143,7 @@ npm run build
 - ✅ 실제 SMS 인증 완료
 - ✅ 보안 검증 완료
 - ✅ 사용자 인증 시스템 완료
+- ✅ 카카오맵 통합 완료
 - 🚀 **플레이스토어 등록 준비 완료!**
 
 # Getting Started with Create React App
@@ -153,9 +186,3 @@ If you aren't satisfied with the build tool and configuration choices, you can `
 Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
 You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).

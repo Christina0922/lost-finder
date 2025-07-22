@@ -86,11 +86,24 @@ apiRouter.post('/login', async (req, res) => {
     if (!username || !password) {
       return res.status(400).json({ 
         success: false, 
-        error: '사용자명과 비밀번호를 입력해주세요.' 
+        error: '사용자명/이메일과 비밀번호를 입력해주세요.' 
       });
     }
 
-    const user = await findUserByUsername(username);
+    // 사용자명 또는 이메일로 사용자 찾기
+    let user = null;
+    try {
+      user = await findUserByUsername(username);
+    } catch (error) {
+      try {
+        user = await findUserByEmail(username);
+      } catch (emailError) {
+        return res.status(401).json({ 
+          success: false, 
+          error: '등록되지 않은 사용자명 또는 이메일입니다.' 
+        });
+      }
+    }
     
     if (user.password !== password) {
       return res.status(401).json({ 
@@ -99,17 +112,22 @@ apiRouter.post('/login', async (req, res) => {
       });
     }
 
-    console.log(`✅ 로그인 성공: ${username}`);
+    console.log(`✅ 로그인 성공: ${user.username} (${user.email})`);
     res.json({ 
       success: true, 
-      message: '로그인이 완료되었습니다.',
-      user: { id: user.id, username: user.username, email: user.email, phone: user.phone }
+      message: '로그인되었습니다.',
+      user: { 
+        id: user.id, 
+        username: user.username, 
+        email: user.email, 
+        phone: user.phone 
+      }
     });
   } catch (error) {
     console.error('❌ 로그인 실패:', error.message);
-    res.status(401).json({ 
+    res.status(500).json({ 
       success: false, 
-      error: error.message 
+      error: '로그인 중 오류가 발생했습니다.' 
     });
   }
 });

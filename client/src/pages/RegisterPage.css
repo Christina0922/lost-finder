@@ -3,6 +3,8 @@
   padding: 30px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .form-container div {
@@ -11,22 +13,62 @@
 
 .form-container label {
   display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 15px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  letter-spacing: 0.5px;
 }
 
 .form-container input[type="text"],
+.form-container input[type="email"],
+.form-container input[type="password"],
+.form-container input[type="tel"],
 .form-container textarea,
 .form-container input[type="file"] {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box; /* padding and border included in width */
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-sizing: border-box;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+  background-color: #ffffff;
+  color: #000000;
+  font-weight: 500;
+}
+
+.form-container input[type="text"]::placeholder,
+.form-container input[type="email"]::placeholder,
+.form-container input[type="password"]::placeholder,
+.form-container input[type="tel"]::placeholder,
+.form-container textarea::placeholder {
+  color: #666666;
+  opacity: 1;
+  font-weight: 400;
+}
+
+.form-container input[type="text"]:focus,
+.form-container input[type="email"]:focus,
+.form-container input[type="password"]:focus,
+.form-container input[type="tel"]:focus,
+.form-container textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
 .form-container textarea {
   resize: vertical;
+  min-height: 100px;
+  color: #000000 !important;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.4;
+  background-color: #ffffff !important;
+  border: 2px solid #007bff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .form-container img {
@@ -53,7 +95,7 @@
   height: 100%;
   object-fit: cover;
   border-radius: 5px;
-  margin-top: 0; /* Override previous margin */
+  margin-top: 0;
 }
 
 .remove-image-button {
@@ -83,22 +125,37 @@
   gap: 10px;
 }
 
+.form-actions .submit-button {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 120px;
+}
+
+.form-actions .button-secondary {
+  flex: 1;
+  max-width: 200px;
+}
+
 /* --- 버튼 공통 스타일 --- */
 .submit-button,
 .button-secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 15px;
-  border-radius: 4px;
-  font-size: 16px;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: 500;
   border: none;
   cursor: pointer;
   text-decoration: none;
-  white-space: nowrap; /* 글자 줄바꿈 방지 */
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  width: 100%;
+  text-align: center;
+  line-height: 1.2;
 }
 
-/* --- 개별 버튼 스타일 --- */
 .submit-button {
   background-color: #007bff;
   color: white;
@@ -106,11 +163,13 @@
 
 .submit-button:hover {
   background-color: #0056b3;
+  transform: translateY(-1px);
 }
 
 .submit-button:disabled {
-  background-color: #cccccc;
+  background-color: #6c757d;
   cursor: not-allowed;
+  transform: none;
 }
 
 .button-secondary {
@@ -119,55 +178,88 @@
 }
 
 .button-secondary:hover {
-  background-color: #5a6268;
+  background-color: #545b62;
+  transform: translateY(-1px);
 }
 
 @media (max-width: 600px) {
   .form-container {
-    padding: 14px 4px 14px 4px !important;
-    border-radius: 10px !important;
+    padding: 20px;
+    margin: 10px;
   }
+
   .form-container input[type="text"],
-  .form-container textarea,
-  .form-container input[type="file"] {
-    min-height: 40px;
-    font-size: 15px;
-    padding: 8px 10px;
+  .form-container input[type="email"],
+  .form-container input[type="password"],
+  .form-container input[type="tel"],
+  .form-container textarea {
+    padding: 10px;
+    font-size: 16px; /* 모바일에서 줌 방지 */
   }
+
   .submit-button, .button-secondary {
-    min-height: 40px;
-    font-size: 15px;
+    padding: 12px 16px;
+    font-size: 16px;
   }
 }
 
-/* 버튼 hover/active 상태 명확히 */
 .submit-button:active, .button-secondary:active {
-  filter: brightness(0.92);
+  transform: translateY(0);
 }
 
-/* 분실물 등록하기 타이틀 강조 */
 .form-container-wrapper h1,
-.form-container h1 {
-  font-size: 2.1rem;
-  font-weight: 900;
-  color: #ffd600 !important;
-  text-shadow: none;
-  margin-bottom: 24px;
+.form-container-wrapper h2,
+.form-container-wrapper h3 {
   text-align: center;
-  letter-spacing: 1px;
-  border-bottom: 2px solid #ffd600;
-  padding-bottom: 6px;
+  color: #333;
+  margin-bottom: 30px;
+  font-weight: 600;
+}
+
+.form-container-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 @media (max-width: 600px) {
   .form-container-wrapper h1,
-  .form-container h1 {
-    font-size: 1.3rem;
-    margin-bottom: 16px;
-    padding-bottom: 4px;
+  .form-container-wrapper h2,
+  .form-container-wrapper h3 {
+    font-size: 24px;
+    margin-bottom: 20px;
   }
 }
 
 h1 {
-  color: #ffd600 !important;
+  font-size: 32px;
+  margin-bottom: 30px;
+  color: #ffffff;
+  text-align: center;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  letter-spacing: 1px;
+  background: linear-gradient(45deg, #ffd700, #ffed4e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  padding: 10px 20px;
+  border-radius: 8px;
+  position: relative;
+}
+
+h1::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  z-index: -1;
 } 

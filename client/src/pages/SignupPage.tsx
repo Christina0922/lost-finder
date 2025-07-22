@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './RegisterPage.css'; // 간단한 재활용을 위해 RegisterPage의 CSS를 사용합니다.
+import './RegisterPage.css';
 
 interface SignupPageProps {
   onSignup: (username: string, email: string, phone: string, password: string) => Promise<boolean>;
@@ -18,13 +18,14 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup }) => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     
-    if (password !== confirmPassword) {
-      alert('비밀번호가 일치하지 않습니다.');
+    // 입력 검증
+    if (!username.trim()) {
+      alert('사용자명을 입력해주세요.');
       return;
     }
     
-    if (!username.trim()) {
-      alert('사용자명을 입력해주세요.');
+    if (!email.trim()) {
+      alert('이메일을 입력해주세요.');
       return;
     }
     
@@ -33,14 +34,26 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup }) => {
       return;
     }
     
+    if (password.length < 4) {
+      alert('비밀번호는 4자 이상 입력해주세요.');
+      return;
+    }
+    
+    if (password !== confirmPassword) {
+      alert('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+    
     setIsLoading(true);
     try {
       const success = await onSignup(username, email, phone, password);
       if (success) {
+        alert('🎉 회원가입이 완료되었습니다!');
         navigate('/');
       }
     } catch (error) {
       console.error('회원가입 오류:', error);
+      alert('회원가입에 실패했습니다. 다시 시도해주세요.');
     } finally {
       setIsLoading(false);
     }
@@ -48,10 +61,10 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup }) => {
 
   return (
     <div className="form-container-wrapper">
-      <h1>회원가입</h1>
+      <h1>📝 회원가입</h1>
       <form onSubmit={handleSubmit} className="form-container">
         <div className="form-group">
-          <label htmlFor="username">사용자명</label>
+          <label htmlFor="username">👤 사용자명</label>
           <input
             type="text"
             id="username"
@@ -62,24 +75,24 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup }) => {
           />
         </div>
         <div className="form-group">
-          <label htmlFor="email">이메일</label>
+          <label htmlFor="email">📧 이메일</label>
           <input
             type="email"
             id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="이메일을 입력하세요"
+            placeholder="example@email.com"
             required
           />
         </div>
         <div className="form-group">
-          <label htmlFor="phone">휴대폰 번호</label>
+          <label htmlFor="phone">📱 휴대폰 번호</label>
           <input
             type="tel"
             id="phone"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            placeholder="'-' 없이 숫자만 입력 (예: 01012345678)"
+            placeholder="01012345678 (하이픈 없이)"
             required
           />
         </div>

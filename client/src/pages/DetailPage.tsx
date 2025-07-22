@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { LostItem, User } from '../App';
-import MapComponent from '../components/MapComponent';
+import KakaoMapComponent from '../components/KakaoMapComponent';
 import './DetailPage.css';
 
 // DetailPage가 받을 props 타입을 정의합니다.
@@ -53,6 +53,12 @@ const DetailPage: React.FC<DetailPageProps> = ({ items, users, currentUser, onAd
     }
   };
 
+  const handleEditItemClick = () => {
+    if (item) {
+      navigate(`/edit/${item.id}`);
+    }
+  };
+
   const getCommentAuthorEmail = (authorId: number) => {
     const author = users.find(u => u.id === authorId);
     return author ? author.email.split('@')[0] : '알 수 없음';
@@ -67,9 +73,14 @@ const DetailPage: React.FC<DetailPageProps> = ({ items, users, currentUser, onAd
       <div className="item-header">
         <h1>{item.itemType}</h1>
         {currentUser && currentUser.id === item.authorId && (
-          <button onClick={handleDeleteItemClick} className="delete-item-button">
-            게시물 삭제
-          </button>
+          <div className="button-group">
+            <button onClick={handleEditItemClick} className="edit-item-button">
+              게시물 수정
+            </button>
+            <button onClick={handleDeleteItemClick} className="delete-item-button">
+              게시물 삭제
+            </button>
+          </div>
         )}
       </div>
 
@@ -100,14 +111,10 @@ const DetailPage: React.FC<DetailPageProps> = ({ items, users, currentUser, onAd
       {/* 지도 섹션 추가 */}
       <div className="map-section">
         <h3>분실 위치</h3>
-        <MapComponent 
-          center={{ lat: 37.5665, lng: 126.9780 }}
-          zoom={13}
-          markers={[{
-            position: { lat: 37.5665, lng: 126.9780 },
-            title: item.itemType,
-            description: item.description
-          }]}
+        <KakaoMapComponent 
+          location={item.location}
+          itemType={item.itemType}
+          description={item.description}
         />
       </div>
 

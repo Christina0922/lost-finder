@@ -242,7 +242,28 @@ const App: React.FC = () => {
   const [lostItems, setLostItems] = useState<LostItem[]>(() => {
     try {
       const savedItems = localStorage.getItem('lostItems');
-      return savedItems ? JSON.parse(savedItems) : [];
+      const items = savedItems ? JSON.parse(savedItems) : [];
+      
+      // 특정 아이템들 삭제 (택배 at 태봉로2길 5, 자전거 at 고려대학교 정경대)
+      const filteredItems = items.filter((item: LostItem) => {
+        if (item.itemType === '택배' && item.location === '태봉로2길 5') {
+          console.log('삭제: 택배 (태봉로2길 5)');
+          return false;
+        }
+        if (item.itemType === '자전거' && item.location === '고려대학교 정경대') {
+          console.log('삭제: 자전거 (고려대학교 정경대)');
+          return false;
+        }
+        return true;
+      });
+      
+      // 필터링된 결과가 다르면 localStorage 업데이트
+      if (filteredItems.length !== items.length) {
+        localStorage.setItem('lostItems', JSON.stringify(filteredItems));
+        console.log(`삭제 완료: ${items.length - filteredItems.length}개 아이템 제거됨`);
+      }
+      
+      return filteredItems;
     } catch (error) {
       console.error("localStorage에서 분실물 데이터를 불러오는데 실패했습니다.", error);
       return [];
@@ -312,19 +333,7 @@ const App: React.FC = () => {
     };
   }, []);
 
-  // ====== 테스트용 분실물 3개 모두 삭제 ======
-  useEffect(() => {
-    // 테스트용 분실물 3개를 자동 삭제 (id, itemType 등으로 구분)
-    setLostItems(prev => {
-      if (!prev || prev.length === 0) return prev;
-      // 예시: 최근 3개, 또는 itemType이 '자전거', '킥보드' 등인 것만 삭제
-      const toDeleteTypes = ['자전거', '킥보드'];
-      let filtered = prev.filter(item => !toDeleteTypes.includes(item.itemType));
-      // 만약 3개만 남아있으면 모두 삭제
-      if (prev.length === 3) return [];
-      return filtered;
-    });
-  }, []);
+  // 테스트용 분실물 자동 삭제 코드 제거 - 등록된 분실물이 보이도록 함
 
   const handleSignup = async (username: string, email: string, phone: string, password: string): Promise<boolean> => {
     try {
@@ -351,10 +360,10 @@ const App: React.FC = () => {
     }
   };
 
-  const handleLogin = async (username: string, password: string): Promise<boolean> => {
+  const handleLogin = async (email: string, password: string): Promise<boolean> => {
     try {
-      // 서버에 로그인 요청
-      const result = await loginUser({ username, password });
+      // 서버에 로그인 요청 (이메일을 username으로 전달)
+      const result = await loginUser({ username: email, password });
       
       // 성공 시 로컬 상태 업데이트
       const user: User = { 

@@ -1,4 +1,5 @@
-const API_BASE_URL = '/api';
+// 환경변수에 따라 API URL 설정
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '/api';
 
 // 핸드폰번호 정규화 함수
 export const normalizePhoneNumber = (phone: string): string => {
