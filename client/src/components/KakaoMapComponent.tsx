@@ -90,6 +90,8 @@ const KakaoMapComponent: React.FC<KakaoMapComponentProps> = ({ location, itemTyp
         `${location} 서울특별시`,
         location.replace('고려대학교', '고려대'),
         location.replace('정경대', '정경관'),
+        location.replace('서초 네이처힐 아파트', '서초구 네이처힐'),
+        location.replace('네이처힐 아파트', '네이처힐'),
         '고려대학교',
         '고려대'
       ];
@@ -103,6 +105,17 @@ const KakaoMapComponent: React.FC<KakaoMapComponentProps> = ({ location, itemTyp
         '성균관대학교': { lat: 37.5889, lng: 126.9915, name: '성균관대학교' },
         '중앙대학교': { lat: 37.5067, lng: 126.9587, name: '중앙대학교' },
         '경희대학교': { lat: 37.5964, lng: 127.0527, name: '경희대학교' }
+      };
+      
+      // 주요 아파트 및 건물의 정확한 좌표
+      const buildingCoordinates: { [key: string]: { lat: number, lng: number, name: string } } = {
+        '서초 네이처힐 아파트': { lat: 37.4837, lng: 127.0324, name: '서초 네이처힐 아파트' },
+        '네이처힐 아파트': { lat: 37.4837, lng: 127.0324, name: '서초 네이처힐 아파트' },
+        '네이처힐': { lat: 37.4837, lng: 127.0324, name: '서초 네이처힐 아파트' },
+        '서초구 네이처힐': { lat: 37.4837, lng: 127.0324, name: '서초 네이처힐 아파트' },
+        '서초 네이처힐': { lat: 37.4837, lng: 127.0324, name: '서초 네이처힐 아파트' },
+        '서초구 서초동 네이처힐': { lat: 37.4837, lng: 127.0324, name: '서초 네이처힐 아파트' },
+        '서초동 네이처힐': { lat: 37.4837, lng: 127.0324, name: '서초 네이처힐 아파트' }
       };
       
       // 고려대학교 내 주요 건물 좌표
@@ -143,13 +156,29 @@ const KakaoMapComponent: React.FC<KakaoMapComponentProps> = ({ location, itemTyp
           let fallbackPosition = defaultPosition;
           let fallbackName = '서울시청';
           
-          // 고려대학교 내 건물 좌표에서 먼저 찾기
-          for (const [key, coords] of Object.entries(koreaUniversityBuildings)) {
-            if (location.includes(key) || key.includes(location.replace('고려대학교 ', ''))) {
+          // 아파트 및 건물 좌표에서 먼저 찾기
+          console.log('아파트 좌표 검색 시작. 입력 위치:', location);
+          for (const [key, coords] of Object.entries(buildingCoordinates)) {
+            console.log(`검사 중: "${key}" vs "${location}"`);
+            if (location.includes(key) || key.includes(location) || 
+                location.includes('네이처힐') || 
+                (location.includes('서초') && location.includes('아파트'))) {
               fallbackPosition = new window.kakao.maps.LatLng(coords.lat, coords.lng);
               fallbackName = coords.name;
-              console.log(`고려대학교 건물 좌표 사용: ${fallbackName} (${coords.lat}, ${coords.lng})`);
+              console.log(`✅ 아파트 좌표 사용: ${fallbackName} (${coords.lat}, ${coords.lng})`);
               break;
+            }
+          }
+          
+          // 아파트에서 못 찾으면 고려대학교 내 건물 좌표에서 찾기
+          if (fallbackName === '서울시청') {
+            for (const [key, coords] of Object.entries(koreaUniversityBuildings)) {
+              if (location.includes(key) || key.includes(location.replace('고려대학교 ', ''))) {
+                fallbackPosition = new window.kakao.maps.LatLng(coords.lat, coords.lng);
+                fallbackName = coords.name;
+                console.log(`고려대학교 건물 좌표 사용: ${fallbackName} (${coords.lat}, ${coords.lng})`);
+                break;
+              }
             }
           }
           

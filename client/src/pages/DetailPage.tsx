@@ -54,8 +54,12 @@ const DetailPage: React.FC<DetailPageProps> = ({ items, users, currentUser, onAd
   };
 
   const handleEditItemClick = () => {
+    console.log('게시물 수정 버튼 클릭됨');
     if (item) {
+      console.log('수정할 아이템 ID:', item.id);
       navigate(`/edit/${item.id}`);
+    } else {
+      console.log('아이템을 찾을 수 없음');
     }
   };
 

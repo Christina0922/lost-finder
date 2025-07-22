@@ -4,8 +4,8 @@ body {
   font-family: 'Segoe UI', 'Pretendard', 'Apple SD Gothic Neo', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #1a2236;
-  color: #f5f6fa;
+  background: linear-gradient(135deg, #ffeef8 0%, #f0f8ff 50%, #fff5f5 100%);
+  color: #4a4a4a;
   min-height: 100vh;
   width: 100vw;
   overflow-x: hidden;
@@ -34,33 +34,35 @@ h2 {
 }
 
 button, .submit-button {
-  background: linear-gradient(90deg, #007bff 60%, #2196F3 100%);
+  background: linear-gradient(45deg, #ff6b9d, #e91e63);
   color: #fff !important;
   border: none;
-  border-radius: 6px;
-  font-weight: 700;
+  border-radius: 20px;
+  font-weight: 600;
   font-size: 1rem;
-  padding: 10px 24px;
+  padding: 12px 28px;
   margin: 0 8px 0 0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  transition: background 0.18s, box-shadow 0.18s;
+  box-shadow: 0 4px 15px rgba(233, 30, 99, 0.3);
+  transition: all 0.3s ease;
 }
 button:last-child, .submit-button:last-child {
   margin-right: 0;
 }
 button:hover, .submit-button:hover {
-  background: linear-gradient(90deg, #0056b3 60%, #1565c0 100%);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+  background: linear-gradient(45deg, #e91e63, #ff6b9d);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(233, 30, 99, 0.4);
 }
 
 a, .nav-link {
-  color: #00c6ad;
+  color: #e91e63;
   text-decoration: none;
   font-weight: 500;
+  transition: color 0.3s ease;
 }
 
 a:hover, .nav-link:hover {
-  color: #ffb400;
+  color: #ff6b9d;
 }
 
 .App-logo {

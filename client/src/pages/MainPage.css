@@ -1,10 +1,14 @@
 .main-container {
   text-align: center;
   padding-top: 8px !important;
-  padding-bottom: 2px !important;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding-bottom: 0px !important;
+  background: linear-gradient(135deg, #fff5f5 0%, #fef7f0 100%);
+  border-radius: 20px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  box-shadow: 0 8px 32px rgba(255, 182, 193, 0.15);
+  border: 1px solid rgba(255, 182, 193, 0.2);
+  border-bottom: none;
 }
 
 .main-container h1 {
@@ -12,90 +16,130 @@
 }
 
 .main-container p {
-  font-size: 18px;
-  color: #555;
+  font-size: 20px;
+  color: #4a4a4a;
   margin-bottom: 30px;
+  font-weight: 500;
+  line-height: 1.6;
 }
 
 .main-title {
-  color: #ff8c00;
+  color: #e91e63;
   font-size: 2.2rem;
-  font-weight: 900;
-  margin-bottom: 12px;
+  font-weight: 700;
+  margin-bottom: 20px;
   font-family: 'Gmarket Sans', sans-serif;
   letter-spacing: 1px;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  text-shadow: 2px 2px 4px rgba(233, 30, 99, 0.2);
+  background: linear-gradient(45deg, #e91e63, #ff6b9d);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  padding: 20px 30px;
+  border-radius: 25px;
+  position: relative;
+  display: inline-block;
+}
+
+.main-title::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 182, 193, 0.1) 0%, rgba(255, 107, 157, 0.1) 100%);
+  border-radius: 25px;
+  z-index: -1;
+  border: 1px solid rgba(233, 30, 99, 0.2);
 }
 
 .main-desc {
-  font-size: 1.18rem;
-  color: #222;
+  font-size: 1.25rem;
+  color: #333;
   font-weight: 600;
-  margin-bottom: 28px;
+  margin-bottom: 0px;
+  line-height: 1.5;
 }
 
 .main-actions {
   display: flex;
   justify-content: center;
   gap: 20px;
-  margin-bottom: 18px;
+  margin-bottom: 0px;
+}
+
+.main-button {
+  margin-bottom: 15px;
 }
 
 .main-button {
   display: inline-block;
-  padding: 14px 28px;
-  background-color: #007bff;
+  padding: 16px 32px;
+  background: linear-gradient(45deg, #ff6b9d, #e91e63);
   color: #fff;
   text-decoration: none;
-  border-radius: 6px;
+  border-radius: 25px;
   font-size: 1.08rem;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.5px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  box-shadow: 0 4px 15px rgba(233, 30, 99, 0.3);
   border: none;
-  transition: background 0.2s, color 0.2s;
+  transition: all 0.3s ease;
   white-space: pre-line;
   text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
 .main-button:hover {
-  background-color: #0056b3;
+  background: linear-gradient(45deg, #e91e63, #ff6b9d);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(233, 30, 99, 0.4);
   color: #fff;
 }
 
 /* 하단 배너 스타일 */
 .bottom-banner {
-  margin-top: 40px;
-  padding: 20px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: 1px solid #dee2e6;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  padding: 15px;
+  background: linear-gradient(135deg, #fff0f5 0%, #f8f4ff 100%);
+  border-radius: 25px;
+  box-shadow: 0 8px 25px rgba(255, 182, 193, 0.2);
+  border: 1px solid rgba(255, 182, 193, 0.3);
+  border-top: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
 
 .bottom-banner h3 {
-  color: #495057;
-  margin-bottom: 8px;
-  font-size: 18px;
+  color: #333;
+  margin-bottom: 12px;
+  font-size: 20px;
   font-weight: 600;
 }
 
 .bottom-banner p {
-  color: #6c757d;
-  font-size: 14px;
-  margin-bottom: 16px;
-  line-height: 1.4;
+  color: #555;
+  font-size: 16px;
+  margin-bottom: 10px;
+  line-height: 1.5;
+  font-weight: 500;
 }
 
 .bottom-banner button {
-  padding: 10px 20px;
+  padding: 12px 24px;
   border: none;
-  border-radius: 8px;
+  border-radius: 20px;
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
   margin: 0 8px;
+  background: linear-gradient(45deg, #ff9a9e, #fecfef);
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(255, 154, 158, 0.3);
 }
 
 .bottom-banner button:hover {
