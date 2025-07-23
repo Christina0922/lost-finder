@@ -506,15 +506,15 @@ a:hover, .nav-link:hover {
 .settings-dropdown {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  min-width: 260px;
-  max-width: 340px;
+  gap: 4px;
+  min-width: 280px;
+  max-width: 320px;
   background: #fff;
   color: #222;
   border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 1.5px 6px rgba(0,0,0,0.10);
-  padding: 22px 20px 18px 20px;
+  padding: 8px 16px 6px 16px;
   position: absolute;
   right: 0;
   top: 40px;
@@ -525,9 +525,10 @@ a:hover, .nav-link:hover {
 .settings-dropdown .settings-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 38px;
+  gap: 8px;
+  min-height: 24px;
   padding: 0;
+  justify-content: flex-start;
 }
 
 .settings-dropdown .settings-row label,
@@ -540,7 +541,9 @@ a:hover, .nav-link:hover {
 
 .settings-dropdown .settings-row .alert-modes {
   display: flex;
-  gap: 10px;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 180px;
 }
 
 .settings-dropdown .settings-link {
@@ -551,15 +554,25 @@ a:hover, .nav-link:hover {
   color: #007bff;
   text-decoration: none;
   font-size: 15px;
-  padding: 2px 0 2px 0;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .theme-dark .settings-dropdown .settings-link {
   color: #4da3ff;
 }
 
+.theme-dark .settings-dropdown .settings-link:hover {
+  background-color: rgba(77, 163, 255, 0.2);
+  color: #66b3ff;
+}
+
 .settings-dropdown .settings-link:hover {
-  text-decoration: underline;
+  background-color: rgba(0, 123, 255, 0.1);
+  color: #0056b3;
+  text-decoration: none;
 }
 
 .app-header, .form-container-wrapper, .form-container, .card, .main-content {
@@ -659,25 +672,49 @@ input:focus, textarea:focus, select:focus {
   touch-action: manipulation;
 }
 
-/* 드롭다운 X(닫기) 버튼 */
+/* 드롭다운 닫기 버튼 */
 .settings-close-btn {
   position: absolute;
   top: 8px;
   right: 8px;
-  background: none;
-  border: none;
-  font-size: 22px;
-  color: #333;
-  opacity: 0.7;
+  background: #e74c3c;
+  border: 2px solid #fff;
+  font-size: 12px;
+  color: #fff;
   z-index: 10;
-  transition: opacity 0.2s;
+  width: auto;
+  min-width: 50px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  transition: all 0.2s ease;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+  padding: 0 8px;
 }
 .settings-close-btn:hover {
-  opacity: 1;
-  color: #e74c3c;
+  background: #c0392b;
+  color: white;
+  border-color: #c0392b;
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.5);
 }
 .theme-dark .settings-close-btn {
+  background: #e74c3c;
   color: #fff;
+  border-color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+}
+
+.theme-dark .settings-close-btn:hover {
+  background: #c0392b;
+  color: white;
+  border-color: #c0392b;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.7);
 }
 
 /* 입력창/버튼 터치 영역 확대 */
@@ -813,4 +850,35 @@ input, button, .submit-button {
   .app-header {
     padding-top: 10px;
   }
+}
+
+/* 불필요한 버튼들 숨기기 */
+button:contains("전화"),
+button:contains("문의"),
+button:contains("저장"),
+button:contains("길찾기"),
+button:contains("공유"),
+button:contains("예약"),
+div:contains("전화"),
+div:contains("문의"),
+div:contains("저장"),
+div:contains("길찾기"),
+div:contains("공유"),
+div:contains("예약") {
+  display: none !important;
+}
+
+/* 추가로 특정 텍스트를 포함하는 요소들 숨기기 */
+*:not(h1):contains("전화"),
+*:not(h1):contains("문의"),
+*:not(h1):contains("저장"),
+*:not(h1):contains("길찾기"),
+*:not(h1):contains("공유"),
+*:not(h1):contains("예약") {
+  display: none !important;
+}
+
+/* 분실물 목록 제목은 제외하고 숨기기 */
+h1:contains("분실물 목록") {
+  display: block !important;
 }

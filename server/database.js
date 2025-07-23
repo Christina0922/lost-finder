@@ -124,6 +124,23 @@ function findUserByUsername(username) {
   });
 }
 
+// ID로 사용자 찾기
+function findUserById(userId) {
+  return new Promise((resolve, reject) => {
+    const sql = 'SELECT * FROM users WHERE id = ?';
+    
+    db.get(sql, [userId], (err, row) => {
+      if (err) {
+        reject(new Error('사용자 검색 중 오류가 발생했습니다.'));
+      } else if (!row) {
+        reject(new Error('사용자를 찾을 수 없습니다.'));
+      } else {
+        resolve(row);
+      }
+    });
+  });
+}
+
 // 비밀번호 업데이트
 function updatePassword(userId, newPassword) {
   return new Promise((resolve, reject) => {
@@ -186,6 +203,7 @@ module.exports = {
   findUserByPhone,
   findUserByEmail,
   findUserByUsername,
+  findUserById,
   updatePassword,
   getAllUsers
 }; 

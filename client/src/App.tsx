@@ -12,6 +12,7 @@ import EditPage from './pages/EditPage';
 import SuccessStoriesPage from './pages/SuccessStoriesPage';
 import { sendVerificationCode, forgotPassword, resetPassword, registerUser, loginUser, verifyCode } from './utils/api';
 import { executeAlertMode, cleanupAlertMode } from './utils/sound';
+import { initCleanup } from './utils/cleanup';
 import './App.css';
 
 // 사용자 정보 타입을 정의합니다.
@@ -122,19 +123,24 @@ const Header: React.FC<{
                 >
                   <button
                     className="settings-close-btn"
-                    style={{ position: 'absolute', top: 8, right: 8, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: 'inherit', zIndex: 10 }}
+                    style={{ position: 'absolute', top: 8, right: 8, background: '#fff3cd', border: '1px solid #ffeaa7', fontSize: '13px', cursor: 'pointer', color: 'white', zIndex: 10, padding: '1px 4px', borderRadius: '2px', fontWeight: '600', textShadow: '0px 0px 2px #000' }}
                     onClick={() => setShowSettings(false)}
                     aria-label="닫기"
                     type="button"
                   >
-                    ×
+                    닫기
                   </button>
                   <div style={{ fontWeight: 'bold', marginBottom: 8, textAlign: 'center' }}>설정</div>
                   {currentUser && (
                     <div className="settings-row">
                       <span className="settings-icon" role="img" aria-label="비밀번호">🔑</span>
                       <span className="settings-label">비밀번호 변경</span>
-                      <Link to="/change-password" className="settings-link" style={{ marginLeft: 'auto' }}>
+                      <Link 
+                        to="/change-password" 
+                        className="settings-link" 
+                        style={{ marginLeft: 'auto', color: '#007bff', textDecoration: 'none', fontWeight: 'bold', cursor: 'pointer' }}
+                        onClick={() => setShowSettings(false)}
+                      >
                         변경하기
                       </Link>
                     </div>
@@ -143,22 +149,61 @@ const Header: React.FC<{
                     <span className="settings-icon" role="img" aria-label="테마">🌗</span>
                     <span className="settings-label">테마</span>
                     <div className="settings-controls" style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
-                      <button onClick={() => setTheme('light')} style={{ fontWeight: theme === 'light' ? 'bold' : 'normal' }}>화이트</button>
-                      <button onClick={() => setTheme('dark')} style={{ fontWeight: theme === 'dark' ? 'bold' : 'normal' }}>다크</button>
+                      <button 
+                        onClick={() => setTheme('light')} 
+                        style={{ 
+                          fontWeight: theme === 'light' ? 'bold' : 'normal',
+                          padding: '4px 8px',
+                          fontSize: '12px',
+                          borderRadius: '4px',
+                          border: '1px solid #ddd',
+                          background: theme === 'light' ? '#007bff' : '#f8f9fa',
+                          color: theme === 'light' ? '#fff' : '#000',
+                          cursor: 'pointer',
+                          minWidth: '40px'
+                        }}
+                      >
+                        화이트
+                      </button>
+                      <button 
+                        onClick={() => setTheme('dark')} 
+                        style={{ 
+                          fontWeight: theme === 'dark' ? 'bold' : 'normal',
+                          padding: '4px 8px',
+                          fontSize: '12px',
+                          borderRadius: '4px',
+                          border: '1px solid #ddd',
+                          background: theme === 'dark' ? '#007bff' : '#f8f9fa',
+                          color: theme === 'dark' ? '#fff' : '#000',
+                          cursor: 'pointer',
+                          minWidth: '40px'
+                        }}
+                      >
+                        다크
+                      </button>
                     </div>
                   </div>
                   <div className="settings-row" style={{ alignItems: 'center', display: 'flex' }}>
                     <span className="settings-icon" role="img" aria-label="알림">🔔</span>
                     <span className="settings-label" style={{ marginRight: 8, whiteSpace: 'nowrap', minWidth: 40 }}>알림</span>
-                    <div className="settings-controls" style={{ display: 'flex', gap: 10, flexWrap: 'nowrap', whiteSpace: 'nowrap', alignItems: 'center' }}>
-                      <label style={{ margin: 0, padding: '4px 8px', fontSize: 16, minWidth: 60, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
-                        <input type="radio" name="alertMode" checked={alertMode === 'vibrate'} onChange={() => setAlertMode('vibrate')} style={{ width: 18, height: 18, marginRight: 4 }} /> 진동
+                    <div className="settings-controls" style={{ display: 'flex', gap: 8, flexWrap: 'nowrap', whiteSpace: 'nowrap', alignItems: 'center', minWidth: 180 }}>
+                      <label style={{ margin: 0, padding: '2px 6px', fontSize: 13, minWidth: 45, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
+                        <input type="radio" name="alertMode" checked={alertMode === 'vibrate'} onChange={() => {
+                          setAlertMode('vibrate');
+                          executeAlertMode('vibrate');
+                        }} style={{ width: 12, height: 12, marginRight: 3 }} /> 진동
                       </label>
-                      <label style={{ margin: 0, padding: '4px 8px', fontSize: 16, minWidth: 60, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
-                        <input type="radio" name="alertMode" checked={alertMode === 'melody'} onChange={() => setAlertMode('melody')} style={{ width: 18, height: 18, marginRight: 4 }} /> 멜로디
+                      <label style={{ margin: 0, padding: '2px 6px', fontSize: 13, minWidth: 45, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
+                        <input type="radio" name="alertMode" checked={alertMode === 'melody'} onChange={() => {
+                          setAlertMode('melody');
+                          executeAlertMode('melody');
+                        }} style={{ width: 12, height: 12, marginRight: 3 }} /> 멜로디
                       </label>
-                      <label style={{ margin: 0, padding: '4px 8px', fontSize: 16, minWidth: 60, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
-                        <input type="radio" name="alertMode" checked={alertMode === 'silent'} onChange={() => setAlertMode('silent')} style={{ width: 18, height: 18, marginRight: 4 }} /> 무음
+                      <label style={{ margin: 0, padding: '2px 6px', fontSize: 13, minWidth: 45, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
+                        <input type="radio" name="alertMode" checked={alertMode === 'silent'} onChange={() => {
+                          setAlertMode('silent');
+                          executeAlertMode('silent');
+                        }} style={{ width: 12, height: 12, marginRight: 3 }} /> 무음
                       </label>
                     </div>
                   </div>
@@ -181,30 +226,70 @@ const Header: React.FC<{
                 >
                   <button
                     className="settings-close-btn"
-                    style={{ position: 'absolute', top: 8, right: 8, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: 'inherit', zIndex: 10 }}
+                    style={{ position: 'absolute', top: 8, right: 8, background: '#fff3cd', border: '1px solid #ffeaa7', fontSize: '13px', cursor: 'pointer', color: 'white', zIndex: 10, padding: '1px 4px', borderRadius: '2px', fontWeight: '600', textShadow: '0px 0px 2px #000' }}
                     onClick={() => setShowSettings(false)}
                     aria-label="닫기"
                     type="button"
                   >
-                    ×
+                    닫기
                   </button>
                   <div style={{ fontWeight: 'bold', marginBottom: 8, textAlign: 'center' }}>설정</div>
                   <div style={{ marginBottom: 12 }}>
                     <span style={{ marginRight: 8 }}>🌗 테마:</span>
-                    <button onClick={() => setTheme('light')} style={{ fontWeight: theme === 'light' ? 'bold' : 'normal', marginRight: 4 }}>화이트</button>
-                    <button onClick={() => setTheme('dark')} style={{ fontWeight: theme === 'dark' ? 'bold' : 'normal' }}>다크</button>
+                    <button 
+                      onClick={() => setTheme('light')} 
+                      style={{ 
+                        fontWeight: theme === 'light' ? 'bold' : 'normal', 
+                        marginRight: 4,
+                        padding: '4px 8px',
+                        fontSize: '12px',
+                        borderRadius: '4px',
+                        border: '1px solid #ddd',
+                        background: theme === 'light' ? '#007bff' : '#f8f9fa',
+                        color: theme === 'light' ? '#fff' : '#333',
+                        cursor: 'pointer',
+                        minWidth: '40px'
+                      }}
+                    >
+                      화이트
+                    </button>
+                    <button 
+                      onClick={() => setTheme('dark')} 
+                      style={{ 
+                        fontWeight: theme === 'dark' ? 'bold' : 'normal',
+                        padding: '4px 8px',
+                        fontSize: '12px',
+                        borderRadius: '4px',
+                        border: '1px solid #ddd',
+                        background: theme === 'dark' ? '#007bff' : '#f8f9fa',
+                        color: theme === 'dark' ? '#fff' : '#333',
+                        cursor: 'pointer',
+                        minWidth: '40px'
+                      }}
+                    >
+                      다크
+                    </button>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12, flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4, flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
                     <span style={{ marginRight: 8, whiteSpace: 'nowrap', minWidth: 40 }}>🔔 알림:</span>
-                    <div className="alert-modes" style={{ display: 'flex', gap: 10, flexWrap: 'nowrap', whiteSpace: 'nowrap', alignItems: 'center' }}>
-                      <label style={{ margin: 0, padding: '4px 8px', fontSize: 16, minWidth: 60, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
-                        <input type="radio" name="alertMode" checked={alertMode === 'vibrate'} onChange={() => setAlertMode('vibrate')} style={{ width: 18, height: 18, marginRight: 4 }} /> 진동
+                    <div className="alert-modes" style={{ display: 'flex', gap: 8, flexWrap: 'nowrap', whiteSpace: 'nowrap', alignItems: 'center', minWidth: 180 }}>
+                      <label style={{ margin: 0, padding: '2px 6px', fontSize: 13, minWidth: 45, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
+                        <input type="radio" name="alertMode" checked={alertMode === 'vibrate'} onChange={() => {
+                          setAlertMode('vibrate');
+                          executeAlertMode('vibrate');
+                        }} style={{ width: 12, height: 12, marginRight: 3 }} /> 진동
                       </label>
-                      <label style={{ margin: 0, padding: '4px 8px', fontSize: 16, minWidth: 60, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
-                        <input type="radio" name="alertMode" checked={alertMode === 'melody'} onChange={() => setAlertMode('melody')} style={{ width: 18, height: 18, marginRight: 4 }} /> 멜로디
+                      <label style={{ margin: 0, padding: '2px 6px', fontSize: 13, minWidth: 45, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
+                        <input type="radio" name="alertMode" checked={alertMode === 'melody'} onChange={() => {
+                          setAlertMode('melody');
+                          executeAlertMode('melody');
+                        }} style={{ width: 12, height: 12, marginRight: 3 }} /> 멜로디
                       </label>
-                      <label style={{ margin: 0, padding: '4px 8px', fontSize: 16, minWidth: 60, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
-                        <input type="radio" name="alertMode" checked={alertMode === 'silent'} onChange={() => setAlertMode('silent')} style={{ width: 18, height: 18, marginRight: 4 }} /> 무음
+                      <label style={{ margin: 0, padding: '2px 6px', fontSize: 13, minWidth: 45, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
+                        <input type="radio" name="alertMode" checked={alertMode === 'silent'} onChange={() => {
+                          setAlertMode('silent');
+                          executeAlertMode('silent');
+                        }} style={{ width: 12, height: 12, marginRight: 3 }} /> 무음
                       </label>
                     </div>
                   </div>
@@ -330,6 +415,23 @@ const App: React.FC = () => {
   useEffect(() => {
     return () => {
       cleanupAlertMode();
+    };
+  }, []);
+
+  // 브라우저 캐시 강제 새로고침 및 불필요한 버튼 제거
+  useEffect(() => {
+    // 캐시 강제 새로고침
+    if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_BACK_FORWARD) {
+      window.location.reload();
+    }
+
+    // 불필요한 버튼들 제거
+    const observer = initCleanup();
+    
+    return () => {
+      if (observer) {
+        observer.disconnect();
+      }
     };
   }, []);
 

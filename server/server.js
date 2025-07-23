@@ -1,11 +1,13 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const twilio = require('twilio');
 const { 
   registerUser, 
   findUserByPhone, 
   findUserByEmail, 
   findUserByUsername, 
+  findUserById,
   updatePassword,
   getAllUsers 
 } = require('./database');
@@ -221,6 +223,52 @@ apiRouter.post('/reset-password', async (req, res) => {
   }
 });
 
+// 비밀번호 변경 API (로그인된 사용자용)
+apiRouter.post('/change-password', async (req, res) => {
+  try {
+    const { userId, currentPassword, newPassword } = req.body;
+    
+    if (!userId || !currentPassword || !newPassword) {
+      return res.status(400).json({ 
+        success: false, 
+        error: '모든 필드를 입력해주세요.' 
+      });
+    }
+
+    // 현재 사용자 정보 조회
+    const user = await findUserById(userId);
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        error: '사용자를 찾을 수 없습니다.' 
+      });
+    }
+
+    // 현재 비밀번호 확인
+    if (user.password !== currentPassword) {
+      return res.status(400).json({ 
+        success: false, 
+        error: '현재 비밀번호가 올바르지 않습니다.' 
+      });
+    }
+
+    // 새 비밀번호로 업데이트
+    const result = await updatePassword(userId, newPassword);
+    
+    console.log(`✅ 비밀번호 변경 성공: ${user.username} (${user.email})`);
+    res.json({ 
+      success: true, 
+      message: result.message
+    });
+  } catch (error) {
+    console.error('❌ 비밀번호 변경 실패:', error.message);
+    res.status(400).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
 // SMS 발송 API (CoolSMS)
 apiRouter.post('/send-sms', async (req, res) => {
   try {
@@ -267,17 +315,28 @@ apiRouter.post('/send-verification', async (req, res) => {
     const code = requestCode || Math.floor(100000 + Math.random() * 900000).toString();
     // 인증번호를 서버 메모리에 저장
     verificationCodes[normalizedPhone] = code;
-    const message = `[LostFinder] 인증번호: ${code}\n\n이 인증번호를 입력해주세요.`;
-    const result = await messageService.sendOne({
-      to: normalizedPhone,
-      from: coolsmsFrom,
-      text: message
-    });
-    console.log(`✅ 인증번호 발송 성공: ${normalizedPhone} - 코드: ${code}`);
+    
+    // 개발 모드에서는 콘솔에 인증번호 출력
+    console.log(`🔐 [개발모드] 인증번호: ${code} (${normalizedPhone})`);
+    console.log(`📱 실제 SMS 대신 콘솔에서 인증번호를 확인하세요!`);
+    
+    // 실제 SMS 발송 시도 (실패해도 성공으로 처리)
+    try {
+      const message = `[LostFinder] 인증번호: ${code}\n\n이 인증번호를 입력해주세요.`;
+      const result = await messageService.sendOne({
+        to: normalizedPhone,
+        from: coolsmsFrom,
+        text: message
+      });
+      console.log(`✅ 실제 SMS 발송 성공: ${normalizedPhone} - 코드: ${code}`);
+    } catch (smsError) {
+      console.log(`⚠️ SMS 발송 실패 (개발모드): ${smsError.message}`);
+    }
+    
     res.json({ 
       success: true, 
-      messageId: result.groupId,
-      message: '인증번호가 발송되었습니다.'
+      messageId: 'dev-mode',
+      message: '인증번호가 발송되었습니다. (개발모드: 콘솔에서 확인)'
     });
   } catch (error) {
     console.error('❌ 인증번호 발송 실패:', error);
@@ -330,6 +389,14 @@ apiRouter.get('/users', async (req, res) => {
 
 // API 라우터를 /api 경로에 마운트
 app.use('/api', apiRouter);
+
+// 정적 파일 서빙 (React 빌드 파일)
+app.use(express.static(path.join(__dirname, '../client/build')));
+
+// 모든 GET 요청을 React 앱으로 라우팅 (SPA 지원)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build/index.html'));
+});
 
 // 전역 에러 핸들러 (모든 에러를 JSON으로 반환)
 app.use((err, req, res, next) => {

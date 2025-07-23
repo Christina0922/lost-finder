@@ -1,38 +1,3 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
-node_modules/
-**/node_modules/
-**/node_modules/**
-/.pnp
-.pnp.js
-
-# testing
-/coverage
-
-# production
-/build
-
-# misc
-.DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Server
-server/node_modules
-server/.env
-
-# Client
-client/node_modules
-client/.env
-
 # Dependencies
 node_modules/
 npm-debug.log*
@@ -40,8 +5,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # Production builds
-build/
-dist/
+/client/build
+/client/dist
 
 # Environment variables
 .env
@@ -50,17 +15,17 @@ dist/
 .env.test.local
 .env.production.local
 
-# Database files
+# Database
 *.db
 *.sqlite
 *.sqlite3
 
 # Logs
-logs
+logs/
 *.log
 
 # Runtime data
-pids
+pids/
 *.pid
 *.seed
 *.pid.lock
@@ -89,17 +54,15 @@ jspm_packages/
 # dotenv environment variables file
 .env
 
-# IDE files
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# OS generated files
+# OS
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
+
+# Vercel
+.vercel

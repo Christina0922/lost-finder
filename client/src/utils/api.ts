@@ -173,6 +173,30 @@ export const resetPassword = async (phone: string, newPassword: string) => {
   }
 };
 
+// 비밀번호 변경 API (로그인된 사용자용)
+export const changePassword = async (userId: number, currentPassword: string, newPassword: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/change-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userId, currentPassword, newPassword }),
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.error || '비밀번호 변경에 실패했습니다.');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('비밀번호 변경 오류:', error);
+    throw error;
+  }
+};
+
 // SMS 발송 API
 export const sendSMS = async (phone: string, message: string) => {
   try {
