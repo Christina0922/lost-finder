@@ -1,9 +1,10 @@
 [build]
   publish = "client/build"
-  command = "cd client && npm run build"
+  command = "cd client && npm install && npm run build"
 
 [build.environment]
   NODE_ENV = "production"
+  CI = "false"
 
 [[redirects]]
   from = "/api/*"
@@ -13,4 +14,11 @@
 [[redirects]]
   from = "/*"
   to = "/index.html"
-  status = 200 
+  status = 200
+
+[headers]
+  for = "/*"
+    [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff" 
