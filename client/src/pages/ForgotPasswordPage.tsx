@@ -24,7 +24,7 @@ const ForgotPasswordPage: React.FC<ForgotPasswordPageProps> = ({ onResetPassword
     
     setTimeout(() => {
       if (success) {
-        setMessage('인증번호가 발송되었습니다. (실제 SMS로 수신, 환경변수 미설정 시 콘솔에서 확인)');
+        setMessage('인증번호 6자리를 발송했습니다! 📱 개발모드에서는 콘솔에서 인증번호를 확인하세요.');
         setIsCodeSent(true);
       } else {
         setMessage('가입되지 않은 휴대폰 번호입니다.');

@@ -160,22 +160,29 @@
   resize: vertical;
   min-height: 80px;
   font-size: 15px;
-  color: #495057;
+  color: #000000 !important;
   font-weight: 500;
-  background-color: #f8f9fa;
+  background-color: #ffffff !important;
   transition: border-color 0.3s ease;
 }
 
 .comment-form textarea:focus {
   outline: none;
   border-color: #007bff;
-  background-color: #fff;
+  background-color: #ffffff !important;
+  color: #000000 !important;
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
 .comment-form textarea::placeholder {
-  color: #666;
+  color: #999 !important;
   font-weight: 400;
+}
+
+.comment-form textarea:disabled {
+  background-color: #f8f9fa !important;
+  color: #6c757d !important;
+  cursor: not-allowed;
 }
 
 .comment-form button {

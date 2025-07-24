@@ -112,11 +112,11 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onAddItem, currentUser }) =
             ))}
           </div>
         </div>
-        <div className="form-actions">
-          <button type="submit" className="submit-button" disabled={isUploading}>
+        <div className="button-group">
+          <button type="submit" className="btn primary" disabled={isUploading}>
             {isUploading ? "업로드 대기 중..." : "등록하기"}
           </button>
-          <Link to="/list" className="button-secondary">취소하고 목록으로</Link>
+          <Link to="/list" className="btn secondary">취소하고 목록으로</Link>
         </div>
       </form>
     </div>

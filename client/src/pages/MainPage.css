@@ -1,7 +1,7 @@
 .main-container {
   text-align: center;
-  padding-top: 8px !important;
-  padding-bottom: 0px !important;
+  padding-top: 6px !important;
+  padding-bottom: 16px !important;
   background: linear-gradient(135deg, #fff5f5 0%, #fef7f0 100%);
   border-radius: 20px;
   border-bottom-left-radius: 0;
@@ -12,30 +12,30 @@
 }
 
 .main-container h1 {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .main-container p {
   font-size: 20px;
   color: #4a4a4a;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   font-weight: 500;
   line-height: 1.6;
 }
 
 .main-title {
   color: #e91e63;
-  font-size: 2.2rem;
-  font-weight: 700;
-  margin-bottom: 20px;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 15px;
   font-family: 'Gmarket Sans', sans-serif;
-  letter-spacing: 1px;
-  text-shadow: 2px 2px 4px rgba(233, 30, 99, 0.2);
+  letter-spacing: 1.5px;
+  text-shadow: 3px 3px 6px rgba(233, 30, 99, 0.3);
   background: linear-gradient(45deg, #e91e63, #ff6b9d);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  padding: 20px 30px;
+  padding: 15px 25px;
   border-radius: 25px;
   position: relative;
   display: inline-block;
@@ -55,18 +55,54 @@
 }
 
 .main-desc {
-  font-size: 1.25rem;
-  color: #333;
-  font-weight: 600;
+  font-size: 1.1rem;
+  color: #555;
+  font-weight: 500;
   margin-bottom: 0px;
   line-height: 1.5;
 }
 
-.main-actions {
+.button-group {
   display: flex;
+  gap: 12px;
   justify-content: center;
-  gap: 20px;
+  margin-top: 24px;
   margin-bottom: 0px;
+}
+
+.btn {
+  font-size: 16px;
+  font-weight: 600;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  min-width: 140px;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+/* 메인 버튼: 등록하기 */
+.btn.primary {
+  background-color: #00c395;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(0, 195, 149, 0.4);
+}
+
+/* 보조 버튼: 목록 보기 */
+.btn.secondary {
+  background-color: #444c56;
+  color: #ffffff;
+}
+
+/* 호버 효과 */
+.btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  color: #ffffff;
+  text-decoration: none;
 }
 
 .main-button {
@@ -205,24 +241,27 @@
 @media (max-width: 600px) {
   .main-container {
     padding-top: 0 !important;
-    padding-bottom: 0 !important;
+    padding-bottom: 12px !important;
     max-width: 98vw;
   }
   .main-title {
     margin-bottom: 2px;
-    font-size: 1rem;
+    font-size: 1.4rem;
+    font-weight: 700;
   }
   .main-desc {
     margin-bottom: 4px;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    font-weight: 400;
   }
-  .main-actions {
-    gap: 4px;
+  .button-group {
+    gap: 8px;
     margin-bottom: 2px;
   }
-  .main-button {
-    padding: 6px 6px;
-    font-size: 0.8rem;
+  .btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    min-width: 100px;
   }
   .bottom-banner {
     margin-top: 1.5px;

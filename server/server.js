@@ -15,7 +15,7 @@ require('dotenv').config();
 const coolsms = require('coolsms-node-sdk').default;
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 // 미들웨어
 app.use(cors());
@@ -336,7 +336,7 @@ apiRouter.post('/send-verification', async (req, res) => {
     res.json({ 
       success: true, 
       messageId: 'dev-mode',
-      message: '인증번호가 발송되었습니다. (개발모드: 콘솔에서 확인)'
+      message: `인증번호 6자리를 발송했습니다!\n\n📱 개발모드에서는 콘솔에서 인증번호를 확인하세요.\n🔐 인증번호: ${code}`
     });
   } catch (error) {
     console.error('❌ 인증번호 발송 실패:', error);
@@ -411,9 +411,10 @@ module.exports = app;
 
 // 서버 시작
 if (require.main === module) {
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 서버가 포트 ${PORT}에서 실행 중입니다.`);
     console.log(`📡 API 엔드포인트: http://localhost:${PORT}/api`);
+    console.log(`🌐 외부 접속: http://192.168.45.27:${PORT}`);
     console.log(`🏥 상태 확인: http://localhost:${PORT}/api/health`);
   });
 } 

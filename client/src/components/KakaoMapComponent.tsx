@@ -26,31 +26,69 @@ const KakaoMapComponent: React.FC<KakaoMapComponentProps> = ({ location, itemTyp
     console.log('KakaoMapComponent 마운트됨');
     console.log('API 키:', KAKAO_MAP_API_KEY);
     console.log('위치:', location);
+    console.log('현재 도메인:', window.location.hostname + ':' + window.location.port);
     
-    setDebugInfo(`API 키: ${KAKAO_MAP_API_KEY.substring(0, 8)}... | 위치: ${location}`);
+    setDebugInfo(`API 키: ${KAKAO_MAP_API_KEY.substring(0, 8)}... | 위치: ${location} | 도메인: ${window.location.hostname}:${window.location.port}`);
 
-    // 카카오맵이 로드될 때까지 대기
-    const checkKakaoMap = () => {
+    // 카카오맵 API 동적 로딩
+    const loadKakaoMap = () => {
       if (window.kakao && window.kakao.maps) {
-        console.log('카카오맵 로드 성공!');
+        console.log('카카오맵 이미 로드됨');
         setMapLoaded(true);
         return;
       }
       
-      // 아직 로드되지 않았다면 다시 시도
+      // 기존 스크립트가 있는지 확인
+      const existingScript = document.querySelector('script[src*="kakao"]');
+      if (existingScript) {
+        console.log('카카오맵 스크립트 이미 존재');
+        const checkKakaoMap = () => {
+          if (window.kakao && window.kakao.maps) {
+            console.log('카카오맵 로드 성공!');
+            setMapLoaded(true);
+            return;
+          }
+          setTimeout(checkKakaoMap, 100);
+        };
+        checkKakaoMap();
+        return;
+      }
+
+      // 새로운 스크립트 생성
+      const script = document.createElement('script');
+      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_API_KEY}&libraries=services`;
+      script.async = true;
+      script.onload = () => {
+        console.log('카카오맵 스크립트 로드 완료');
+        const checkKakaoMap = () => {
+          if (window.kakao && window.kakao.maps) {
+            console.log('카카오맵 로드 성공!');
+            setMapLoaded(true);
+            return;
+          }
       setTimeout(checkKakaoMap, 100);
     };
-
     checkKakaoMap();
+      };
+      script.onerror = () => {
+        console.error('카카오맵 스크립트 로드 실패');
+        setMapError('카카오맵을 로드할 수 없습니다.');
+        setUseFallback(true);
+      };
+      
+      document.head.appendChild(script);
+    };
 
-    // 10초 후에도 로드되지 않으면 에러
+    loadKakaoMap();
+
+    // 5초 후에도 로드되지 않으면 에러
     const timeout = setTimeout(() => {
       if (!window.kakao || !window.kakao.maps) {
         console.error('카카오맵 로드 실패');
-        setMapError('카카오맵을 로드할 수 없습니다. 도메인 설정을 확인해주세요.');
+        setMapError(`카카오맵을 로드할 수 없습니다. 도메인 설정을 확인해주세요. (현재: ${window.location.hostname}:${window.location.port})`);
         setUseFallback(true);
       }
-    }, 10000);
+    }, 5000);
 
     return () => clearTimeout(timeout);
   }, []);
@@ -305,10 +343,13 @@ const KakaoMapComponent: React.FC<KakaoMapComponentProps> = ({ location, itemTyp
               <li><code>http://localhost:3000</code></li>
               <li><code>https://localhost:3000</code> (HTTPS 사용 시)</li>
               <li><code>http://127.0.0.1:3000</code></li>
+              <li><code>http://192.168.45.27:3000</code> (현재 사용 중인 IP)</li>
+              <li><code>http://192.168.45.27</code></li>
         </ul>
           </li>
           <li>JavaScript 키를 복사하여 환경변수 <code>REACT_APP_KAKAO_MAP_API_KEY</code>에 설정</li>
         </ol>
+        <p><strong>현재 도메인:</strong> {window.location.hostname}:{window.location.port}</p>
         <button 
           onClick={() => window.location.reload()} 
           style={{

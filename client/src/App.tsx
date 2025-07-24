@@ -15,6 +15,39 @@ import { executeAlertMode, cleanupAlertMode } from './utils/sound';
 import { initCleanup } from './utils/cleanup';
 import './App.css';
 
+// 오류 경계 컴포넌트 추가
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error?: Error }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('App Error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '20px', textAlign: 'center' }}>
+          <h1>오류가 발생했습니다</h1>
+          <p>{this.state.error?.message}</p>
+          <button onClick={() => window.location.reload()}>새로고침</button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 // 사용자 정보 타입을 정의합니다.
 export interface User {
   id: number;
@@ -56,246 +89,147 @@ const Header: React.FC<{
   alertMode: 'vibrate' | 'melody' | 'silent';
   setAlertMode: (m: 'vibrate' | 'melody' | 'silent') => void;
 }> = ({ currentUser, notifications, onLogout, theme, setTheme, alertMode, setAlertMode }) => {
-  const [showNotifications, setShowNotifications] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-
-  const unreadNotifications = notifications.filter(n => !n.read && n.userId === currentUser?.id);
-
-  const handleNotificationClick = (itemId: number) => {
-    window.location.href = `/detail/${itemId}`;
-  };
-
   return (
-    <header className="app-header">
-      <div className="header-left">
-        <a href="/" className="logo">LostFinder</a>
+    <header style={{
+      backgroundColor: '#333',
+      color: 'white',
+      padding: '15px 20px',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center'
+    }}>
+      <div>
+        <a href="/" style={{ color: 'white', textDecoration: 'none', fontSize: '20px', fontWeight: 'bold' }}>
+          LostFinder
+        </a>
       </div>
-      <nav className="header-right">
+      <nav style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
         {currentUser ? (
-          <div className="user-nav">
-            {currentUser.isTemporaryPassword && (
-              <div style={{ 
-                backgroundColor: '#fff3cd', 
-                border: '1px solid #ffeaa7', 
-                borderRadius: '4px', 
-                padding: '8px 12px', 
-                marginRight: '16px',
-                fontSize: '14px',
-                color: '#856404'
-              }}>
-                <Link to="/change-password" style={{ color: '#856404', textDecoration: 'none' }}>
-                  🔒 비밀번호 변경 필요
+          <div style={{ display: 'flex', gap: '15px', alignItems: 'center', whiteSpace: 'nowrap', position: 'relative' }}>
+            <button 
+              onClick={onLogout} 
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#dc3545',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              로그아웃
+            </button>
+            <button 
+              onClick={() => setShowSettings(!showSettings)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: '24px',
+                padding: '0',
+                margin: '0',
+                outline: 'none'
+              }}
+            >
+              ⚙
+            </button>
+            {showSettings && (
+            <div style={{ 
+              position: 'absolute',
+              top: '100%',
+              right: '0',
+              width: '90px',
+              padding: '6px',
+              backgroundColor: '#fff',
+              borderRadius: '6px',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+              fontSize: '9px',
+              marginTop: '5px',
+              zIndex: 1000
+            }}>
+              <div style={{ fontWeight: 'bold', marginBottom: 1, textAlign: 'center', color: '#333', fontSize: '8px' }}>설정</div>
+              <div style={{ marginBottom: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ marginRight: 4, color: '#333', fontSize: '10px' }}>🌗</span>
+                <div style={{ display: 'flex', gap: 2 }}>
+                <button 
+                  onClick={() => setTheme('light')} 
+                  style={{ 
+                    fontWeight: theme === 'light' ? 'bold' : 'normal', 
+                    padding: '2px 6px',
+                      fontSize: '9px',
+                    borderRadius: '3px',
+                      border: theme === 'light' ? '1px solid #007bff' : '1px solid #ccc',
+                    background: theme === 'light' ? '#007bff' : '#ffffff',
+                    color: theme === 'light' ? '#ffffff' : '#333333',
+                      cursor: 'pointer',
+                      minWidth: '35px'
+                  }}
+                >
+                  화이트
+                </button>
+                <button 
+                  onClick={() => setTheme('dark')} 
+                  style={{ 
+                    fontWeight: theme === 'dark' ? 'bold' : 'normal',
+                    padding: '2px 6px',
+                      fontSize: '9px',
+                    borderRadius: '3px',
+                      border: theme === 'dark' ? '1px solid #007bff' : '1px solid #ccc',
+                    background: theme === 'dark' ? '#007bff' : '#ffffff',
+                    color: theme === 'dark' ? '#ffffff' : '#333333',
+                      cursor: 'pointer',
+                      minWidth: '35px'
+                  }}
+                >
+                    블랙
+                </button>
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: 3 }}>
+                <span style={{ marginRight: 3, color: '#333', fontSize: '8px' }}>🔔</span>
+                <div style={{ display: 'flex', gap: 2 }}>
+                  <label style={{ margin: 0, padding: '1px 2px', fontSize: '8px', display: 'flex', alignItems: 'center' }}>
+                    <input type="radio" name="alertMode" checked={alertMode === 'vibrate'} onChange={() => setAlertMode('vibrate')} style={{ width: 8, height: 8, marginRight: 1 }} /> 진동
+                  </label>
+                  <label style={{ margin: 0, padding: '1px 2px', fontSize: '8px', display: 'flex', alignItems: 'center' }}>
+                    <input type="radio" name="alertMode" checked={alertMode === 'melody'} onChange={() => setAlertMode('melody')} style={{ width: 8, height: 8, marginRight: 1 }} /> 멜로디
+                  </label>
+                  <label style={{ margin: 0, padding: '1px 2px', fontSize: '8px', display: 'flex', alignItems: 'center' }}>
+                    <input type="radio" name="alertMode" checked={alertMode === 'silent'} onChange={() => setAlertMode('silent')} style={{ width: 8, height: 8, marginRight: 1 }} /> 무음
+                  </label>
+                </div>
+              </div>
+              <div style={{ borderTop: '1px solid #eee', paddingTop: 3, marginTop: 3 }}>
+                <Link 
+                  to="/change-password" 
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    padding: '2px 4px',
+                    backgroundColor: '#007bff',
+                    color: 'white',
+                    textDecoration: 'none',
+                    borderRadius: '2px',
+                    fontSize: '8px',
+                    textAlign: 'center',
+                    fontWeight: '500',
+                    transition: 'background-color 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0056b3'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#007bff'}
+                >
+                  🔐 비밀번호 변경
                 </Link>
               </div>
+            </div>
             )}
-            <div className="notification-container">
-              <button onClick={() => setShowNotifications(!showNotifications)} className="notification-bell">
-                🔔 
-                {unreadNotifications.length > 0 && 
-                  <span className="notification-count">{unreadNotifications.length}</span>
-                }
-              </button>
-              {showNotifications && (
-                <div className="notification-dropdown">
-                  {unreadNotifications.length > 0 ? (
-                    <ul>
-                      {unreadNotifications.map(n => (
-                        <li key={n.id} onClick={() => handleNotificationClick(n.itemId)}>
-                          {n.message}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <div className="no-notifications">새로운 알림이 없습니다.</div>
-                  )}
-                </div>
-              )}
-            </div>
-            <button onClick={onLogout} className="logout-button">로그아웃</button>
-            <div className="settings-container" style={{ position: 'relative', display: 'inline-block' }}>
-              <button className="settings-gear" onClick={() => setShowSettings(v => !v)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', marginRight: 0 }} title="설정">
-                ⚙️
-              </button>
-              {showSettings && (
-                <div className={"settings-dropdown" + (window.innerWidth <= 600 ? " mobile" : "")}
-                  style={{ position: 'absolute', right: 0, top: 36, zIndex: 2000 }}
-                  onClick={e => e.stopPropagation()}
-                >
-                  <button
-                    className="settings-close-btn"
-                    style={{ position: 'absolute', top: 8, right: 8, background: '#fff3cd', border: '1px solid #ffeaa7', fontSize: '13px', cursor: 'pointer', color: 'white', zIndex: 10, padding: '1px 4px', borderRadius: '2px', fontWeight: '600', textShadow: '0px 0px 2px #000' }}
-                    onClick={() => setShowSettings(false)}
-                    aria-label="닫기"
-                    type="button"
-                  >
-                    닫기
-                  </button>
-                  <div style={{ fontWeight: 'bold', marginBottom: 8, textAlign: 'center' }}>설정</div>
-                  {currentUser && (
-                    <div className="settings-row">
-                      <span className="settings-icon" role="img" aria-label="비밀번호">🔑</span>
-                      <span className="settings-label">비밀번호 변경</span>
-                      <Link 
-                        to="/change-password" 
-                        className="settings-link" 
-                        style={{ marginLeft: 'auto', color: '#007bff', textDecoration: 'none', fontWeight: 'bold', cursor: 'pointer' }}
-                        onClick={() => setShowSettings(false)}
-                      >
-                        변경하기
-                      </Link>
-                    </div>
-                  )}
-                  <div className="settings-row">
-                    <span className="settings-icon" role="img" aria-label="테마">🌗</span>
-                    <span className="settings-label">테마</span>
-                    <div className="settings-controls" style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
-                      <button 
-                        onClick={() => setTheme('light')} 
-                        style={{ 
-                          fontWeight: theme === 'light' ? 'bold' : 'normal',
-                          padding: '4px 8px',
-                          fontSize: '12px',
-                          borderRadius: '4px',
-                          border: '1px solid #ddd',
-                          background: theme === 'light' ? '#007bff' : '#f8f9fa',
-                          color: theme === 'light' ? '#fff' : '#000',
-                          cursor: 'pointer',
-                          minWidth: '40px'
-                        }}
-                      >
-                        화이트
-                      </button>
-                      <button 
-                        onClick={() => setTheme('dark')} 
-                        style={{ 
-                          fontWeight: theme === 'dark' ? 'bold' : 'normal',
-                          padding: '4px 8px',
-                          fontSize: '12px',
-                          borderRadius: '4px',
-                          border: '1px solid #ddd',
-                          background: theme === 'dark' ? '#007bff' : '#f8f9fa',
-                          color: theme === 'dark' ? '#fff' : '#000',
-                          cursor: 'pointer',
-                          minWidth: '40px'
-                        }}
-                      >
-                        다크
-                      </button>
-                    </div>
-                  </div>
-                  <div className="settings-row" style={{ alignItems: 'center', display: 'flex' }}>
-                    <span className="settings-icon" role="img" aria-label="알림">🔔</span>
-                    <span className="settings-label" style={{ marginRight: 8, whiteSpace: 'nowrap', minWidth: 40 }}>알림</span>
-                    <div className="settings-controls" style={{ display: 'flex', gap: 8, flexWrap: 'nowrap', whiteSpace: 'nowrap', alignItems: 'center', minWidth: 180 }}>
-                      <label style={{ margin: 0, padding: '2px 6px', fontSize: 13, minWidth: 45, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
-                        <input type="radio" name="alertMode" checked={alertMode === 'vibrate'} onChange={() => {
-                          setAlertMode('vibrate');
-                          executeAlertMode('vibrate');
-                        }} style={{ width: 12, height: 12, marginRight: 3 }} /> 진동
-                      </label>
-                      <label style={{ margin: 0, padding: '2px 6px', fontSize: 13, minWidth: 45, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
-                        <input type="radio" name="alertMode" checked={alertMode === 'melody'} onChange={() => {
-                          setAlertMode('melody');
-                          executeAlertMode('melody');
-                        }} style={{ width: 12, height: 12, marginRight: 3 }} /> 멜로디
-                      </label>
-                      <label style={{ margin: 0, padding: '2px 6px', fontSize: 13, minWidth: 45, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
-                        <input type="radio" name="alertMode" checked={alertMode === 'silent'} onChange={() => {
-                          setAlertMode('silent');
-                          executeAlertMode('silent');
-                        }} style={{ width: 12, height: 12, marginRight: 3 }} /> 무음
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
         ) : (
-          <div className="guest-nav">
-            <Link to="/login" className="nav-link">로그인</Link>
-            <Link to="/signup" className="nav-link">회원가입</Link>
-            <div className="settings-container" style={{ position: 'relative', display: 'inline-block' }}>
-              <button className="settings-gear" onClick={() => setShowSettings(v => !v)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', marginRight: 0 }} title="설정">
-                ⚙️
-              </button>
-              {showSettings && (
-                <div className={"settings-dropdown" + (window.innerWidth <= 600 ? " mobile" : "")}
-                  style={{ position: 'absolute', right: 0, top: 36, zIndex: 2000 }}
-                  onClick={e => e.stopPropagation()}
-                >
-                  <button
-                    className="settings-close-btn"
-                    style={{ position: 'absolute', top: 8, right: 8, background: '#fff3cd', border: '1px solid #ffeaa7', fontSize: '13px', cursor: 'pointer', color: 'white', zIndex: 10, padding: '1px 4px', borderRadius: '2px', fontWeight: '600', textShadow: '0px 0px 2px #000' }}
-                    onClick={() => setShowSettings(false)}
-                    aria-label="닫기"
-                    type="button"
-                  >
-                    닫기
-                  </button>
-                  <div style={{ fontWeight: 'bold', marginBottom: 8, textAlign: 'center' }}>설정</div>
-                  <div style={{ marginBottom: 12 }}>
-                    <span style={{ marginRight: 8 }}>🌗 테마:</span>
-                    <button 
-                      onClick={() => setTheme('light')} 
-                      style={{ 
-                        fontWeight: theme === 'light' ? 'bold' : 'normal', 
-                        marginRight: 4,
-                        padding: '4px 8px',
-                        fontSize: '12px',
-                        borderRadius: '4px',
-                        border: '1px solid #ddd',
-                        background: theme === 'light' ? '#007bff' : '#f8f9fa',
-                        color: theme === 'light' ? '#fff' : '#333',
-                        cursor: 'pointer',
-                        minWidth: '40px'
-                      }}
-                    >
-                      화이트
-                    </button>
-                    <button 
-                      onClick={() => setTheme('dark')} 
-                      style={{ 
-                        fontWeight: theme === 'dark' ? 'bold' : 'normal',
-                        padding: '4px 8px',
-                        fontSize: '12px',
-                        borderRadius: '4px',
-                        border: '1px solid #ddd',
-                        background: theme === 'dark' ? '#007bff' : '#f8f9fa',
-                        color: theme === 'dark' ? '#fff' : '#333',
-                        cursor: 'pointer',
-                        minWidth: '40px'
-                      }}
-                    >
-                      다크
-                    </button>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4, flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
-                    <span style={{ marginRight: 8, whiteSpace: 'nowrap', minWidth: 40 }}>🔔 알림:</span>
-                    <div className="alert-modes" style={{ display: 'flex', gap: 8, flexWrap: 'nowrap', whiteSpace: 'nowrap', alignItems: 'center', minWidth: 180 }}>
-                      <label style={{ margin: 0, padding: '2px 6px', fontSize: 13, minWidth: 45, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
-                        <input type="radio" name="alertMode" checked={alertMode === 'vibrate'} onChange={() => {
-                          setAlertMode('vibrate');
-                          executeAlertMode('vibrate');
-                        }} style={{ width: 12, height: 12, marginRight: 3 }} /> 진동
-                      </label>
-                      <label style={{ margin: 0, padding: '2px 6px', fontSize: 13, minWidth: 45, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
-                        <input type="radio" name="alertMode" checked={alertMode === 'melody'} onChange={() => {
-                          setAlertMode('melody');
-                          executeAlertMode('melody');
-                        }} style={{ width: 12, height: 12, marginRight: 3 }} /> 멜로디
-                      </label>
-                      <label style={{ margin: 0, padding: '2px 6px', fontSize: 13, minWidth: 45, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
-                        <input type="radio" name="alertMode" checked={alertMode === 'silent'} onChange={() => {
-                          setAlertMode('silent');
-                          executeAlertMode('silent');
-                        }} style={{ width: 12, height: 12, marginRight: 3 }} /> 무음
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+          <div style={{ display: 'flex', gap: '15px' }}>
+            <Link to="/login" style={{ color: 'white', textDecoration: 'none' }}>로그인</Link>
+            <Link to="/signup" style={{ color: 'white', textDecoration: 'none' }}>회원가입</Link>
           </div>
         )}
       </nav>
@@ -372,7 +306,7 @@ const App: React.FC = () => {
     return (localStorage.getItem('alertMode') as 'vibrate' | 'melody' | 'silent') || 'melody';
   });
 
-  const [showSettings, setShowSettings] = useState(false);
+
 
   useEffect(() => {
     localStorage.setItem('users', JSON.stringify(users));
@@ -398,18 +332,9 @@ const App: React.FC = () => {
 
   useEffect(() => {
     localStorage.setItem('alertMode', alertMode);
-    // 알림 모드 변경 시 즉시 테스트 실행
-    executeAlertMode(alertMode);
   }, [alertMode]);
 
-  useEffect(() => {
-    if (!showSettings) return;
-    const handleClick = (e: MouseEvent) => {
-      setShowSettings(false);
-    };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, [showSettings]);
+
 
   // 컴포넌트 언마운트 시 정리
   useEffect(() => {
@@ -418,21 +343,9 @@ const App: React.FC = () => {
     };
   }, []);
 
-  // 브라우저 캐시 강제 새로고침 및 불필요한 버튼 제거
+  // 컴포넌트 마운트 시 한 번만 실행
   useEffect(() => {
-    // 캐시 강제 새로고침
-    if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_BACK_FORWARD) {
-      window.location.reload();
-    }
-
-    // 불필요한 버튼들 제거
-    const observer = initCleanup();
-    
-    return () => {
-      if (observer) {
-        observer.disconnect();
-      }
-    };
+    console.log('App 컴포넌트 마운트됨');
   }, []);
 
   // 테스트용 분실물 자동 삭제 코드 제거 - 등록된 분실물이 보이도록 함
@@ -505,7 +418,12 @@ const App: React.FC = () => {
       // 인증번호 발송
       const result = await sendVerificationCode(phone);
       
-      alert("인증번호가 발송되었습니다. (개발 모드에서는 콘솔에서 확인)");
+      // 서버에서 보내는 상세한 메시지를 표시
+      if (result && result.message) {
+        alert(result.message);
+      } else {
+        alert("인증번호 6자리를 발송했습니다!");
+      }
       return true;
     } catch (error: any) {
       console.error('인증번호 발송 오류:', error);
@@ -635,54 +553,56 @@ const App: React.FC = () => {
   };
 
   return (
-    <Router>
-      <Header
-        currentUser={currentUser}
-        notifications={notifications}
-        onLogout={handleLogout}
-        theme={theme}
-        setTheme={setTheme}
-        alertMode={alertMode}
-        setAlertMode={setAlertMode}
-      />
-      <main className="app-main">
-        <Routes>
-          <Route path="/" element={<MainPage currentUser={currentUser} />} />
-          <Route path="/register" element={<RegisterPage onAddItem={handleAddItem} currentUser={currentUser} />} />
-          <Route
-            path="/list"
-            element={<ListPage items={lostItems} currentUser={currentUser} onDeleteItem={handleDeleteItem} />}
-          />
-          <Route
-            path="/detail/:id"
-            element={<DetailPage items={lostItems} users={users} currentUser={currentUser} onAddComment={handleAddComment} onDeleteComment={handleDeleteComment} onMarkAsRead={handleMarkAsRead} onDeleteItem={handleDeleteItem} />}
-          />
-          <Route
-            path="/edit/:id"
-            element={<EditPage items={lostItems} currentUser={currentUser} onUpdateItem={handleUpdateItem} />}
-          />
-          <Route path="/signup" element={<SignupPage onSignup={handleSignup} />} />
-          <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
-          <Route
-            path="/forgot-password"
-            element={
-              <ForgotPasswordPage 
-                onSendVerificationCode={handleSendVerificationCode}
-                onResetPasswordByPhone={handleVerifyAndResetPassword} 
-              />
-            }
-          />
-          <Route
-            path="/change-password"
-            element={<ChangePasswordPage currentUser={currentUser} onChangePassword={handleChangePassword} />}
-          />
-          <Route
-            path="/success-stories"
-            element={<SuccessStoriesPage />}
-          />
-        </Routes>
-      </main>
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <Header
+          currentUser={currentUser}
+          notifications={notifications}
+          onLogout={handleLogout}
+          theme={theme}
+          setTheme={setTheme}
+          alertMode={alertMode}
+          setAlertMode={setAlertMode}
+        />
+        <main className="app-main">
+          <Routes>
+            <Route path="/" element={<MainPage currentUser={currentUser} />} />
+            <Route path="/register" element={<RegisterPage onAddItem={handleAddItem} currentUser={currentUser} />} />
+            <Route
+              path="/list"
+              element={<ListPage items={lostItems} currentUser={currentUser} onDeleteItem={handleDeleteItem} />}
+            />
+            <Route
+              path="/detail/:id"
+              element={<DetailPage items={lostItems} users={users} currentUser={currentUser} onAddComment={handleAddComment} onDeleteComment={handleDeleteComment} onMarkAsRead={handleMarkAsRead} onDeleteItem={handleDeleteItem} />}
+            />
+            <Route
+              path="/edit/:id"
+              element={<EditPage items={lostItems} currentUser={currentUser} onUpdateItem={handleUpdateItem} />}
+            />
+            <Route path="/signup" element={<SignupPage onSignup={handleSignup} />} />
+            <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+            <Route
+              path="/forgot-password"
+              element={
+                <ForgotPasswordPage 
+                  onSendVerificationCode={handleSendVerificationCode}
+                  onResetPasswordByPhone={handleVerifyAndResetPassword} 
+                />
+              }
+            />
+            <Route
+              path="/change-password"
+              element={<ChangePasswordPage currentUser={currentUser} onChangePassword={handleChangePassword} />}
+            />
+            <Route
+              path="/success-stories"
+              element={<SuccessStoriesPage />}
+            />
+          </Routes>
+        </main>
+      </Router>
+    </ErrorBoundary>
   );
 }
 
