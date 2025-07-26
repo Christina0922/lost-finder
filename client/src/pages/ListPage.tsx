@@ -5,12 +5,13 @@ import './ListPage.css';
 
 // ListPage가 받을 props의 타입을 정의합니다.
 interface ListPageProps {
-  items: LostItem[];
+  lostItems: LostItem[];
   currentUser: User | null;
   onDeleteItem: (itemId: number) => void;
+  theme: 'light' | 'dark';
 }
 
-const ListPage: React.FC<ListPageProps> = ({ items, currentUser, onDeleteItem }) => {
+const ListPage: React.FC<ListPageProps> = ({ lostItems, currentUser, onDeleteItem, theme }) => {
   const navigate = useNavigate();
 
   const handleDeleteClick = (itemId: number) => {
@@ -26,11 +27,11 @@ const ListPage: React.FC<ListPageProps> = ({ items, currentUser, onDeleteItem })
   return (
     <div>
       <h1>분실물 목록</h1>
-      {items.length === 0 ? (
+      {lostItems.length === 0 ? (
         <p>등록된 분실물이 없습니다.</p>
       ) : (
         <div className="list-container">
-          {items.map((item) => (
+          {lostItems.map((item: LostItem) => (
             <div key={item.id} className="list-item">
               <Link to={`/detail/${item.id}`} className="list-item-image-link">
                 <img src={(item.imageUrls && item.imageUrls[0]) || 'https://via.placeholder.com/200x150'} alt={item.itemType} className="list-item-image" />

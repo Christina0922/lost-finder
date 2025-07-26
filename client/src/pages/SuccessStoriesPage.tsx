@@ -65,30 +65,78 @@ export default function SuccessStoriesPage() {
   };
 
   return (
-    <main className="max-w-xl mx-auto px-4 py-10 space-y-10">
-      <h1 className="text-2xl font-bold text-center">📦 감동 후기 모음</h1>
-      <p className="text-base text-gray-700 text-center mb-4 font-semibold">
-        이곳은 다시 만난 소중한 물건과 따뜻한 이야기들이 모이는 공간입니다.<br />
+    <main style={{ 
+      maxWidth: 'min(600px, 90vw)', 
+      margin: '0 auto', 
+      padding: 'min(20px, 3vw) min(16px, 4vw)', 
+      display: 'flex', 
+      flexDirection: 'column', 
+      gap: 'min(20px, 3vw)' 
+    }}>
+      <h1 style={{ fontSize: 'min(20px, 5vw)', fontWeight: 'bold', textAlign: 'center', marginBottom: '8px' }}>📦 감동 후기 모음</h1>
+      <p style={{ 
+        fontSize: 'min(14px, 3.5vw)', 
+        color: '#374151', 
+        textAlign: 'center', 
+        marginBottom: '8px', 
+        fontWeight: '600',
+        lineHeight: '1.4'
+      }}>
+        이곳은 다시 만난 소중한 물건과<br />
+        따뜻한 이야기들이 모이는 공간입니다.<br />
         당신의 경험이 누군가에게 큰 희망이 될 수 있어요.
       </p>
-      <p className="text-sm text-gray-700 text-center mb-4">
+      <p style={{ 
+        fontSize: 'min(12px, 3vw)', 
+        color: '#374151', 
+        textAlign: 'center', 
+        marginBottom: '12px' 
+      }}>
         지금까지 총 <strong>{stories.length}</strong>개의 따뜻한 후기가 등록되었습니다.
       </p>
 
       {/* ✅ 작성 폼 */}
-      <div className="bg-gray-100 p-6 rounded-xl shadow-md">
-        <h2 className="text-xl font-semibold mb-4 text-center">📝 나도 후기 남기기</h2>
+      <div style={{ 
+        backgroundColor: '#f3f4f6', 
+        padding: 'min(16px, 4vw)', 
+        borderRadius: '12px', 
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+        width: '100%',
+        boxSizing: 'border-box'
+      }}>
+        <h2 style={{ 
+          fontSize: 'min(16px, 4vw)', 
+          fontWeight: '600', 
+          marginBottom: '12px', 
+          textAlign: 'center' 
+        }}>📝 나도 후기 남기기</h2>
         {submitted && (
-          <p className="text-green-600 font-medium text-center mb-4">
+          <p style={{ 
+            color: '#059669', 
+            fontWeight: '500', 
+            textAlign: 'center', 
+            marginBottom: '12px',
+            fontSize: 'min(12px, 3vw)'
+          }}>
             감사합니다! 후기가 제출되었습니다.
           </p>
         )}
-        <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="success-form">
+        <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <textarea
             placeholder="후기 내용을 입력해 주세요"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="success-textarea"
+            style={{
+              width: '100%',
+              padding: '8px',
+              border: '1px solid #ddd',
+              borderRadius: '6px',
+              fontSize: 'min(13px, 3.2vw)',
+              minHeight: '80px',
+              resize: 'vertical',
+              fontFamily: 'inherit',
+              boxSizing: 'border-box'
+            }}
             required
           />
           <input
@@ -96,7 +144,15 @@ export default function SuccessStoriesPage() {
             placeholder="이름 또는 닉네임"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="success-input"
+            style={{
+              width: '100%',
+              padding: '8px',
+              border: '1px solid #ddd',
+              borderRadius: '6px',
+              fontSize: 'min(13px, 3.2vw)',
+              fontFamily: 'inherit',
+              boxSizing: 'border-box'
+            }}
             required
           />
           <input
@@ -104,12 +160,32 @@ export default function SuccessStoriesPage() {
             placeholder="지역 (예: 서울 강남구)"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            className="success-input"
+            style={{
+              width: '100%',
+              padding: '8px',
+              border: '1px solid #ddd',
+              borderRadius: '6px',
+              fontSize: 'min(13px, 3.2vw)',
+              fontFamily: 'inherit',
+              boxSizing: 'border-box'
+            }}
             required
           />
           <button
             type="submit"
-            className="success-submit-btn"
+            style={{
+              width: '100%',
+              padding: '8px',
+              backgroundColor: '#007bff',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              fontSize: 'min(14px, 3.5vw)',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'background-color 0.3s',
+              boxSizing: 'border-box'
+            }}
           >
             후기 남기기
           </button>
@@ -117,59 +193,130 @@ export default function SuccessStoriesPage() {
       </div>
 
       {/* ✅ 후기 리스트 출력 */}
-      <div className="space-y-6">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {stories.length === 0 ? (
           <>
-            <p className="text-center no-story-message">아직 후기가 없습니다. 첫 후기를 남겨보세요!</p>
+            <p style={{ 
+              textAlign: 'center', 
+              color: '#222', 
+              fontWeight: '700', 
+              fontSize: 'min(14px, 3.5vw)', 
+              marginBottom: '4px' 
+            }}>아직 후기가 없습니다. 첫 후기를 남겨보세요!</p>
           </>
         ) : (
           stories.map((story, idx) => (
             <div
               key={idx}
-              className="bg-white p-4 rounded-xl shadow mb-4 space-y-2 border border-gray-100"
+              style={{
+                backgroundColor: 'white',
+                padding: '12px',
+                borderRadius: '8px',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                marginBottom: '8px',
+                border: '1px solid #f3f4f6',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '6px'
+              }}
             >
-              <p className="text-gray-700 font-medium">"{story.content}"</p>
-              <div className="flex justify-between items-center text-xs text-gray-500">
+              <p style={{ color: '#374151', fontWeight: '500', fontSize: 'min(13px, 3.2vw)' }}>"{story.content}"</p>
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center', 
+                fontSize: 'min(11px, 2.8vw)', 
+                color: '#6b7280' 
+              }}>
                 <span>– {story.name}, {story.location}</span>
                 <button
                   onClick={() => handleLike(idx)}
-                  className="text-pink-500 hover:text-pink-700 font-bold flex items-center gap-1"
+                  style={{
+                    color: '#ec4899',
+                    fontWeight: 'bold',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '3px',
+                    border: 'none',
+                    background: 'none',
+                    cursor: 'pointer',
+                    fontSize: 'min(11px, 2.8vw)'
+                  }}
                   aria-label="공감하기"
                 >
                   ❤️ <span>{story.likes || 0}</span>
                 </button>
               </div>
-              {/* <AdminOnly>
-                <button
-                  onClick={() => handleDelete(idx)}
-                  className="text-red-500 text-xs mt-1 hover:underline"
-                >
-                  삭제하기
-                </button>
-              </AdminOnly> */}
             </div>
           ))
         )}
       </div>
 
-      <div className="footer-section">
-        <p className="footer-message">
+      <div style={{ 
+        textAlign: 'center', 
+        marginTop: '8px', 
+        paddingTop: '8px', 
+        borderTop: '1px solid #e9ecef',
+        width: '100%'
+      }}>
+        <p style={{ 
+          fontSize: 'min(14px, 3.5vw)', 
+          color: '#6c757d', 
+          marginBottom: '12px', 
+          lineHeight: '1.4' 
+        }}>
           여러분의 따뜻한 마음이 누군가에게 큰 도움이 됩니다
         </p>
         <button 
           onClick={() => navigate("/")}
-          className="home-button"
+          style={{
+            backgroundColor: '#007bff',
+            color: 'white',
+            border: 'none',
+            padding: 'min(8px, 2vw) min(16px, 4vw)',
+            borderRadius: '6px',
+            fontSize: 'min(14px, 3.5vw)',
+            fontWeight: '600',
+            cursor: 'pointer',
+            transition: 'background-color 0.3s',
+            boxSizing: 'border-box'
+          }}
         >
           홈으로 돌아가기
         </button>
       </div>
 
-      <div className="mt-10 text-center">
+      <div style={{ 
+        marginTop: '20px', 
+        textAlign: 'center',
+        width: '100%'
+      }}>
         <a
           href="https://3match-game-865e.vercel.app"
           target="_blank"
           rel="noopener noreferrer"
-          className="block w-full bg-yellow-100 border border-yellow-400 text-yellow-800 text-center font-semibold py-3 rounded-xl shadow hover:scale-105 transition text-lg"
+          style={{
+            display: 'block',
+            width: '100%',
+            backgroundColor: '#fef3c7',
+            border: '1px solid #f59e0b',
+            color: '#92400e',
+            textAlign: 'center',
+            fontWeight: '600',
+            padding: '8px',
+            borderRadius: '8px',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+            textDecoration: 'none',
+            fontSize: 'min(14px, 3.5vw)',
+            transition: 'transform 0.2s ease',
+            boxSizing: 'border-box'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.02)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1)';
+          }}
         >
           기다리는 동안, 퍼즐 게임 한 판 어때요?
         </a>

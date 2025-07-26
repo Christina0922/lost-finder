@@ -747,6 +747,124 @@ input, button, .submit-button {
   background: #00c6ad;
 }
 
+/* 다크 모드 텍스트 가독성 개선 */
+.theme-dark {
+  background-color: #181a1b;
+  color: #f5f6fa;
+}
+
+.theme-dark h1, .theme-dark h2, .theme-dark h3 {
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+.theme-dark .form-container-wrapper h1 {
+  color: #ffe082;
+  text-shadow: 1px 2px 8px #222, 0 1px 0 #fff;
+}
+
+.theme-dark input, .theme-dark textarea, .theme-dark select {
+  background: #2c3e50;
+  color: #fff;
+  border: 1px solid #34495e;
+}
+
+.theme-dark input:focus, .theme-dark textarea:focus, .theme-dark select:focus {
+  background: #34495e;
+  border-color: #3498db;
+  color: #fff;
+}
+
+/* 설정 메뉴 애니메이션 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* 설정 메뉴 다크 모드 스타일 */
+.theme-dark .settings-menu {
+  background: #2c3e50;
+  color: #fff;
+  border: 1px solid #34495e;
+}
+
+.theme-dark .settings-menu button {
+  background: #34495e;
+  color: #fff;
+  border: 1px solid #4a5568;
+}
+
+.theme-dark .settings-menu button:hover {
+  background: #4a5568;
+}
+
+.theme-dark .settings-menu button.active {
+  background: #3498db;
+  color: #fff;
+  border-color: #3498db;
+}
+
+.theme-dark .settings-menu label {
+  color: #fff;
+}
+
+.theme-dark .settings-menu input[type="radio"] {
+  accent-color: #3498db;
+}
+
+.theme-dark .settings-menu a {
+  color: #3498db;
+}
+
+.theme-dark .settings-menu a:hover {
+  color: #5dade2;
+}
+
+/* 설정 메뉴 헤더 다크 모드 */
+.theme-dark .settings-header {
+  background: #34495e !important;
+  color: #fff !important;
+  border-bottom-color: #4a5568 !important;
+}
+
+.theme-dark .settings-header h3 {
+  color: #fff !important;
+}
+
+/* 설정 메뉴 내용 다크 모드 */
+.theme-dark .settings-content {
+  background: #2c3e50 !important;
+  color: #fff !important;
+}
+
+.theme-dark .settings-content span {
+  color: #fff !important;
+}
+
+/* 기존 설정 스타일 제거 - Tailwind로 대체됨 */
+
 /* 로그인 타이틀 더 선명하게 */
 .form-container-wrapper h1 {
   font-size: 2.1rem;

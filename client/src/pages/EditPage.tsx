@@ -5,12 +5,14 @@ import './RegisterPage.css'; // 등록 페이지와 동일한 스타일 사용
 import { resizeAndCompressImage } from '../utils/image';
 
 interface EditPageProps {
-  items: LostItem[];
+  lostItems: LostItem[];
   currentUser: User | null;
   onUpdateItem: (item: LostItem) => void;
+  onAddItem?: (item: Omit<LostItem, 'id' | 'authorId' | 'comments'>) => void;
+  theme: 'light' | 'dark';
 }
 
-const EditPage: React.FC<EditPageProps> = ({ items, currentUser, onUpdateItem }) => {
+const EditPage: React.FC<EditPageProps> = ({ lostItems, currentUser, onUpdateItem, onAddItem, theme }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   
@@ -22,24 +24,33 @@ const EditPage: React.FC<EditPageProps> = ({ items, currentUser, onUpdateItem })
   const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
-    const foundItem = items.find(i => i.id === Number(id));
-    if (foundItem) {
-      // 본인 게시물인지 확인
-      if (currentUser?.id !== foundItem.authorId) {
-        alert('수정 권한이 없습니다.');
-        navigate('/list');
-        return;
-      }
-      setItemToEdit(foundItem);
-      setItemType(foundItem.itemType);
-      setDescription(foundItem.description);
-      setLocation(foundItem.location);
-      setImageUrls(foundItem.imageUrls || []);
+    if (id === 'new') {
+      // 새로운 아이템 생성 모드
+      setItemToEdit(null);
+      setItemType('');
+      setDescription('');
+      setLocation('');
+      setImageUrls([]);
     } else {
-      alert('게시물을 찾을 수 없습니다.');
-      navigate('/list');
+      const foundItem = lostItems.find((i: LostItem) => i.id === Number(id));
+      if (foundItem) {
+        // 본인 게시물인지 확인
+        if (currentUser?.id !== foundItem.authorId) {
+          alert('수정 권한이 없습니다.');
+          navigate('/list');
+          return;
+        }
+        setItemToEdit(foundItem);
+        setItemType(foundItem.itemType);
+        setDescription(foundItem.description);
+        setLocation(foundItem.location);
+        setImageUrls(foundItem.imageUrls || []);
+      } else {
+        alert('게시물을 찾을 수 없습니다.');
+        navigate('/list');
+      }
     }
-  }, [id, items, currentUser, navigate]);
+  }, [id, lostItems, currentUser, navigate]);
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -68,27 +79,47 @@ const EditPage: React.FC<EditPageProps> = ({ items, currentUser, onUpdateItem })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!itemToEdit) return;
+    
+    if (id === 'new') {
+      // 새로운 아이템 생성
+      if (!onAddItem) {
+        alert('새로운 아이템을 생성할 수 없습니다.');
+        return;
+      }
+      
+      const newItem = {
+        itemType,
+        description,
+        location,
+        imageUrls,
+      };
+      onAddItem(newItem);
+      alert('등록되었습니다.');
+      navigate('/list');
+    } else {
+      // 기존 아이템 수정
+      if (!itemToEdit) return;
 
-    const updatedItem = {
-      ...itemToEdit,
-      itemType,
-      description,
-      location,
-      imageUrls,
-    };
-    onUpdateItem(updatedItem);
-    alert('수정되었습니다.');
-    navigate('/list');
+      const updatedItem = {
+        ...itemToEdit,
+        itemType,
+        description,
+        location,
+        imageUrls,
+      };
+      onUpdateItem(updatedItem);
+      alert('수정되었습니다.');
+      navigate('/list');
+    }
   };
 
-  if (!itemToEdit) {
+  if (id !== 'new' && !itemToEdit) {
     return <div>로딩 중...</div>;
   }
 
   return (
     <div className="form-container-wrapper">
-      <h1>분실물 정보 수정</h1>
+      <h1>{id === 'new' ? '분실물 등록' : '분실물 정보 수정'}</h1>
       <form onSubmit={handleSubmit} className="form-container">
         <div className="form-group">
           <label htmlFor="itemType">분실물 종류</label>
@@ -120,7 +151,7 @@ const EditPage: React.FC<EditPageProps> = ({ items, currentUser, onUpdateItem })
           />
         </div>
         <div className="form-group">
-          <label htmlFor="item-photo">사진 수정 (새 파일 추가 또는 기존 파일 삭제)</label>
+          <label htmlFor="item-photo" style={{ fontSize: '14px' }}>사진 수정 (새 파일 추가 또는 기존 파일 삭제)</label>
           <input type="file" id="item-photo" accept="image/*" onChange={handleImageUpload} multiple disabled={isUploading} />
           {isUploading && <p>이미지를 최적화하는 중...</p>}
           <div className="image-preview-container">
@@ -132,11 +163,17 @@ const EditPage: React.FC<EditPageProps> = ({ items, currentUser, onUpdateItem })
             ))}
           </div>
         </div>
-        <div className="form-actions">
-          <button type="submit" className="submit-button" disabled={isUploading}>
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: '16px',
+          alignItems: 'center',
+          width: '100%'
+        }}>
+          <button type="submit" className="submit-button" disabled={isUploading} style={{ width: '100%' }}>
             {isUploading ? "업로드 대기 중..." : "수정 완료"}
           </button>
-          <Link to="/list" className="button-secondary">취소하고 목록으로</Link>
+          <Link to="/list" className="button-secondary" style={{ width: '100%' }}>취소하고 목록으로</Link>
         </div>
       </form>
     </div>

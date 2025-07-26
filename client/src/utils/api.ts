@@ -1,5 +1,6 @@
 // 환경변수에 따라 API URL 설정
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '/api';
+// const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '/api';
+const API_BASE_URL = '/api'; // 무조건 프록시 경로 사용
 
 // 핸드폰번호 정규화 함수
 export const normalizePhoneNumber = (phone: string): string => {
@@ -59,17 +60,10 @@ export const registerUser = async (userData: {
       body: JSON.stringify({ ...userData, phone: normalizedPhone }),
     });
 
-    // 응답이 JSON인지 확인
-    const contentType = response.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
-      const text = await response.text();
-      console.error('서버 응답이 JSON이 아닙니다:', text);
-      throw new Error('서버에서 잘못된 응답을 받았습니다. 잠시 후 다시 시도해주세요.');
-    }
-
     const data = await response.json();
     
-    if (!response.ok) {
+    // 서버의 success 필드를 확인
+    if (!data.success) {
       throw new Error(data.error || '회원가입에 실패했습니다.');
     }
 
@@ -97,17 +91,10 @@ export const loginUser = async (credentials: {
       body: JSON.stringify(credentials),
     });
 
-    // 응답이 JSON인지 확인
-    const contentType = response.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
-      const text = await response.text();
-      console.error('서버 응답이 JSON이 아닙니다:', text);
-      throw new Error('서버에서 잘못된 응답을 받았습니다. 잠시 후 다시 시도해주세요.');
-    }
-
     const data = await response.json();
     
-    if (!response.ok) {
+    // 서버의 success 필드를 확인
+    if (!data.success) {
       throw new Error(data.error || '로그인에 실패했습니다.');
     }
 
@@ -136,7 +123,8 @@ export const forgotPassword = async (phone: string) => {
 
     const data = await response.json();
     
-    if (!response.ok) {
+    // 서버의 success 필드를 확인
+    if (!data.success) {
       throw new Error(data.error || '비밀번호 찾기에 실패했습니다.');
     }
 
@@ -299,6 +287,47 @@ export const getAllUsers = async () => {
     return data;
   } catch (error) {
     console.error('사용자 목록 조회 오류:', error);
+    throw error;
+  }
+}; 
+
+// 이메일 기반 비밀번호 재설정 요청 API
+export const requestPasswordResetByEmail = async (email: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/request-password-reset`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    // 응답이 JSON인지 확인
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await response.text();
+      console.error('서버 응답이 JSON이 아닙니다:', text);
+      throw new Error('서버에서 잘못된 응답을 받았습니다. 잠시 후 다시 시도해주세요.');
+    }
+
+    const data = await response.json();
+    
+    // HTTP 상태 코드 확인
+    if (!response.ok) {
+      throw new Error(data.error || '서버 연결에 실패했습니다.');
+    }
+    
+    // 서버의 success 필드를 확인
+    if (!data.success) {
+      throw new Error(data.error || '비밀번호 재설정 요청에 실패했습니다.');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('이메일 비밀번호 재설정 요청 오류:', error);
+    if (error instanceof SyntaxError) {
+      throw new Error('서버 연결에 실패했습니다.');
+    }
     throw error;
   }
 }; 

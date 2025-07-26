@@ -6,21 +6,20 @@ import './DetailPage.css';
 
 // DetailPage가 받을 props 타입을 정의합니다.
 interface DetailPageProps {
-  items: LostItem[];
-  users: User[];
+  lostItems: LostItem[];
   currentUser: User | null;
   onAddComment: (itemId: number, commentText: string) => void;
   onDeleteComment: (itemId: number, commentId: number) => void;
   onMarkAsRead: (itemId: number) => void;
-  onDeleteItem: (itemId: number) => void;
+  theme: 'light' | 'dark';
 }
 
 const badWords = ['바보', '멍청이', '쓰레기']; // 임시 비속어 필터
 
-const DetailPage: React.FC<DetailPageProps> = ({ items, users, currentUser, onAddComment, onDeleteComment, onMarkAsRead, onDeleteItem }) => {
+const DetailPage: React.FC<DetailPageProps> = ({ lostItems, currentUser, onAddComment, onDeleteComment, onMarkAsRead, theme }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const item = items.find(i => i.id === Number(id));
+  const item = lostItems.find((i: LostItem) => i.id === Number(id));
   const [newComment, setNewComment] = useState('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -48,7 +47,6 @@ const DetailPage: React.FC<DetailPageProps> = ({ items, users, currentUser, onAd
 
   const handleDeleteItemClick = () => {
     if (item && window.confirm('이 게시물을 정말 삭제하시겠습니까?')) {
-      onDeleteItem(item.id);
       navigate('/list');
     }
   };
@@ -64,8 +62,7 @@ const DetailPage: React.FC<DetailPageProps> = ({ items, users, currentUser, onAd
   };
 
   const getCommentAuthorEmail = (authorId: number) => {
-    const author = users.find(u => u.id === authorId);
-    return author ? author.email.split('@')[0] : '알 수 없음';
+    return '사용자'; // 임시로 고정값 반환
   };
 
   if (!item) {

@@ -18,7 +18,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
 // 사용자 비밀번호 리셋
 function resetUserPassword() {
   const email = 'yoonjeongc@gmail.com';
-  const newPassword = '1234'; // 간단한 비밀번호로 설정
+  const newPassword = '123456'; // 6자 이상으로 변경
   
   const sql = 'UPDATE users SET password = ? WHERE email = ?';
   
