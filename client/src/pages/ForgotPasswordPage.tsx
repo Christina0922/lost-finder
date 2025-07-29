@@ -5,6 +5,7 @@ interface ForgotPasswordPageProps {
   onVerifyAndResetPassword: (phone: string, code: string) => Promise<string | null>;
   onSendVerificationCode: (phone: string) => Promise<boolean>;
   onRequestPasswordResetByEmail: (email: string) => Promise<boolean>;
+  onRequestPasswordResetBySMS: (phone: string) => Promise<boolean>;
   theme: 'light' | 'dark';
 }
 
@@ -32,12 +33,13 @@ const validateEmail = (email: string): { isValid: boolean; error: string } => {
   return { isValid: true, error: '' };
 };
 
-const ForgotPasswordPage: React.FC<ForgotPasswordPageProps> = ({ 
+const ForgotPasswordPage = ({ 
   onVerifyAndResetPassword, 
   onSendVerificationCode,
   onRequestPasswordResetByEmail,
+  onRequestPasswordResetBySMS,
   theme
-}) => {
+}: ForgotPasswordPageProps) => {
   const [resetMethod, setResetMethod] = useState<ResetMethod>('email');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -46,6 +48,7 @@ const ForgotPasswordPage: React.FC<ForgotPasswordPageProps> = ({
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isEmailSent, setIsEmailSent] = useState(false);
+  const [isSMSSent, setIsSMSSent] = useState(false);
   
   const [message, setMessage] = useState('');
   const [tempPassword, setTempPassword] = useState('');
@@ -100,6 +103,25 @@ const ForgotPasswordPage: React.FC<ForgotPasswordPageProps> = ({
     }
   };
 
+  const handleSendSMS = async () => {
+    setIsLoading(true);
+    setMessage('');
+    
+    try {
+      const success = await onRequestPasswordResetBySMS(phone);
+      if (success) {
+        setMessage('비밀번호 재설정 SMS를 발송했습니다! 📱 SMS를 확인해주세요.');
+        setIsSMSSent(true);
+      } else {
+        setMessage('가입되지 않은 휴대폰 번호입니다.');
+      }
+    } catch (error: any) {
+      setMessage(error.message || 'SMS 발송에 실패했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleVerifyAndReset = async (event: React.FormEvent) => {
     event.preventDefault();
     
@@ -132,6 +154,7 @@ const ForgotPasswordPage: React.FC<ForgotPasswordPageProps> = ({
     setCode('');
     setIsCodeSent(false);
     setIsEmailSent(false);
+    setIsSMSSent(false);
     setMessage('');
     setTempPassword('');
   };
@@ -213,64 +236,34 @@ const ForgotPasswordPage: React.FC<ForgotPasswordPageProps> = ({
               </button>
             </div>
           ) : (
-            <form onSubmit={handleVerifyAndReset} className="form-container" style={{ marginBottom: '16px' }}>
+            <div className="form-container" style={{ marginBottom: '16px' }}>
               <div className="form-group" style={{ marginBottom: '12px' }}>
                 <label htmlFor="phone" style={{ fontSize: 'min(14px, 3.5vw)', marginBottom: '6px' }}>📱 휴대폰 번호</label>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <input
-                    type="tel"
-                    id="phone"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="'-' 없이 숫자만 입력"
-                    required
-                    disabled={isCodeSent}
-                    style={{ padding: '8px 12px', fontSize: 'min(14px, 3.5vw)', flex: 1 }}
-                  />
-                  <button 
-                    type="button" 
-                    onClick={handleSendCode} 
-                    disabled={isLoading || isCodeSent || !phone}
-                    style={{ 
-                      flexShrink: 0, 
-                      padding: '8px 12px', 
-                      fontSize: 'min(12px, 3vw)',
-                      whiteSpace: 'nowrap'
-                    }}
-                  >
-                    {isLoading ? '발송 중...' : (isCodeSent ? '재전송' : '인증번호 발송')}
-                  </button>
-                </div>
+                <input
+                  type="tel"
+                  id="phone"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="'-' 없이 숫자만 입력"
+                  required
+                  style={{ padding: '8px 12px', fontSize: 'min(14px, 3.5vw)' }}
+                />
               </div>
               
-              {isCodeSent && (
-                <div className="form-group" style={{ marginBottom: '12px' }}>
-                  <label htmlFor="code" style={{ fontSize: 'min(14px, 3.5vw)', marginBottom: '6px' }}>🔐 인증번호</label>
-                  <input
-                    type="text"
-                    id="code"
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    placeholder="6자리 인증번호"
-                    required
-                    style={{ padding: '8px 12px', fontSize: 'min(14px, 3.5vw)' }}
-                  />
-                </div>
-              )}
-              
               <button 
-                type="submit" 
-                className="submit-button" 
-                disabled={!isCodeSent}
+                type="button" 
+                onClick={handleSendSMS} 
+                disabled={isLoading || !phone}
+                className="submit-button"
                 style={{ 
                   padding: '10px 16px', 
                   fontSize: 'min(14px, 3.5vw)',
                   marginTop: '8px'
                 }}
               >
-                인증하고 비밀번호 재설정
+                {isLoading ? '발송 중...' : '인증하고 비밀번호 재설정'}
               </button>
-            </form>
+            </div>
           )}
         </>
       ) : null}
@@ -308,6 +301,21 @@ const ForgotPasswordPage: React.FC<ForgotPasswordPageProps> = ({
               <p style={{ margin: 0, color: '#155724', fontSize: 'min(13px, 3.2vw)' }}>
                 <strong>✅ 이메일이 발송되었습니다!</strong><br />
                 📧 이메일을 확인하여 임시 비밀번호를 확인하세요.<br />
+                🔐 임시 비밀번호로 로그인 후 반드시 새로운 비밀번호로 변경해주세요.
+              </p>
+            </div>
+          )}
+          {isSMSSent && (
+            <div style={{ 
+              backgroundColor: '#d4edda', 
+              border: '1px solid #c3e6cb', 
+              borderRadius: '8px', 
+              padding: '12px', 
+              marginTop: '12px' 
+            }}>
+              <p style={{ margin: 0, color: '#155724', fontSize: 'min(13px, 3.2vw)' }}>
+                <strong>✅ SMS가 발송되었습니다!</strong><br />
+                📱 SMS를 확인하여 임시 비밀번호를 확인하세요.<br />
                 🔐 임시 비밀번호로 로그인 후 반드시 새로운 비밀번호로 변경해주세요.
               </p>
             </div>
