@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import type { LostItem, User } from '../App';
+import { getLostItemById } from '../utils/api';
 import './RegisterPage.css'; // 등록 페이지와 동일한 스타일 사용
 import { resizeAndCompressImage } from '../utils/image';
 
 interface EditPageProps {
-  lostItems: LostItem[];
   currentUser: User | null;
   onUpdateItem: (item: LostItem) => void;
-  onAddItem?: (item: Omit<LostItem, 'id' | 'authorId' | 'comments'>) => void;
+  onAddItem?: (item: Omit<LostItem, 'id' | 'author_id' | 'comments'>) => void;
   theme: 'light' | 'dark';
 }
 
-const EditPage: React.FC<EditPageProps> = ({ lostItems, currentUser, onUpdateItem, onAddItem, theme }) => {
+const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   
@@ -22,6 +22,49 @@ const EditPage: React.FC<EditPageProps> = ({ lostItems, currentUser, onUpdateIte
   const [location, setLocation] = useState('');
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error'>('success');
+
+  // 토스트 메시지 표시 함수
+  const showToastMessage = (message: string, type: 'success' | 'error' = 'success') => {
+    setToastMessage(message);
+    setToastType(type);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
+
+  // 입력값 검증 함수
+  const validateInputs = () => {
+    if (!itemType.trim()) {
+      showToastMessage('분실물 종류를 선택해주세요.', 'error');
+      return false;
+    }
+    
+    if (!description.trim()) {
+      showToastMessage('상세 설명을 입력해주세요.', 'error');
+      return false;
+    }
+    
+    if (description.trim().length < 5) {
+      showToastMessage('상세 설명은 최소 5자 이상 입력해주세요.', 'error');
+      return false;
+    }
+    
+    if (!location.trim()) {
+      showToastMessage('분실 장소를 입력해주세요.', 'error');
+      return false;
+    }
+    
+    if (location.trim().length < 2) {
+      showToastMessage('분실 장소는 최소 2자 이상 입력해주세요.', 'error');
+      return false;
+    }
+    
+    return true;
+  };
 
   useEffect(() => {
     if (id === 'new') {
@@ -31,26 +74,40 @@ const EditPage: React.FC<EditPageProps> = ({ lostItems, currentUser, onUpdateIte
       setDescription('');
       setLocation('');
       setImageUrls([]);
+      setError(null);
     } else {
-      const foundItem = lostItems.find((i: LostItem) => i.id === Number(id));
-      if (foundItem) {
-        // 본인 게시물인지 확인
-        if (currentUser?.id !== foundItem.authorId) {
-          alert('수정 권한이 없습니다.');
+      // 기존 아이템 수정 모드
+      const fetchItem = async () => {
+        try {
+          setLoading(true);
+          const itemData = await getLostItemById(Number(id));
+          
+          // 본인 게시물인지 확인
+          if (currentUser?.id !== itemData.author_id) {
+            showToastMessage('수정 권한이 없습니다.', 'error');
+            navigate('/list');
+            return;
+          }
+          
+          setItemToEdit(itemData);
+          setItemType(itemData.item_type);
+          setDescription(itemData.description);
+          setLocation(itemData.location);
+          setImageUrls(itemData.image_urls || []);
+          setError(null);
+        } catch (err) {
+          console.error('분실물 조회 실패:', err);
+          setError('분실물 정보를 불러오는데 실패했습니다.');
+          showToastMessage('게시물을 찾을 수 없습니다.', 'error');
           navigate('/list');
-          return;
+        } finally {
+          setLoading(false);
         }
-        setItemToEdit(foundItem);
-        setItemType(foundItem.itemType);
-        setDescription(foundItem.description);
-        setLocation(foundItem.location);
-        setImageUrls(foundItem.imageUrls || []);
-      } else {
-        alert('게시물을 찾을 수 없습니다.');
-        navigate('/list');
-      }
+      };
+
+      fetchItem();
     }
-  }, [id, lostItems, currentUser, navigate]);
+  }, [id, currentUser, navigate]);
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -62,9 +119,10 @@ const EditPage: React.FC<EditPageProps> = ({ lostItems, currentUser, onUpdateIte
           files.map(file => resizeAndCompressImage(file))
         );
         setImageUrls(prevUrls => [...prevUrls, ...compressedImages]);
+        showToastMessage('이미지가 성공적으로 업로드되었습니다.');
       } catch (error) {
         console.error("이미지 처리 중 오류 발생:", error);
-        alert("이미지를 처리하는 중 오류가 발생했습니다. 다른 파일을 시도해 주세요.");
+        showToastMessage("이미지를 처리하는 중 오류가 발생했습니다. 다른 파일을 시도해 주세요.", 'error');
       } finally {
         setIsUploading(false);
       }
@@ -75,85 +133,119 @@ const EditPage: React.FC<EditPageProps> = ({ lostItems, currentUser, onUpdateIte
 
   const handleRemoveImage = (indexToRemove: number) => {
     setImageUrls(prevUrls => prevUrls.filter((_, index) => index !== indexToRemove));
+    showToastMessage('이미지가 삭제되었습니다.');
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // 입력값 검증
+    if (!validateInputs()) {
+      return;
+    }
+    
     if (id === 'new') {
       // 새로운 아이템 생성
       if (!onAddItem) {
-        alert('새로운 아이템을 생성할 수 없습니다.');
+        showToastMessage('새로운 아이템을 생성할 수 없습니다.', 'error');
         return;
       }
       
       const newItem = {
-        itemType,
-        description,
-        location,
-        imageUrls,
+        item_type: itemType.trim(),
+        description: description.trim(),
+        location: location.trim(),
+        image_urls: imageUrls,
       };
       onAddItem(newItem);
-      alert('등록되었습니다.');
-      navigate('/list');
+      showToastMessage('분실물이 성공적으로 등록되었습니다!');
+      setTimeout(() => navigate('/list'), 1500);
     } else {
       // 기존 아이템 수정
       if (!itemToEdit) return;
 
       const updatedItem = {
         ...itemToEdit,
-        itemType,
-        description,
-        location,
-        imageUrls,
+        item_type: itemType.trim(),
+        description: description.trim(),
+        location: location.trim(),
+        image_urls: imageUrls,
       };
       onUpdateItem(updatedItem);
-      alert('수정되었습니다.');
-      navigate('/list');
+      showToastMessage('분실물 정보가 성공적으로 수정되었습니다!');
+      setTimeout(() => navigate('/list'), 1500);
     }
   };
 
-  if (id !== 'new' && !itemToEdit) {
+  if (loading) {
     return <div>로딩 중...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
   }
 
   return (
     <div className="form-container-wrapper">
       <h1>{id === 'new' ? '분실물 등록' : '분실물 정보 수정'}</h1>
+      
+      {/* 토스트 메시지 */}
+      {showToast && (
+        <div className={`toast-message ${toastType}`}>
+          {toastMessage}
+        </div>
+      )}
+      
       <form onSubmit={handleSubmit} className="form-container">
         <div className="form-group">
-          <label htmlFor="itemType">분실물 종류</label>
-          <input
-            type="text"
+          <label htmlFor="itemType">분실물 종류 *</label>
+          <select
             id="itemType"
             value={itemType}
             onChange={(e) => setItemType(e.target.value)}
             required
-          />
+            className={itemType.trim() === '' ? 'error' : ''}
+          >
+            <option value="">분실물 종류를 선택하세요</option>
+            <option value="자전거">자전거</option>
+            <option value="킥보드">킥보드</option>
+            <option value="택배">택배</option>
+            <option value="기타">기타</option>
+          </select>
         </div>
         <div className="form-group">
-          <label htmlFor="description">상세 설명</label>
+          <label htmlFor="description">상세 설명 * (최소 5자)</label>
           <textarea
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             required
+            minLength={5}
+            placeholder="분실물에 대한 상세한 설명을 입력해주세요..."
+            className={description.trim().length < 5 && description.trim() !== '' ? 'error' : ''}
           />
+          <div className="character-count">
+            {description.length}/1000자
+          </div>
         </div>
         <div className="form-group">
-          <label htmlFor="location">분실 장소</label>
+          <label htmlFor="location">분실 장소 * (최소 2자)</label>
           <input
             type="text"
             id="location"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             required
+            minLength={2}
+            placeholder="분실한 정확한 장소를 입력해주세요..."
+            className={location.trim().length < 2 && location.trim() !== '' ? 'error' : ''}
           />
         </div>
+        
         <div className="form-group">
-          <label htmlFor="item-photo" style={{ fontSize: '14px' }}>사진 수정 (새 파일 추가 또는 기존 파일 삭제)</label>
+          <label htmlFor="item-photo" style={{ fontSize: '14px' }}>사진 {id === 'new' ? '업로드' : '수정'} (선택사항)</label>
           <input type="file" id="item-photo" accept="image/*" onChange={handleImageUpload} multiple disabled={isUploading} />
-          {isUploading && <p>이미지를 최적화하는 중...</p>}
+          {isUploading && <p className="upload-status">이미지를 최적화하는 중...</p>}
           <div className="image-preview-container">
             {imageUrls.map((url, index) => (
               <div key={index} className="image-preview-item">
@@ -163,6 +255,7 @@ const EditPage: React.FC<EditPageProps> = ({ lostItems, currentUser, onUpdateIte
             ))}
           </div>
         </div>
+        
         <div style={{ 
           display: 'flex', 
           flexDirection: 'column', 
@@ -171,7 +264,7 @@ const EditPage: React.FC<EditPageProps> = ({ lostItems, currentUser, onUpdateIte
           width: '100%'
         }}>
           <button type="submit" className="submit-button" disabled={isUploading} style={{ width: '100%' }}>
-            {isUploading ? "업로드 대기 중..." : "수정 완료"}
+            {isUploading ? "업로드 대기 중..." : (id === 'new' ? "등록 완료" : "수정 완료")}
           </button>
           <Link to="/list" className="button-secondary" style={{ width: '100%' }}>취소하고 목록으로</Link>
         </div>
