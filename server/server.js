@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const twilio = require('twilio');
+// Twilio 제거 - CoolSMS만 사용
 const nodemailer = require('nodemailer');
 const { 
   registerUser, 
@@ -9,11 +9,20 @@ const {
   findUserByEmail, 
   findUserByUsername, 
   findUserById,
+  setTemporaryPassword,
   updatePassword,
-  getAllUsers 
+  getAllUsers,
+  createLostItem,
+  updateLostItem,
+  deleteLostItem,
+  getAllLostItems,
+  getLostItemById,
+  createComment,
+  deleteComment,
+  getCommentsByItemId
 } = require('./database');
 require('dotenv').config();
-const coolsms = require('coolsms-node-sdk').default;
+const coolsms = require('coolsms-node-sdk');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -22,19 +31,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Twilio 클라이언트 초기화
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const fromNumber = process.env.TWILIO_FROM_NUMBER;
-
-let twilioClient = null;
-
-if (accountSid && authToken && fromNumber) {
-  twilioClient = twilio(accountSid, authToken);
-  console.log('✅ Twilio 클라이언트 초기화 완료');
-} else {
-  console.log('⚠️ Twilio 환경변수가 설정되지 않았습니다. 개발 모드로 실행됩니다.');
-}
+// Twilio 제거됨 - CoolSMS만 사용
 
 // 이메일 전송 설정 (동적 처리)
 let emailTransporter = null;
@@ -103,14 +100,26 @@ function setupEmailTransporter() {
   console.log(`📧 이메일 전송 설정 완료 (발신자: ${emailUser}, 서비스: ${emailService})`);
 }
 
-const coolsmsApiKey = process.env.COOLSMS_API_KEY;
-const coolsmsApiSecret = process.env.COOLSMS_API_SECRET;
-const coolsmsFrom = process.env.COOLSMS_FROM_NUMBER;
+const coolsmsApiKey = process.env.SOLAPI_API_KEY;
+const coolsmsApiSecret = process.env.SOLAPI_API_SECRET;
+const coolsmsFrom = process.env.SOLAPI_SENDER;
 
 let messageService = null;
 if (coolsmsApiKey && coolsmsApiSecret) {
-  messageService = new coolsms(coolsmsApiKey, coolsmsApiSecret);
-  console.log('✅ CoolSMS 클라이언트 초기화 완료');
+  try {
+    // CoolSMS 라이브러리 초기화
+    coolsms.config.init({
+      apiKey: coolsmsApiKey,
+      apiSecret: coolsmsApiSecret
+    });
+    messageService = coolsms.msg;
+    console.log('✅ CoolSMS 클라이언트 초기화 완료');
+    console.log(`📱 발신번호: ${coolsmsFrom}`);
+  } catch (error) {
+    console.log('⚠️ CoolSMS 초기화 실패:', error.message);
+    console.log('⚠️ 개발 모드로 실행됩니다.');
+    messageService = null;
+  }
 } else {
   console.log('⚠️ CoolSMS 환경변수가 설정되지 않았습니다. 개발 모드로 실행됩니다.');
 }
@@ -476,6 +485,87 @@ function maskPhoneNumber(phone) {
   return phone;
 }
 
+// SMS로 비밀번호 재설정 요청 API
+apiRouter.post('/request-password-reset-sms', async (req, res) => {
+  try {
+    const { phone } = req.body;
+    const normalizedPhone = toKoreanPhone(phone);
+    
+    if (!phone) {
+      return res.status(400).json({ 
+        success: false, 
+        error: '휴대폰 번호를 입력해주세요.' 
+      });
+    }
+
+    // Rate limiting 체크 (1분에 3회 제한)
+    if (!checkRateLimit(normalizedPhone, 3, 60000)) {
+      return res.status(429).json({ 
+        success: false, 
+        error: '너무 많은 요청입니다. 1분 후에 다시 시도해주세요.' 
+      });
+    }
+
+    const user = await findUserByPhone(normalizedPhone);
+    if (!user) {
+      logAuthEvent('reset_request', normalizedPhone, false, '등록되지 않은 휴대폰 번호');
+      return res.status(404).json({ 
+        success: false, 
+        error: '등록된 휴대폰 번호가 아닙니다.' 
+      });
+    }
+
+    // 임시 비밀번호 생성
+    const tempPassword = generateSecureTempPassword();
+    
+    // 임시 비밀번호로 사용자 비밀번호 업데이트
+    await setTemporaryPassword(user.id, tempPassword);
+    
+    // SMS 메시지 생성
+    const message = `[LostFinder] 비밀번호 재설정\n\n임시 비밀번호: ${tempPassword}\n\n⚠️ 로그인 후 반드시 새로운 비밀번호로 변경해주세요.`;
+    
+    // SMS 발송 시도
+    try {
+      if (messageService && coolsmsFrom) {
+        const result = await messageService.send({
+          messages: [{
+            to: normalizedPhone,
+            from: coolsmsFrom,
+            text: message
+          }]
+        });
+        console.log(`✅ 실제 SMS 발송 성공: ${maskPhoneNumber(normalizedPhone)}`);
+        console.log(`📱 SMS 결과:`, result);
+      } else {
+        console.log(`⚠️ SMS 서비스 미설정 - 시뮬레이션 모드`);
+        console.log(`📱 수신자: ${maskPhoneNumber(normalizedPhone)}`);
+        console.log(`👤 사용자: ${user.username}`);
+        console.log(`🔑 임시 비밀번호: ${tempPassword}`);
+      }
+    } catch (smsError) {
+      console.log(`⚠️ SMS 발송 실패 (시뮬레이션): ${smsError.message}`);
+      console.log(`📱 수신자: ${maskPhoneNumber(normalizedPhone)}`);
+      console.log(`👤 사용자: ${user.username}`);
+      console.log(`🔑 임시 비밀번호: ${tempPassword}`);
+    }
+    
+    logAuthEvent('reset_request', normalizedPhone, true, '임시 비밀번호 발송');
+    
+    res.json({ 
+      success: true, 
+      message: '임시 비밀번호가 SMS로 발송되었습니다. 로그인 후 새로운 비밀번호로 변경해주세요.'
+    });
+  } catch (error) {
+    console.error('❌ SMS 비밀번호 재설정 요청 실패:', error.message);
+    logAuthEvent('reset_request', req.body.phone || 'unknown', false, error.message);
+    res.status(500).json({ 
+      success: false, 
+      error: '비밀번호 재설정 요청 중 오류가 발생했습니다.',
+      details: error.message
+    });
+  }
+});
+
 // 비밀번호 재설정 API (SMS 인증 후)
 apiRouter.post('/reset-password', async (req, res) => {
   try {
@@ -518,10 +608,10 @@ apiRouter.post('/change-password', async (req, res) => {
   try {
     const { userId, currentPassword, newPassword } = req.body;
     
-    if (!userId || !currentPassword || !newPassword) {
+    if (!userId || !newPassword) {
       return res.status(400).json({ 
         success: false, 
-        error: '모든 필드를 입력해주세요.' 
+        error: '사용자 ID와 새 비밀번호를 입력해주세요.' 
       });
     }
 
@@ -534,15 +624,27 @@ apiRouter.post('/change-password', async (req, res) => {
       });
     }
 
-    // 현재 비밀번호 확인
-    if (user.password !== currentPassword) {
-      return res.status(400).json({ 
-        success: false, 
-        error: '현재 비밀번호가 올바르지 않습니다.' 
-      });
+    // 임시 비밀번호 사용자인 경우 현재 비밀번호 확인 생략
+    if (user.isTemporaryPassword) {
+      console.log(`✅ 임시 비밀번호 사용자 비밀번호 변경: ${user.username} (${user.email})`);
+    } else {
+      // 일반 사용자는 현재 비밀번호 확인
+      if (!currentPassword) {
+        return res.status(400).json({ 
+          success: false, 
+          error: '현재 비밀번호를 입력해주세요.' 
+        });
+      }
+      
+      if (user.password !== currentPassword) {
+        return res.status(400).json({ 
+          success: false, 
+          error: '현재 비밀번호가 올바르지 않습니다.' 
+        });
+      }
     }
 
-    // 새 비밀번호로 업데이트
+    // 새 비밀번호로 업데이트 (임시 비밀번호 플래그 제거)
     const result = await updatePassword(userId, newPassword);
     
     console.log(`✅ 비밀번호 변경 성공: ${user.username} (${user.email})`);
@@ -570,12 +672,15 @@ apiRouter.post('/send-sms', async (req, res) => {
         error: '휴대폰 번호와 메시지가 필요합니다.' 
       });
     }
-    const result = await messageService.sendOne({
-      to: toPhone,
-      from: coolsmsFrom,
-      text: message
+    const result = await messageService.send({
+      messages: [{
+        to: toPhone,
+        from: coolsmsFrom,
+        text: message
+      }]
     });
-    console.log(`✅ SMS 발송 성공: ${toPhone} - groupId: ${result.groupId}`);
+    console.log(`✅ SMS 발송 성공: ${toPhone}`);
+    console.log(`📱 SMS 결과:`, result);
     res.json({ 
       success: true, 
       messageId: result.groupId,
@@ -621,12 +726,15 @@ apiRouter.post('/send-verification', async (req, res) => {
     // 실제 SMS 발송 시도 (실패해도 성공으로 처리)
     try {
       const message = `[LostFinder] 인증번호: ${code}\n\n이 인증번호를 입력해주세요.`;
-      const result = await messageService.sendOne({
-        to: normalizedPhone,
-        from: coolsmsFrom,
-        text: message
+      const result = await messageService.send({
+        messages: [{
+          to: normalizedPhone,
+          from: coolsmsFrom,
+          text: message
+        }]
       });
       console.log(`✅ 실제 SMS 발송 성공: ${normalizedPhone} - 코드: ${code}`);
+      console.log(`📱 SMS 결과:`, result);
     } catch (smsError) {
       console.log(`⚠️ SMS 발송 실패 (개발모드): ${smsError.message}`);
     }
@@ -835,7 +943,8 @@ apiRouter.get('/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
-    twilio: twilioClient ? 'configured' : 'development_mode'
+    email: emailTransporter ? 'configured' : 'development_mode',
+    sms: messageService ? 'configured' : 'development_mode'
   });
 });
 
@@ -970,6 +1079,195 @@ apiRouter.get('/suspicious-activity', (req, res) => {
     });
   } catch (error) {
     console.error('❌ 의심스러운 활동 분석 실패:', error.message);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// ===== 분실물 관련 API =====
+
+// 모든 분실물 조회
+apiRouter.get('/lost-items', async (req, res) => {
+  try {
+    const items = await getAllLostItems();
+    res.json({ 
+      success: true, 
+      items 
+    });
+  } catch (error) {
+    console.error('❌ 분실물 목록 조회 실패:', error.message);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// 특정 분실물 조회
+apiRouter.get('/lost-items/:id', async (req, res) => {
+  try {
+    const itemId = parseInt(req.params.id);
+    const item = await getLostItemById(itemId);
+    const comments = await getCommentsByItemId(itemId);
+    
+    res.json({ 
+      success: true, 
+      item: { ...item, comments } 
+    });
+  } catch (error) {
+    console.error('❌ 분실물 조회 실패:', error.message);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// 분실물 등록
+apiRouter.post('/lost-items', async (req, res) => {
+  try {
+    const { author_id, item_type, description, location, image_urls } = req.body;
+    
+    if (!author_id || !item_type || !description || !location) {
+      return res.status(400).json({
+        success: false,
+        error: '필수 필드가 누락되었습니다.'
+      });
+    }
+    
+    const newItem = await createLostItem({
+      author_id,
+      item_type,
+      description,
+      location,
+      image_urls: image_urls || []
+    });
+    
+    console.log('✅ 분실물 등록 성공:', newItem.id);
+    res.status(201).json({ 
+      success: true, 
+      item: newItem 
+    });
+  } catch (error) {
+    console.error('❌ 분실물 등록 실패:', error.message);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// 분실물 수정
+apiRouter.put('/lost-items/:id', async (req, res) => {
+  try {
+    const itemId = parseInt(req.params.id);
+    const { item_type, description, location, image_urls } = req.body;
+    
+    if (!item_type || !description || !location) {
+      return res.status(400).json({
+        success: false,
+        error: '필수 필드가 누락되었습니다.'
+      });
+    }
+    
+    await updateLostItem(itemId, {
+      item_type,
+      description,
+      location,
+      image_urls: image_urls || []
+    });
+    
+    console.log('✅ 분실물 수정 성공:', itemId);
+    res.json({ 
+      success: true, 
+      message: '분실물이 성공적으로 수정되었습니다.' 
+    });
+  } catch (error) {
+    console.error('❌ 분실물 수정 실패:', error.message);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// 분실물 삭제
+apiRouter.delete('/lost-items/:id', async (req, res) => {
+  try {
+    const itemId = parseInt(req.params.id);
+    await deleteLostItem(itemId);
+    
+    console.log('✅ 분실물 삭제 성공:', itemId);
+    res.json({ 
+      success: true, 
+      message: '분실물이 성공적으로 삭제되었습니다.' 
+    });
+  } catch (error) {
+    console.error('❌ 분실물 삭제 실패:', error.message);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// 댓글 등록
+apiRouter.post('/lost-items/:id/comments', async (req, res) => {
+  try {
+    const itemId = parseInt(req.params.id);
+    const { author_id, text } = req.body;
+    
+    if (!author_id || !text) {
+      return res.status(400).json({
+        success: false,
+        error: '필수 필드가 누락되었습니다.'
+      });
+    }
+    
+    const newComment = await createComment({
+      item_id: itemId,
+      author_id,
+      text
+    });
+    
+    console.log('✅ 댓글 등록 성공:', newComment.id);
+    res.status(201).json({ 
+      success: true, 
+      comment: newComment 
+    });
+  } catch (error) {
+    console.error('❌ 댓글 등록 실패:', error.message);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// 댓글 삭제
+apiRouter.delete('/comments/:id', async (req, res) => {
+  try {
+    const commentId = parseInt(req.params.id);
+    const { author_id } = req.body;
+    
+    if (!author_id) {
+      return res.status(400).json({
+        success: false,
+        error: '작성자 정보가 필요합니다.'
+      });
+    }
+    
+    await deleteComment(commentId, author_id);
+    
+    console.log('✅ 댓글 삭제 성공:', commentId);
+    res.json({ 
+      success: true, 
+      message: '댓글이 성공적으로 삭제되었습니다.' 
+    });
+  } catch (error) {
+    console.error('❌ 댓글 삭제 실패:', error.message);
     res.status(500).json({ 
       success: false, 
       error: error.message 

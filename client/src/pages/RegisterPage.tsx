@@ -6,7 +6,7 @@ import { resizeAndCompressImage } from '../utils/image';
 
 // RegisterPage가 받을 props의 타입을 정의합니다.
 interface RegisterPageProps {
-  onAddItem: (item: Omit<LostItem, 'id' | 'authorId' | 'comments'>) => void;
+  onAddItem: (item: Omit<LostItem, 'id' | 'author_id' | 'comments'>) => void;
   currentUser: User | null;
 }
 
@@ -60,7 +60,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onAddItem, currentUser }) =
       return;
     }
 
-    onAddItem({ itemType, description, location, imageUrls });
+    onAddItem({ item_type: itemType, description, location, image_urls: imageUrls });
 
     // 입력 필드 초기화
     setItemType('');

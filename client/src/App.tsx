@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link, useNavigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
@@ -11,6 +11,7 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import SuccessStoriesPage from './pages/SuccessStoriesPage';
 import AdminPanel from './pages/AdminPanel';
+import { AlertMode, getAlertMode, setAlertMode, triggerAlert } from './utils/notification';
 import './App.css';
 
 // Error Boundary Component
@@ -56,16 +57,27 @@ export interface User {
   role?: 'user' | 'admin';
 }
 
-export interface Comment { id: number; authorId: number; text: string; }
+export interface Comment { 
+  id: number; 
+  author_id: number; 
+  author_name?: string;
+  author_email?: string;
+  text: string; 
+  created_at?: string;
+}
 
 export interface LostItem {
   id: number;
-  authorId: number;
-  itemType: string;
+  author_id: number;
+  author_name?: string;
+  author_email?: string;
+  item_type: string;
   description: string;
   location: string;
-  imageUrls: string[];
-  comments: Comment[];
+  image_urls: string[];
+  created_at?: string;
+  updated_at?: string;
+  comments?: Comment[];
 }
 
 export interface Notification {
@@ -83,8 +95,8 @@ const Header: React.FC<{
   onLogout: () => void;
   theme: 'light' | 'dark';
   setTheme: (t: 'light' | 'dark') => void;
-  alertMode: 'vibrate' | 'melody' | 'silent';
-  setAlertMode: (m: 'vibrate' | 'melody' | 'silent') => void;
+  alertMode: AlertMode;
+  setAlertMode: (m: AlertMode) => void;
 }> = ({ currentUser, notifications, onLogout, theme, setTheme, alertMode, setAlertMode }) => {
   const [showSettings, setShowSettings] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -146,7 +158,10 @@ const Header: React.FC<{
       alignItems: 'center'
     }}>
       <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold', cursor: 'pointer' }}>
+        <h1 
+          style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold', cursor: 'pointer' }}
+          onClick={() => navigate('/')}
+        >
           Lost Finder
         </h1>
       </Link>
@@ -226,37 +241,38 @@ const Header: React.FC<{
               ref={settingsRef}
               style={{
                 position: 'fixed',
-                top: 0,
-                right: 0,
-                width: 'min(300px, 85vw)',
-                maxHeight: 'min(500px, 80vh)',
-                padding: '16px',
+                top: '50%',
+                left: '50%',
+                transform: `translate(-50%, -50%) ${isAnimating ? 'scale(0.9)' : 'scale(1)'}`,
+                width: 'min(280px, 90vw)',
+                maxHeight: 'min(400px, 85vh)',
+                padding: '16px 24px 48px 24px',
                 borderRadius: '12px',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '12px',
                 zIndex: 1000,
                 transition: 'all 0.2s ease-in-out',
-                transform: isAnimating ? 'translateX(-100%)' : 'translateX(0)',
                 backgroundColor: theme === 'dark' ? '#111827' : '#ffffff',
                 color: theme === 'dark' ? '#f9fafb' : '#1f2937',
                 boxShadow: theme === 'dark' 
                   ? '0 25px 50px -12px rgba(0, 0, 0, 0.25)' 
-                  : '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+                  : '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                overflow: 'hidden'
               }}
             >
               {/* 타이틀 */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '16px', fontWeight: 'bold' }}>설정</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                <span style={{ fontSize: '18px', fontWeight: 'bold' }}>설정</span>
                 <button 
                   style={{
-                    width: '24px',
-                    height: '24px',
+                    width: '28px',
+                    height: '28px',
                     borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '14px',
+                    fontSize: '16px',
                     border: 'none',
                     cursor: 'pointer',
                     transition: 'background-color 0.2s ease',
@@ -276,15 +292,15 @@ const Header: React.FC<{
               </div>
 
               {/* 테마 */}
-              <div>
-                <p style={{ marginBottom: '4px', fontSize: '14px' }}>🌞 테마</p>
+              <div style={{ marginTop: '0px' }}>
+                <p style={{ marginBottom: '8px', fontSize: '15px', fontWeight: '500' }}>🌞 테마</p>
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <button
                     style={{
                       flex: 1,
-                      padding: '8px 12px',
-                      borderRadius: '6px',
-                      fontSize: '13px',
+                      padding: '10px 12px',
+                      borderRadius: '8px',
+                      fontSize: '14px',
                       fontWeight: '500',
                       transition: 'all 0.2s ease',
                       border: 'none',
@@ -292,20 +308,20 @@ const Header: React.FC<{
                       backgroundColor: theme === 'light' ? '#ec4899' : '#e5e7eb',
                       color: theme === 'light' ? '#ffffff' : '#374151'
                     }}
-                                         onMouseEnter={(e) => {
-                       if (theme === 'dark') {
-                         e.currentTarget.style.backgroundColor = '#4b5563';
-                       } else {
-                         e.currentTarget.style.backgroundColor = '#d1d5db';
-                       }
-                     }}
-                     onMouseLeave={(e) => {
-                       if (theme === 'dark') {
-                         e.currentTarget.style.backgroundColor = '#374151';
-                       } else {
-                         e.currentTarget.style.backgroundColor = '#e5e7eb';
-                       }
-                     }}
+                    onMouseEnter={(e) => {
+                      if (theme === 'dark') {
+                        e.currentTarget.style.backgroundColor = '#4b5563';
+                      } else {
+                        e.currentTarget.style.backgroundColor = '#d1d5db';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (theme === 'dark') {
+                        e.currentTarget.style.backgroundColor = '#374151';
+                      } else {
+                        e.currentTarget.style.backgroundColor = '#e5e7eb';
+                      }
+                    }}
                     onClick={() => setTheme('light')}
                   >
                     화이트
@@ -313,9 +329,9 @@ const Header: React.FC<{
                   <button
                     style={{
                       flex: 1,
-                      padding: '8px 12px',
-                      borderRadius: '6px',
-                      fontSize: '13px',
+                      padding: '10px 12px',
+                      borderRadius: '8px',
+                      fontSize: '14px',
                       fontWeight: '500',
                       transition: 'all 0.2s ease',
                       border: 'none',
@@ -323,20 +339,20 @@ const Header: React.FC<{
                       backgroundColor: theme === 'dark' ? '#ec4899' : '#e5e7eb',
                       color: theme === 'dark' ? '#ffffff' : '#374151'
                     }}
-                                         onMouseEnter={(e) => {
-                       if (theme === 'dark') {
-                         e.currentTarget.style.backgroundColor = '#4b5563';
-                       } else {
-                         e.currentTarget.style.backgroundColor = '#d1d5db';
-                       }
-                     }}
-                     onMouseLeave={(e) => {
-                       if (theme === 'dark') {
-                         e.currentTarget.style.backgroundColor = '#374151';
-                       } else {
-                         e.currentTarget.style.backgroundColor = '#e5e7eb';
-                       }
-                     }}
+                    onMouseEnter={(e) => {
+                      if (theme === 'dark') {
+                        e.currentTarget.style.backgroundColor = '#4b5563';
+                      } else {
+                        e.currentTarget.style.backgroundColor = '#d1d5db';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (theme === 'dark') {
+                        e.currentTarget.style.backgroundColor = '#374151';
+                      } else {
+                        e.currentTarget.style.backgroundColor = '#e5e7eb';
+                      }
+                    }}
                     onClick={() => setTheme('dark')}
                   >
                     다크
@@ -344,14 +360,43 @@ const Header: React.FC<{
                 </div>
               </div>
 
-              {/* 알림 */}
-              <div>
-                <p style={{ marginBottom: '4px', fontSize: '14px' }}>🔔 알림</p>
-                <div style={{ display: 'flex', gap: '8px' }}>
+              {/* 알림 설정 */}
+              <div style={{ marginTop: '4px' }}>
+                <p style={{ marginBottom: '8px', fontSize: '15px', fontWeight: '500' }}>🔔 알림</p>
+                <div style={{ display: 'flex', gap: '6px' }}>
                   <button
                     style={{
                       flex: 1,
-                      padding: '8px 12px',
+                      padding: '8px 6px',
+                      borderRadius: '6px',
+                      fontSize: '13px',
+                      fontWeight: '500',
+                      transition: 'all 0.2s ease',
+                      border: 'none',
+                      cursor: 'pointer',
+                      backgroundColor: alertMode === 'silent' ? '#ec4899' : '#e5e7eb',
+                      color: alertMode === 'silent' ? '#ffffff' : '#374151'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (alertMode !== 'silent') {
+                        e.currentTarget.style.backgroundColor = theme === 'dark' ? '#4b5563' : '#d1d5db';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (alertMode !== 'silent') {
+                        e.currentTarget.style.backgroundColor = theme === 'dark' ? '#374151' : '#e5e7eb';
+                      }
+                    }}
+                    onClick={() => {
+                      setAlertMode('silent');
+                    }}
+                  >
+                    무음
+                  </button>
+                  <button
+                    style={{
+                      flex: 1,
+                      padding: '8px 6px',
                       borderRadius: '6px',
                       fontSize: '13px',
                       fontWeight: '500',
@@ -371,14 +416,17 @@ const Header: React.FC<{
                         e.currentTarget.style.backgroundColor = theme === 'dark' ? '#374151' : '#e5e7eb';
                       }
                     }}
-                    onClick={() => setAlertMode('vibrate')}
+                    onClick={() => {
+                      setAlertMode('vibrate');
+                      triggerAlert('vibrate');
+                    }}
                   >
                     진동
                   </button>
                   <button
                     style={{
                       flex: 1,
-                      padding: '8px 12px',
+                      padding: '8px 6px',
                       borderRadius: '6px',
                       fontSize: '13px',
                       fontWeight: '500',
@@ -398,65 +446,45 @@ const Header: React.FC<{
                         e.currentTarget.style.backgroundColor = theme === 'dark' ? '#374151' : '#e5e7eb';
                       }
                     }}
-                    onClick={() => setAlertMode('melody')}
+                    onClick={() => {
+                      setAlertMode('melody');
+                      triggerAlert('melody');
+                    }}
                   >
                     멜로디
                   </button>
-                  <button
-                    style={{
-                      flex: 1,
-                      padding: '8px 12px',
-                      borderRadius: '6px',
-                      fontSize: '13px',
-                      fontWeight: '500',
-                      transition: 'all 0.2s ease',
-                      border: 'none',
-                      cursor: 'pointer',
-                      backgroundColor: alertMode === 'silent' ? '#ec4899' : '#e5e7eb',
-                      color: alertMode === 'silent' ? '#ffffff' : '#374151'
-                    }}
-                    onMouseEnter={(e) => {
-                      if (alertMode !== 'silent') {
-                        if (theme === 'dark') {
-                          e.currentTarget.style.backgroundColor = '#4b5563';
-                        } else {
-                          e.currentTarget.style.backgroundColor = '#d1d5db';
-                        }
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (alertMode !== 'silent') {
-                        if (theme === 'dark') {
-                          e.currentTarget.style.backgroundColor = '#374151';
-                        } else {
-                          e.currentTarget.style.backgroundColor = '#e5e7eb';
-                        }
-                      }
-                    }}
-                    onClick={() => setAlertMode('silent')}
-                  >
-                    무음
-                  </button>
+                </div>
+                
+                {/* 안내 문구 */}
+                <div style={{ 
+                  marginTop: '8px', 
+                  padding: '8px 12px', 
+                  backgroundColor: theme === 'dark' ? '#374151' : '#f3f4f6',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  color: theme === 'dark' ? '#d1d5db' : '#6b7280',
+                  lineHeight: '1.4'
+                }}>
+                  ※ 이 설정은 LostFinder 앱 내 알림에만 적용됩니다. 휴대폰 전체의 무음/진동/벨소리 설정은 변경되지 않습니다.
                 </div>
               </div>
 
-
-
               {/* 하단 버튼 */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px' }}>
                 <button
                   style={{
                     backgroundColor: '#2563eb',
-                    padding: '8px 12px',
-                    borderRadius: '6px',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
                     color: '#ffffff',
-                    fontSize: '13px',
+                    fontSize: '14px',
                     fontWeight: '500',
                     border: 'none',
                     cursor: 'pointer',
                     transition: 'background-color 0.2s ease',
                     width: '100%',
-                    height: '36px'
+                    height: '40px',
+                    boxSizing: 'border-box'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = '#1d4ed8';
@@ -474,16 +502,17 @@ const Header: React.FC<{
                 <button
                   style={{
                     backgroundColor: '#ec4899',
-                    padding: '8px 12px',
-                    borderRadius: '6px',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
                     color: '#ffffff',
-                    fontSize: '13px',
+                    fontSize: '14px',
                     fontWeight: '500',
                     border: 'none',
                     cursor: 'pointer',
                     transition: 'background-color 0.2s ease',
                     width: '100%',
-                    height: '36px'
+                    height: '40px',
+                    boxSizing: 'border-box'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = '#db2777';
@@ -507,19 +536,180 @@ const Header: React.FC<{
   );
 };
 
+// 오프라인 상태 감지 컴포넌트
+const OfflineDetector: React.FC = () => {
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOffline(false);
+      console.log('온라인 상태로 변경됨');
+    };
+
+    const handleOffline = () => {
+      setIsOffline(true);
+      console.log('오프라인 상태로 변경됨');
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  if (!isOffline) return null;
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: '#d32f2f',
+      color: 'white',
+      padding: '10px',
+      textAlign: 'center',
+      fontSize: '14px',
+      zIndex: 9999,
+      fontWeight: 'bold'
+    }}>
+      현재 인터넷이 연결되지 않았습니다.
+    </div>
+  );
+};
+
+// 오프라인 오버레이 컴포넌트
+const OfflineOverlay: React.FC = () => {
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+
+  useEffect(() => {
+    const checkOnlineStatus = () => {
+      setIsOffline(!navigator.onLine);
+    };
+
+    const handleOnline = () => {
+      setIsOffline(false);
+    };
+
+    const handleOffline = () => {
+      setIsOffline(true);
+    };
+
+    // 초기 상태 확인
+    checkOnlineStatus();
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  if (!isOffline) return null;
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 10000
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '30px',
+        borderRadius: '10px',
+        textAlign: 'center',
+        maxWidth: '400px',
+        margin: '20px'
+      }}>
+        <h2 style={{ color: '#333', fontSize: '18px', marginBottom: '15px' }}>
+          인터넷 연결이 필요합니다
+        </h2>
+        <p style={{ color: '#666', fontSize: '16px', marginBottom: '20px' }}>
+          Wi-Fi 또는 데이터를 켜 주세요.
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          style={{
+            backgroundColor: '#007bff',
+            color: 'white',
+            border: 'none',
+            padding: '10px 20px',
+            borderRadius: '5px',
+            fontSize: '16px',
+            cursor: 'pointer'
+          }}
+        >
+          확인
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// Toast 메시지 컴포넌트
+const Toast: React.FC<{ message: string; type: 'success' | 'error' | 'info'; onClose: () => void }> = ({ message, type, onClose }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  const getBackgroundColor = () => {
+    switch (type) {
+      case 'success': return '#4caf50';
+      case 'error': return '#333';
+      case 'info': return '#2196f3';
+      default: return '#333';
+    }
+  };
+
+  return (
+    <div style={{
+      position: 'fixed',
+      bottom: '20px',
+      right: '20px',
+      backgroundColor: getBackgroundColor(),
+      color: 'white',
+      padding: '12px 20px',
+      borderRadius: '5px',
+      fontSize: '14px',
+      zIndex: 10001,
+      maxWidth: '300px',
+      wordWrap: 'break-word'
+    }}>
+      {message}
+    </div>
+  );
+};
+
 // Main App Component
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [lostItems, setLostItems] = useState<LostItem[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
-  const [alertMode, setAlertMode] = useState<'vibrate' | 'melody' | 'silent'>('vibrate');
+  const [alertMode, setAlertMode] = useState<AlertMode>(getAlertMode());
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
   // Load user from localStorage on app start
   useEffect(() => {
     const savedUser = localStorage.getItem('currentUser');
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
-    const savedAlertMode = localStorage.getItem('alertMode') as 'vibrate' | 'melody' | 'silent';
+    const savedAlertMode = localStorage.getItem('alertMode') as AlertMode;
     
     if (savedUser) {
       setCurrentUser(JSON.parse(savedUser));
@@ -532,13 +722,43 @@ const App: React.FC = () => {
     }
   }, []);
 
+  // Load lost items from server when user is logged in
+  const loadLostItems = useCallback(async () => {
+    if (currentUser) {
+      try {
+        const response = await fetch('/api/lost-items');
+        if (response.ok) {
+          const data = await response.json();
+          const items: LostItem[] = data.items.map((item: any) => ({
+            id: item.id,
+            author_id: item.author_id,
+            item_type: item.item_type,
+            description: item.description,
+            location: item.location,
+            image_urls: item.image_urls || [],
+            comments: item.comments || []
+          }));
+          setLostItems(items);
+        } else {
+          console.error('분실물 목록 로드 실패');
+        }
+      } catch (error) {
+        console.error('분실물 목록 로드 오류:', error);
+      }
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    loadLostItems();
+  }, [loadLostItems]);
+
   // Save theme and alert mode to localStorage when they change
   useEffect(() => {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
   useEffect(() => {
-    localStorage.setItem('alertMode', alertMode);
+    setAlertMode(alertMode);
   }, [alertMode]);
 
   // Apply theme to body
@@ -667,6 +887,29 @@ const App: React.FC = () => {
     }
   };
 
+  const handleRequestPasswordResetBySMS = async (phone: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`/api/request-password-reset-sms`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone })
+      });
+
+      if (response.ok) {
+        alert('비밀번호 재설정 SMS가 발송되었습니다.');
+        return true;
+      } else {
+        const error = await response.json();
+        alert(error.message || 'SMS 비밀번호 재설정 요청에 실패했습니다.');
+        return false;
+      }
+    } catch (error) {
+      console.error('Request SMS password reset error:', error);
+      alert('서버 연결에 실패했습니다.');
+      return false;
+    }
+  };
+
   const handleChangePassword = (newPassword: string): boolean => {
     if (!currentUser) return false;
     
@@ -682,48 +925,213 @@ const App: React.FC = () => {
     localStorage.removeItem('currentUser');
   };
 
-  const handleAddItem = (item: Omit<LostItem, 'id' | 'authorId' | 'comments'>) => {
-    const newItem: LostItem = {
-      ...item,
-      id: Date.now(),
-      authorId: currentUser!.id,
-      comments: []
-    };
-    setLostItems(prev => [...prev, newItem]);
+  const handleAddItem = async (item: Omit<LostItem, 'id' | 'author_id' | 'comments'>) => {
+    try {
+      const response = await fetch('/api/lost-items', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          author_id: currentUser!.id,
+          item_type: item.item_type,
+          description: item.description,
+          location: item.location,
+          image_urls: item.image_urls
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const newItem: LostItem = {
+          id: data.item.id,
+          author_id: data.item.author_id,
+          item_type: data.item.item_type,
+          description: data.item.description,
+          location: data.item.location,
+          image_urls: data.item.image_urls || [],
+          comments: []
+        };
+        setLostItems(prev => [newItem, ...prev]);
+        setToast({ message: '분실물이 성공적으로 등록되었습니다!', type: 'success' });
+        return true;
+      } else {
+        console.error('분실물 등록 실패');
+        setToast({ message: '분실물 등록에 실패했습니다.', type: 'error' });
+        return false;
+      }
+    } catch (error) {
+      console.error('분실물 등록 오류:', error);
+      setToast({ message: '분실물 등록에 실패했습니다.', type: 'error' });
+      return false;
+    }
   };
 
-  const handleAddComment = (itemId: number, commentText: string) => {
-    setLostItems(prev => prev.map(item => 
-      item.id === itemId 
-        ? { ...item, comments: [...item.comments, { id: Date.now(), authorId: currentUser!.id, text: commentText }] }
-        : item
-    ));
+  const handleAddComment = async (itemId: number, commentText: string) => {
+    try {
+      const response = await fetch(`/api/lost-items/${itemId}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          item_id: itemId,
+          author_id: currentUser!.id,
+          text: commentText
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        const newComment = {
+          id: data.comment.id,
+          author_id: data.comment.author_id,
+          text: data.comment.text
+        };
+
+        setLostItems(prevItems => 
+          prevItems.map(item => 
+            item.id === itemId 
+              ? { 
+                  ...item, 
+                  comments: [...(item.comments || []), newComment] 
+                }
+              : item
+          )
+        );
+        setToast({ message: '댓글이 성공적으로 등록되었습니다!', type: 'success' });
+        return true;
+      }
+      setToast({ message: '댓글 등록에 실패했습니다.', type: 'error' });
+      return false;
+    } catch (error) {
+      console.error('댓글 추가 실패:', error);
+      setToast({ message: '댓글 등록에 실패했습니다.', type: 'error' });
+      return false;
+    }
   };
 
-  const handleMarkAsRead = (itemId: number) => {
+  const handleMarkAsRead = useCallback((itemId: number) => {
     setNotifications(prev => prev.map(notification => 
       notification.itemId === itemId 
         ? { ...notification, read: true }
         : notification
     ));
+  }, []);
+
+  const handleDeleteComment = async (itemId: number, commentId: number) => {
+    try {
+      const response = await fetch(`/api/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ author_id: currentUser!.id })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setLostItems(prevItems => 
+          prevItems.map(item => 
+            item.id === itemId 
+              ? { 
+                  ...item, 
+                  comments: (item.comments || []).filter(comment => comment.id !== commentId) 
+                }
+              : item
+          )
+        );
+        setToast({ message: '댓글이 성공적으로 삭제되었습니다!', type: 'success' });
+        return true;
+      }
+      setToast({ message: '댓글 삭제에 실패했습니다.', type: 'error' });
+      return false;
+    } catch (error) {
+      console.error('댓글 삭제 실패:', error);
+      setToast({ message: '댓글 삭제에 실패했습니다.', type: 'error' });
+      return false;
+    }
   };
 
-  const handleDeleteComment = (itemId: number, commentId: number) => {
-    setLostItems(prev => prev.map(item => 
-      item.id === itemId 
-        ? { ...item, comments: item.comments.filter(comment => comment.id !== commentId) }
-        : item
-    ));
+  const handleDeleteItem = async (itemId: number) => {
+    try {
+      const response = await fetch(`/api/lost-items/${itemId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setLostItems(prevItems => prevItems.filter(item => item.id !== itemId));
+        setToast({ message: '분실물이 성공적으로 삭제되었습니다!', type: 'success' });
+        return true;
+      }
+      setToast({ message: '분실물 삭제에 실패했습니다.', type: 'error' });
+      return false;
+    } catch (error) {
+      console.error('분실물 삭제 실패:', error);
+      setToast({ message: '분실물 삭제에 실패했습니다.', type: 'error' });
+      return false;
+    }
   };
 
-  const handleDeleteItem = (itemId: number) => {
-    setLostItems(prev => prev.filter(item => item.id !== itemId));
+  const handleUpdateItem = async (updatedItem: LostItem) => {
+    try {
+      const response = await fetch(`/api/lost-items/${updatedItem.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          item_type: updatedItem.item_type,
+          description: updatedItem.description,
+          location: updatedItem.location,
+          image_urls: updatedItem.image_urls
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setLostItems(prevItems => 
+          prevItems.map(item => 
+            item.id === updatedItem.id ? updatedItem : item
+          )
+        );
+        setToast({ message: '분실물이 성공적으로 수정되었습니다!', type: 'success' });
+        return true;
+      }
+      setToast({ message: '분실물 수정에 실패했습니다.', type: 'error' });
+      return false;
+    } catch (error) {
+      console.error('분실물 수정 실패:', error);
+      setToast({ message: '분실물 수정에 실패했습니다.', type: 'error' });
+      return false;
+    }
   };
 
-  const handleUpdateItem = (updatedItem: LostItem) => {
-    setLostItems(prev => prev.map(item => 
-      item.id === updatedItem.id ? updatedItem : item
-    ));
+  // 에러 처리 함수
+  const handleError = (error: any, context: string) => {
+    console.error(`${context} 오류:`, error);
+    
+    let message = '서버와의 연결이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.';
+    
+    if (error.response?.status === 404) {
+      message = '요청하신 정보를 찾을 수 없습니다.';
+    } else if (error.response?.status === 500) {
+      message = '서버 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
+    } else if (error.code === 'NETWORK_ERROR') {
+      message = '네트워크 연결을 확인해 주세요.';
+    }
+    
+    // Toast 메시지 표시
+    setToast({ message, type: 'error' });
+    
+    // 추가로 alert도 표시 (중요한 작업의 경우)
+    if (context.includes('등록') || context.includes('수정') || context.includes('삭제')) {
+      alert(message);
+    }
+  };
+
+  // API 호출 래퍼 함수
+  const safeApiCall = async (apiFunction: () => Promise<any>, context: string) => {
+    try {
+      return await apiFunction();
+    } catch (error) {
+      handleError(error, context);
+      throw error;
+    }
   };
 
   return (
@@ -734,6 +1142,15 @@ const App: React.FC = () => {
         color: theme === 'dark' ? '#f9fafb' : '#1f2937'
       }}>
         <Router>
+          <OfflineDetector />
+          <OfflineOverlay />
+          {toast && (
+            <Toast
+              message={toast.message}
+              type={toast.type}
+              onClose={() => setToast(null)}
+            />
+          )}
           <Header 
             currentUser={currentUser} 
             notifications={notifications} 
@@ -760,6 +1177,7 @@ const App: React.FC = () => {
                   onSendVerificationCode={handleSendVerificationCode}
                   onVerifyAndResetPassword={handleVerifyAndResetPassword}
                   onRequestPasswordResetByEmail={handleRequestPasswordResetByEmail}
+                  onRequestPasswordResetBySMS={handleRequestPasswordResetBySMS}
                   theme={theme}
                 />
               } />
@@ -794,20 +1212,20 @@ const App: React.FC = () => {
               <Route path="/list" element={
                 currentUser ? 
                 <ListPage 
-                  lostItems={lostItems}
                   currentUser={currentUser}
                   onDeleteItem={handleDeleteItem}
                   theme={theme}
                 /> : 
                 <Navigate to="/login" />
               } />
-              <Route path="/item/:id" element={
+              <Route path="/detail/:id" element={
                 currentUser ? 
                 <DetailPage 
-                  lostItems={lostItems}
                   currentUser={currentUser}
                   onAddComment={handleAddComment}
                   onDeleteComment={handleDeleteComment}
+                  onDeleteItem={handleDeleteItem}
+                  onUpdateItem={handleUpdateItem}
                   onMarkAsRead={handleMarkAsRead}
                   theme={theme}
                 /> : 
@@ -816,7 +1234,6 @@ const App: React.FC = () => {
               <Route path="/edit/:id" element={
                 currentUser ? 
                 <EditPage 
-                  lostItems={lostItems}
                   currentUser={currentUser}
                   onUpdateItem={handleUpdateItem}
                   onAddItem={handleAddItem}

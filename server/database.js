@@ -16,22 +16,73 @@ const db = new sqlite3.Database(dbPath, (err) => {
 
 // 데이터베이스 초기화 (테이블 생성)
 function initDatabase() {
-  const createTableSQL = `
+  const createUsersTableSQL = `
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       username TEXT UNIQUE NOT NULL,
       email TEXT UNIQUE NOT NULL,
       phone TEXT UNIQUE NOT NULL,
       password TEXT NOT NULL,
+      isTemporaryPassword BOOLEAN DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `;
 
-  db.run(createTableSQL, (err) => {
+  const createLostItemsTableSQL = `
+    CREATE TABLE IF NOT EXISTS lost_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      author_id INTEGER NOT NULL,
+      item_type TEXT NOT NULL,
+      description TEXT NOT NULL,
+      location TEXT NOT NULL,
+      image_urls TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (author_id) REFERENCES users (id)
+    )
+  `;
+
+  const createCommentsTableSQL = `
+    CREATE TABLE IF NOT EXISTS comments (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      item_id INTEGER NOT NULL,
+      author_id INTEGER NOT NULL,
+      text TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (item_id) REFERENCES lost_items (id),
+      FOREIGN KEY (author_id) REFERENCES users (id)
+    )
+  `;
+
+  db.run(createUsersTableSQL, (err) => {
     if (err) {
-      console.error('❌ 테이블 생성 실패:', err.message);
+      console.error('❌ users 테이블 생성 실패:', err.message);
     } else {
       console.log('✅ users 테이블 생성 완료');
+      // 기존 테이블에 isTemporaryPassword 컬럼 추가
+      db.run('ALTER TABLE users ADD COLUMN isTemporaryPassword BOOLEAN DEFAULT 0', (err) => {
+        if (err && !err.message.includes('duplicate column name')) {
+          console.error('❌ isTemporaryPassword 컬럼 추가 실패:', err.message);
+        } else {
+          console.log('✅ isTemporaryPassword 컬럼 확인 완료');
+        }
+      });
+    }
+  });
+
+  db.run(createLostItemsTableSQL, (err) => {
+    if (err) {
+      console.error('❌ lost_items 테이블 생성 실패:', err.message);
+    } else {
+      console.log('✅ lost_items 테이블 생성 완료');
+    }
+  });
+
+  db.run(createCommentsTableSQL, (err) => {
+    if (err) {
+      console.error('❌ comments 테이블 생성 실패:', err.message);
+    } else {
+      console.log('✅ comments 테이블 생성 완료');
     }
   });
 }
@@ -124,18 +175,35 @@ function findUserByUsername(username) {
   });
 }
 
-// ID로 사용자 찾기
+// ID로 사용자 조회
 function findUserById(userId) {
   return new Promise((resolve, reject) => {
-    const sql = 'SELECT * FROM users WHERE id = ?';
+    const sql = 'SELECT id, username, email, phone, password, isTemporaryPassword, created_at FROM users WHERE id = ?';
     
     db.get(sql, [userId], (err, row) => {
       if (err) {
-        reject(new Error('사용자 검색 중 오류가 발생했습니다.'));
+        reject(new Error('사용자 조회 중 오류가 발생했습니다.'));
       } else if (!row) {
-        reject(new Error('사용자를 찾을 수 없습니다.'));
+        resolve(null);
       } else {
         resolve(row);
+      }
+    });
+  });
+}
+
+// 임시 비밀번호 설정
+function setTemporaryPassword(userId, tempPassword) {
+  return new Promise((resolve, reject) => {
+    const sql = 'UPDATE users SET password = ?, isTemporaryPassword = 1 WHERE id = ?';
+    
+    db.run(sql, [tempPassword, userId], function(err) {
+      if (err) {
+        reject(new Error('임시 비밀번호 설정 중 오류가 발생했습니다.'));
+      } else if (this.changes === 0) {
+        reject(new Error('사용자를 찾을 수 없습니다.'));
+      } else {
+        resolve({ message: '임시 비밀번호가 설정되었습니다.' });
       }
     });
   });
@@ -144,7 +212,7 @@ function findUserById(userId) {
 // 비밀번호 업데이트
 function updatePassword(userId, newPassword) {
   return new Promise((resolve, reject) => {
-    const sql = 'UPDATE users SET password = ? WHERE id = ?';
+    const sql = 'UPDATE users SET password = ?, isTemporaryPassword = 0 WHERE id = ?';
     
     db.run(sql, [newPassword, userId], function(err) {
       if (err) {
@@ -198,12 +266,242 @@ function maskPhoneNumber(phone) {
   return phone;
 }
 
+// 분실물 등록
+function createLostItem(itemData) {
+  return new Promise((resolve, reject) => {
+    const { author_id, item_type, description, location, image_urls } = itemData;
+    const imageUrlsJson = image_urls ? JSON.stringify(image_urls) : null;
+    
+    const sql = `
+      INSERT INTO lost_items (author_id, item_type, description, location, image_urls)
+      VALUES (?, ?, ?, ?, ?)
+    `;
+    
+    db.run(sql, [author_id, item_type, description, location, imageUrlsJson], function(err) {
+      if (err) {
+        reject(new Error('분실물 등록 중 오류가 발생했습니다.'));
+      } else {
+        resolve({
+          id: this.lastID,
+          author_id,
+          item_type,
+          description,
+          location,
+          image_urls: image_urls || []
+        });
+      }
+    });
+  });
+}
+
+// 분실물 수정
+function updateLostItem(itemId, itemData) {
+  return new Promise((resolve, reject) => {
+    const { item_type, description, location, image_urls } = itemData;
+    const imageUrlsJson = image_urls ? JSON.stringify(image_urls) : null;
+    
+    const sql = `
+      UPDATE lost_items 
+      SET item_type = ?, description = ?, location = ?, image_urls = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+    
+    db.run(sql, [item_type, description, location, imageUrlsJson, itemId], function(err) {
+      if (err) {
+        reject(new Error('분실물 수정 중 오류가 발생했습니다.'));
+      } else if (this.changes === 0) {
+        reject(new Error('분실물을 찾을 수 없습니다.'));
+      } else {
+        resolve({ message: '분실물이 성공적으로 수정되었습니다.' });
+      }
+    });
+  });
+}
+
+// 분실물 삭제
+function deleteLostItem(itemId) {
+  return new Promise((resolve, reject) => {
+    // 먼저 관련 댓글들을 삭제
+    const deleteCommentsSql = 'DELETE FROM comments WHERE item_id = ?';
+    
+    db.run(deleteCommentsSql, [itemId], (err) => {
+      if (err) {
+        reject(new Error('댓글 삭제 중 오류가 발생했습니다.'));
+        return;
+      }
+      
+      // 그 다음 분실물을 삭제
+      const deleteItemSql = 'DELETE FROM lost_items WHERE id = ?';
+      
+      db.run(deleteItemSql, [itemId], function(err) {
+        if (err) {
+          reject(new Error('분실물 삭제 중 오류가 발생했습니다.'));
+        } else if (this.changes === 0) {
+          reject(new Error('분실물을 찾을 수 없습니다.'));
+        } else {
+          resolve({ message: '분실물이 성공적으로 삭제되었습니다.' });
+        }
+      });
+    });
+  });
+}
+
+// 모든 분실물 조회 (작성자 정보 포함)
+function getAllLostItems() {
+  return new Promise((resolve, reject) => {
+    const sql = `
+      SELECT 
+        li.id,
+        li.item_type,
+        li.description,
+        li.location,
+        li.image_urls,
+        li.created_at,
+        li.updated_at,
+        u.id as author_id,
+        u.username as author_name,
+        u.email as author_email
+      FROM lost_items li
+      JOIN users u ON li.author_id = u.id
+      ORDER BY li.created_at DESC
+    `;
+    
+    db.all(sql, [], (err, rows) => {
+      if (err) {
+        reject(new Error('분실물 목록 조회 중 오류가 발생했습니다.'));
+      } else {
+        // image_urls를 JSON에서 배열로 변환
+        const items = rows.map(row => ({
+          ...row,
+          image_urls: row.image_urls ? JSON.parse(row.image_urls) : []
+        }));
+        resolve(items);
+      }
+    });
+  });
+}
+
+// 특정 분실물 조회
+function getLostItemById(itemId) {
+  return new Promise((resolve, reject) => {
+    const sql = `
+      SELECT 
+        li.id,
+        li.item_type,
+        li.description,
+        li.location,
+        li.image_urls,
+        li.created_at,
+        li.updated_at,
+        u.id as author_id,
+        u.username as author_name,
+        u.email as author_email
+      FROM lost_items li
+      JOIN users u ON li.author_id = u.id
+      WHERE li.id = ?
+    `;
+    
+    db.get(sql, [itemId], (err, row) => {
+      if (err) {
+        reject(new Error('분실물 조회 중 오류가 발생했습니다.'));
+      } else if (!row) {
+        reject(new Error('분실물을 찾을 수 없습니다.'));
+      } else {
+        // image_urls를 JSON에서 배열로 변환
+        const item = {
+          ...row,
+          image_urls: row.image_urls ? JSON.parse(row.image_urls) : []
+        };
+        resolve(item);
+      }
+    });
+  });
+}
+
+// 댓글 등록
+function createComment(commentData) {
+  return new Promise((resolve, reject) => {
+    const { item_id, author_id, text } = commentData;
+    
+    const sql = `
+      INSERT INTO comments (item_id, author_id, text)
+      VALUES (?, ?, ?)
+    `;
+    
+    db.run(sql, [item_id, author_id, text], function(err) {
+      if (err) {
+        reject(new Error('댓글 등록 중 오류가 발생했습니다.'));
+      } else {
+        resolve({
+          id: this.lastID,
+          item_id,
+          author_id,
+          text
+        });
+      }
+    });
+  });
+}
+
+// 댓글 삭제
+function deleteComment(commentId, authorId) {
+  return new Promise((resolve, reject) => {
+    const sql = 'DELETE FROM comments WHERE id = ? AND author_id = ?';
+    
+    db.run(sql, [commentId, authorId], function(err) {
+      if (err) {
+        reject(new Error('댓글 삭제 중 오류가 발생했습니다.'));
+      } else if (this.changes === 0) {
+        reject(new Error('댓글을 찾을 수 없거나 삭제 권한이 없습니다.'));
+      } else {
+        resolve({ message: '댓글이 성공적으로 삭제되었습니다.' });
+      }
+    });
+  });
+}
+
+// 특정 분실물의 모든 댓글 조회
+function getCommentsByItemId(itemId) {
+  return new Promise((resolve, reject) => {
+    const sql = `
+      SELECT 
+        c.id,
+        c.text,
+        c.created_at,
+        u.id as author_id,
+        u.username as author_name,
+        u.email as author_email
+      FROM comments c
+      JOIN users u ON c.author_id = u.id
+      WHERE c.item_id = ?
+      ORDER BY c.created_at ASC
+    `;
+    
+    db.all(sql, [itemId], (err, rows) => {
+      if (err) {
+        reject(new Error('댓글 목록 조회 중 오류가 발생했습니다.'));
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+}
+
 module.exports = {
   registerUser,
   findUserByPhone,
   findUserByEmail,
   findUserByUsername,
   findUserById,
+  setTemporaryPassword,
   updatePassword,
-  getAllUsers
+  getAllUsers,
+  createLostItem,
+  updateLostItem,
+  deleteLostItem,
+  getAllLostItems,
+  getLostItemById,
+  createComment,
+  deleteComment,
+  getCommentsByItemId
 }; 
