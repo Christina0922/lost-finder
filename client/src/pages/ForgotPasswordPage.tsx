@@ -343,4 +343,5 @@ const ForgotPasswordPage = ({
   );
 };
 
-export default ForgotPasswordPage; 
+const ForgotPasswordPageComponent = ForgotPasswordPage;
+export default ForgotPasswordPageComponent; 
