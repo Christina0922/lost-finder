@@ -803,6 +803,152 @@ input, button, .submit-button {
   }
 }
 
+/* 테마 전환 애니메이션 */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 설정창 특별 애니메이션 */
+.settings-modal {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 12px 16px 24px 16px !important; /* 위, 오른쪽/왼쪽, 아래 여백 */
+  border-radius: 16px !important;
+  background-color: white !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+  width: 240px !important;
+  max-height: 85vh !important; /* 최대 높이 제한 */
+  overflow-y: auto !important; /* 스크롤 활성화 */
+  overflow-x: hidden !important;
+}
+
+.settings-modal * {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 버튼 호버 효과 */
+.settings-button {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.settings-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 반응형 폰트 크기 */
+@media (max-width: 480px) {
+  .settings-text {
+    font-size: clamp(12px, 3vw, 14px) !important;
+  }
+  
+  .settings-button-text {
+    font-size: clamp(11px, 3vw, 13px) !important;
+  }
+}
+
+/* 내부 요소 간 여백 조정 */
+.settings-section {
+  margin-bottom: 16px !important; /* 테마, 알림 섹션 간 간격 */
+}
+
+.settings-section:last-of-type {
+  margin-bottom: 24px !important; /* 마지막 알림 설정 이후 여백 */
+}
+
+.settings-button {
+  margin-top: 12px !important;
+  margin-bottom: 12px !important;
+}
+
+/* 로그아웃 버튼 여백 확보 */
+.logout-button {
+  margin-top: 12px !important;
+  margin-bottom: 8px !important; /* 하단 여백 줄임 */
+}
+
+/* 다크모드 설정창 스타일 */
+.theme-dark .settings-modal {
+  background-color: #111827 !important;
+  color: #f9fafb !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+}
+
+/* 닫기 버튼 클릭 영역 확대 */
+.settings-close-button {
+  padding: 12px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  border-radius: 9999px !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.settings-close-button:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* 알림 설명 텍스트 박스 스타일 */
+.alert-description {
+  background-color: #f5f5f5 !important;
+  color: #666 !important;
+  font-size: 12px !important;
+  line-height: 1.5 !important;
+  padding: 8px 12px !important;
+  border-radius: 10px !important;
+  margin-top: 8px !important;
+  margin-bottom: 16px !important; /* 여백 줄임 */
+}
+
+/* 하단 버튼(비밀번호 변경, 로그아웃) 간격 조정 */
+.settings-footer {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important; /* 버튼 간 간격 */
+  margin-bottom: 16px !important; /* 하단 여백 줄임 */
+  padding-bottom: 8px !important; /* 추가 하단 패딩 */
+}
+
+/* 각 버튼 스타일 보완 */
+.settings-footer button {
+  height: 44px !important;
+  border-radius: 12px !important;
+  font-weight: bold !important;
+}
+
+/* 다크모드 알림 설명 텍스트 박스 */
+.theme-dark .alert-description {
+  background-color: #374151 !important;
+  color: #d1d5db !important;
+}
+
+/* 다크모드 닫기 버튼 호버 */
+.theme-dark .settings-close-button:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 모바일 설정창 최적화 */
+@media (max-width: 360px) {
+  .settings-modal {
+    width: 95vw !important;
+    min-width: 280px !important;
+    padding: 16px 12px 20px 12px !important;
+    max-height: 80vh !important; /* 모바일에서는 더 작게 */
+  }
+  
+  .settings-modal button {
+    font-size: clamp(11px, 2.5vw, 13px) !important;
+    padding: 10px 8px !important;
+  }
+  
+  .settings-modal p {
+    font-size: clamp(13px, 3vw, 15px) !important;
+  }
+  
+  .settings-footer {
+    margin-bottom: 12px !important; /* 모바일에서 더 줄임 */
+    padding-bottom: 4px !important;
+  }
+}
+
 /* 설정 메뉴 다크 모드 스타일 */
 .theme-dark .settings-menu {
   background: #2c3e50;

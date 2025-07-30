@@ -141,7 +141,15 @@ export default function BottomBanner() {
             className="inline-block mt-2"
             title="외부 사이트로 이동합니다"
           >
-            <span className="px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg text-sm hover:bg-purple-700 transition-colors duration-200 shadow-lg" style={{ display: 'inline-block', marginBottom: '8px' }}>
+            <span className="px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg text-sm hover:bg-purple-700 transition-colors duration-200 shadow-lg" style={{ 
+              display: 'inline-block', 
+              marginBottom: '8px',
+              fontSize: '14px',
+              padding: '12px 20px',
+              whiteSpace: 'nowrap',
+              minWidth: '220px',
+              textAlign: 'center'
+            }}>
               지금 쿠팡에서 확인하기
             </span>
           </a>

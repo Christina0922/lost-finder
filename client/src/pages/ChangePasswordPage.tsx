@@ -40,8 +40,11 @@ const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ currentUser, on
     setMessage('');
 
     try {
+      // 임시 비밀번호 사용자는 현재 비밀번호 확인 생략
+      const currentPwd = currentUser.isTemporaryPassword ? '' : currentPassword;
+      
       // 서버에 비밀번호 변경 요청
-      await changePassword(currentUser.id, currentPassword, newPassword);
+      await changePassword(currentPwd, newPassword);
       
       // 로컬 상태도 업데이트
       onChangePassword(newPassword);

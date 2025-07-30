@@ -97,7 +97,8 @@ const Header: React.FC<{
   setTheme: (t: 'light' | 'dark') => void;
   alertMode: AlertMode;
   setAlertMode: (m: AlertMode) => void;
-}> = ({ currentUser, notifications, onLogout, theme, setTheme, alertMode, setAlertMode }) => {
+  setToast: (toast: { message: string; type: 'success' | 'error' | 'info' } | null) => void;
+}> = ({ currentUser, notifications, onLogout, theme, setTheme, alertMode, setAlertMode, setToast }) => {
   const [showSettings, setShowSettings] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const settingsRef = useRef<HTMLDivElement>(null);
@@ -239,51 +240,50 @@ const Header: React.FC<{
             {/* 설정 메뉴 */}
             <div 
               ref={settingsRef}
+              className="settings-modal"
               style={{
                 position: 'fixed',
                 top: '50%',
                 left: '50%',
                 transform: `translate(-50%, -50%) ${isAnimating ? 'scale(0.9)' : 'scale(1)'}`,
-                width: 'min(280px, 90vw)',
-                maxHeight: 'min(400px, 85vh)',
-                padding: '16px 24px 48px 24px',
+                width: 'min(90vw, 360px)',
+                minWidth: '280px',
+                maxHeight: 'min(450px, 85vh)',
+                padding: '20px 16px 24px 16px',
                 borderRadius: '12px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '12px',
+                gap: '16px',
                 zIndex: 1000,
-                transition: 'all 0.2s ease-in-out',
+                transition: 'all 0.3s ease-in-out',
                 backgroundColor: theme === 'dark' ? '#111827' : '#ffffff',
                 color: theme === 'dark' ? '#f9fafb' : '#1f2937',
-                boxShadow: theme === 'dark' 
-                  ? '0 25px 50px -12px rgba(0, 0, 0, 0.25)' 
-                  : '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                boxShadow: '0px 4px 12px rgba(0,0,0,0.1), 0px 8px 24px rgba(0,0,0,0.08)',
                 overflow: 'hidden'
               }}
             >
               {/* 타이틀 */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <span style={{ fontSize: '18px', fontWeight: 'bold' }}>설정</span>
                 <button 
+                  className="settings-close-button"
                   style={{
-                    width: '28px',
-                    height: '28px',
-                    borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: '16px',
                     border: 'none',
                     cursor: 'pointer',
-                    transition: 'background-color 0.2s ease',
                     backgroundColor: theme === 'dark' ? '#374151' : '#e5e7eb',
                     color: theme === 'dark' ? '#f9fafb' : '#1f2937'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = theme === 'dark' ? '#4b5563' : '#d1d5db';
+                    e.currentTarget.style.transform = 'scale(1.05)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = theme === 'dark' ? '#374151' : '#e5e7eb';
+                    e.currentTarget.style.transform = 'scale(1)';
                   }}
                   onClick={handleCloseSettings}
                 >
@@ -292,17 +292,17 @@ const Header: React.FC<{
               </div>
 
               {/* 테마 */}
-              <div style={{ marginTop: '0px' }}>
-                <p style={{ marginBottom: '8px', fontSize: '15px', fontWeight: '500' }}>🌞 테마</p>
+              <div className="settings-section" style={{ marginTop: '8px' }}>
+                <p style={{ marginBottom: '12px', fontSize: 'clamp(14px, 2vw, 15px)', fontWeight: '500' }}>🌞 테마</p>
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <button
                     style={{
                       flex: 1,
-                      padding: '10px 12px',
+                      padding: '12px 16px',
                       borderRadius: '8px',
-                      fontSize: '14px',
+                      fontSize: 'clamp(13px, 2vw, 14px)',
                       fontWeight: '500',
-                      transition: 'all 0.2s ease',
+                      transition: 'all 0.3s ease',
                       border: 'none',
                       cursor: 'pointer',
                       backgroundColor: theme === 'light' ? '#ec4899' : '#e5e7eb',
@@ -322,18 +322,21 @@ const Header: React.FC<{
                         e.currentTarget.style.backgroundColor = '#e5e7eb';
                       }
                     }}
-                    onClick={() => setTheme('light')}
+                    onClick={() => {
+                      setTheme('light');
+                      setToast({ message: '화이트 테마로 변경되었습니다.', type: 'success' });
+                    }}
                   >
                     화이트
                   </button>
                   <button
                     style={{
                       flex: 1,
-                      padding: '10px 12px',
+                      padding: '12px 16px',
                       borderRadius: '8px',
-                      fontSize: '14px',
+                      fontSize: 'clamp(13px, 2vw, 14px)',
                       fontWeight: '500',
-                      transition: 'all 0.2s ease',
+                      transition: 'all 0.3s ease',
                       border: 'none',
                       cursor: 'pointer',
                       backgroundColor: theme === 'dark' ? '#ec4899' : '#e5e7eb',
@@ -353,7 +356,10 @@ const Header: React.FC<{
                         e.currentTarget.style.backgroundColor = '#e5e7eb';
                       }
                     }}
-                    onClick={() => setTheme('dark')}
+                    onClick={() => {
+                      setTheme('dark');
+                      setToast({ message: '다크 테마로 변경되었습니다.', type: 'success' });
+                    }}
                   >
                     다크
                   </button>
@@ -361,21 +367,21 @@ const Header: React.FC<{
               </div>
 
               {/* 알림 설정 */}
-              <div style={{ marginTop: '4px' }}>
-                <p style={{ marginBottom: '8px', fontSize: '15px', fontWeight: '500' }}>🔔 알림</p>
-                <div style={{ display: 'flex', gap: '6px' }}>
+              <div className="settings-section" style={{ marginTop: '8px' }}>
+                <p style={{ marginBottom: '12px', fontSize: 'clamp(14px, 2vw, 15px)', fontWeight: '500' }}>🔔 알림</p>
+                <div style={{ display: 'flex', gap: '8px' }}>
                   <button
                     style={{
                       flex: 1,
-                      padding: '8px 6px',
+                      padding: '10px 8px',
                       borderRadius: '6px',
-                      fontSize: '13px',
+                      fontSize: 'clamp(12px, 2vw, 13px)',
                       fontWeight: '500',
-                      transition: 'all 0.2s ease',
+                      transition: 'all 0.3s ease',
                       border: 'none',
                       cursor: 'pointer',
                       backgroundColor: alertMode === 'silent' ? '#ec4899' : '#e5e7eb',
-                      color: alertMode === 'silent' ? '#ffffff' : '#374151'
+                      color: alertMode === 'silent' ? '#ffffff' : (theme === 'dark' ? '#ffffff' : '#374151')
                     }}
                     onMouseEnter={(e) => {
                       if (alertMode !== 'silent') {
@@ -389,6 +395,7 @@ const Header: React.FC<{
                     }}
                     onClick={() => {
                       setAlertMode('silent');
+                      setToast({ message: '알림 모드가 무음으로 설정되었습니다.', type: 'success' });
                     }}
                   >
                     무음
@@ -396,15 +403,15 @@ const Header: React.FC<{
                   <button
                     style={{
                       flex: 1,
-                      padding: '8px 6px',
+                      padding: '10px 8px',
                       borderRadius: '6px',
-                      fontSize: '13px',
+                      fontSize: 'clamp(12px, 2vw, 13px)',
                       fontWeight: '500',
-                      transition: 'all 0.2s ease',
+                      transition: 'all 0.3s ease',
                       border: 'none',
                       cursor: 'pointer',
                       backgroundColor: alertMode === 'vibrate' ? '#ec4899' : '#e5e7eb',
-                      color: alertMode === 'vibrate' ? '#ffffff' : '#374151'
+                      color: alertMode === 'vibrate' ? '#ffffff' : (theme === 'dark' ? '#ffffff' : '#374151')
                     }}
                     onMouseEnter={(e) => {
                       if (alertMode !== 'vibrate') {
@@ -419,6 +426,7 @@ const Header: React.FC<{
                     onClick={() => {
                       setAlertMode('vibrate');
                       triggerAlert('vibrate');
+                      setToast({ message: '알림 모드가 진동으로 설정되었습니다.', type: 'success' });
                     }}
                   >
                     진동
@@ -426,15 +434,15 @@ const Header: React.FC<{
                   <button
                     style={{
                       flex: 1,
-                      padding: '8px 6px',
+                      padding: '10px 8px',
                       borderRadius: '6px',
-                      fontSize: '13px',
+                      fontSize: 'clamp(12px, 2vw, 13px)',
                       fontWeight: '500',
-                      transition: 'all 0.2s ease',
+                      transition: 'all 0.3s ease',
                       border: 'none',
                       cursor: 'pointer',
                       backgroundColor: alertMode === 'melody' ? '#ec4899' : '#e5e7eb',
-                      color: alertMode === 'melody' ? '#ffffff' : '#374151'
+                      color: alertMode === 'melody' ? '#ffffff' : (theme === 'dark' ? '#ffffff' : '#374151')
                     }}
                     onMouseEnter={(e) => {
                       if (alertMode !== 'melody') {
@@ -449,6 +457,7 @@ const Header: React.FC<{
                     onClick={() => {
                       setAlertMode('melody');
                       triggerAlert('melody');
+                      setToast({ message: '알림 모드가 멜로디로 설정되었습니다.', type: 'success' });
                     }}
                   >
                     멜로디
@@ -456,76 +465,84 @@ const Header: React.FC<{
                 </div>
                 
                 {/* 안내 문구 */}
-                <div style={{ 
-                  marginTop: '8px', 
-                  padding: '8px 12px', 
-                  backgroundColor: theme === 'dark' ? '#374151' : '#f3f4f6',
-                  borderRadius: '6px',
-                  fontSize: '12px',
-                  color: theme === 'dark' ? '#d1d5db' : '#6b7280',
-                  lineHeight: '1.4'
-                }}>
+                <div className="alert-description">
                   ※ 이 설정은 LostFinder 앱 내 알림에만 적용됩니다. 휴대폰 전체의 무음/진동/벨소리 설정은 변경되지 않습니다.
                 </div>
               </div>
 
               {/* 하단 버튼 */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px' }}>
+              <div className="settings-footer">
                 <button
+                  className="settings-button"
                   style={{
                     backgroundColor: '#2563eb',
-                    padding: '12px 16px',
+                    padding: '14px 16px',
                     borderRadius: '8px',
                     color: '#ffffff',
-                    fontSize: '14px',
+                    fontSize: 'clamp(13px, 2vw, 14px)',
                     fontWeight: '500',
                     border: 'none',
                     cursor: 'pointer',
-                    transition: 'background-color 0.2s ease',
+                    transition: 'all 0.3s ease',
                     width: '100%',
-                    height: '40px',
-                    boxSizing: 'border-box'
+                    height: '44px',
+                    boxSizing: 'border-box',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = '#1d4ed8';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = '#2563eb';
+                    e.currentTarget.style.transform = 'translateY(0)';
                   }}
                   onClick={() => {
                     handleCloseSettings();
                     navigate('/change-password');
                   }}
                 >
-                  🔒 비밀번호 변경
+                  <span>🔒</span>
+                  <span className="settings-button-text">비밀번호 변경</span>
                 </button>
                 <button
+                  className="settings-button logout-button"
                   style={{
                     backgroundColor: '#ec4899',
-                    padding: '12px 16px',
+                    padding: '14px 16px',
                     borderRadius: '8px',
                     color: '#ffffff',
-                    fontSize: '14px',
+                    fontSize: 'clamp(13px, 2vw, 14px)',
                     fontWeight: '500',
                     border: 'none',
                     cursor: 'pointer',
-                    transition: 'background-color 0.2s ease',
+                    transition: 'all 0.3s ease',
                     width: '100%',
-                    height: '40px',
-                    boxSizing: 'border-box'
+                    height: '44px',
+                    boxSizing: 'border-box',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = '#db2777';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = '#ec4899';
+                    e.currentTarget.style.transform = 'translateY(0)';
                   }}
                   onClick={() => {
                     handleCloseSettings();
                     onLogout();
                   }}
                 >
-                  🧳 로그아웃
+                  <span>🧳</span>
+                  <span className="settings-button-text">로그아웃</span>
                 </button>
               </div>
             </div>
@@ -705,20 +722,24 @@ const App: React.FC = () => {
   const [alertMode, setAlertMode] = useState<AlertMode>(getAlertMode());
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
-  // Load user from localStorage on app start
+  // Load user and settings from localStorage on app start
   useEffect(() => {
-    const savedUser = localStorage.getItem('currentUser');
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
-    const savedAlertMode = localStorage.getItem('alertMode') as AlertMode;
-    
-    if (savedUser) {
-      setCurrentUser(JSON.parse(savedUser));
-    }
-    if (savedTheme) {
-      setTheme(savedTheme);
-    }
-    if (savedAlertMode) {
-      setAlertMode(savedAlertMode);
+    try {
+      const savedUser = localStorage.getItem('currentUser');
+      const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
+      const savedAlertMode = localStorage.getItem('alertMode') as AlertMode;
+      
+      if (savedUser) {
+        setCurrentUser(JSON.parse(savedUser));
+      }
+      if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
+        setTheme(savedTheme);
+      }
+      if (savedAlertMode && (savedAlertMode === 'silent' || savedAlertMode === 'vibrate' || savedAlertMode === 'melody')) {
+        setAlertMode(savedAlertMode);
+      }
+    } catch (error) {
+      console.error('설정 로드 중 오류:', error);
     }
   }, []);
 
@@ -754,11 +775,21 @@ const App: React.FC = () => {
 
   // Save theme and alert mode to localStorage when they change
   useEffect(() => {
-    localStorage.setItem('theme', theme);
+    try {
+      localStorage.setItem('theme', theme);
+      console.log('테마 설정 저장됨:', theme);
+    } catch (error) {
+      console.error('테마 설정 저장 실패:', error);
+    }
   }, [theme]);
 
   useEffect(() => {
-    setAlertMode(alertMode);
+    try {
+      localStorage.setItem('alertMode', alertMode);
+      console.log('알림 설정 저장됨:', alertMode);
+    } catch (error) {
+      console.error('알림 설정 저장 실패:', error);
+    }
   }, [alertMode]);
 
   // Apply theme to body
@@ -923,6 +954,7 @@ const App: React.FC = () => {
   const handleLogout = () => {
     setCurrentUser(null);
     localStorage.removeItem('currentUser');
+    setToast({ message: '로그아웃되었습니다. 로그인 페이지로 이동합니다.', type: 'info' });
   };
 
   const handleAddItem = async (item: Omit<LostItem, 'id' | 'author_id' | 'comments'>) => {
@@ -1159,6 +1191,7 @@ const App: React.FC = () => {
             setTheme={setTheme}
             alertMode={alertMode}
             setAlertMode={setAlertMode}
+            setToast={setToast}
           />
           
           <main style={{ padding: '1rem' }}>

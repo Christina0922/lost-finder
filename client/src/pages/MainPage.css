@@ -27,7 +27,7 @@
   color: #e91e63;
   font-size: 2.5rem;
   font-weight: 800;
-  margin-bottom: 15px;
+  margin-bottom: 8px; /* 15px에서 8px로 줄임 */
   font-family: 'Gmarket Sans', sans-serif;
   letter-spacing: 1.5px;
   text-shadow: 3px 3px 6px rgba(233, 30, 99, 0.3);
@@ -68,6 +68,12 @@
   justify-content: center;
   margin-top: 24px;
   margin-bottom: 0px;
+  flex-wrap: nowrap !important; /* 한 줄에 강제 배치 */
+  flex-direction: row !important; /* 가로 방향 강제 */
+  width: 100%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .btn {
@@ -82,6 +88,9 @@
   text-decoration: none;
   display: inline-block;
   text-align: center;
+  flex: 1; /* 동일한 너비로 배치 */
+  max-width: 200px; /* 최대 너비 제한 */
+  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
 }
 
 /* 메인 버튼: 등록하기 */
@@ -245,7 +254,7 @@
     max-width: 98vw;
   }
   .main-title {
-    margin-bottom: 2px;
+    margin-bottom: 1px; /* 2px에서 1px로 줄임 */
     font-size: 1.4rem;
     font-weight: 700;
   }
@@ -257,15 +266,24 @@
   .button-group {
     gap: 8px;
     margin-bottom: 2px;
+    flex-wrap: nowrap !important; /* 모바일에서도 한 줄 유지 */
+    flex-direction: row !important; /* 가로 방향 강제 */
+    width: 100%;
+    max-width: 350px;
+    margin-left: auto;
+    margin-right: auto;
   }
   .btn {
-    padding: 8px 16px;
-    font-size: 14px;
-    min-width: 100px;
+    padding: 8px 12px;
+    font-size: 13px;
+    min-width: 80px;
+    flex: 1; /* 동일한 너비 */
+    max-width: none;
+    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
   }
   .bottom-banner {
     margin-top: 1.5px;
-    padding: 1px 0.5px;
+    padding: 8px 12px;
   }
   .important-message {
     text-align: center !important;
@@ -275,6 +293,15 @@
   .main-card {
     padding: 12px 12px 16px 12px;
     margin: 4px auto 1px auto;
+  }
+  /* 쿠팡 버튼 스타일 개선 */
+  .bottom-banner a span {
+    font-size: 12px !important;
+    padding: 8px 16px !important;
+    white-space: nowrap;
+    display: inline-block;
+    width: auto;
+    min-width: 200px;
   }
 }
 
