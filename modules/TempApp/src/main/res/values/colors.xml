@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    
+    <!-- Material Design Colors -->
+    <color name="blue_500">#2196F3</color>
+    <color name="blue_600">#1976D2</color>
+    <color name="green_500">#4CAF50</color>
+    <color name="green_600">#388E3C</color>
+    <color name="orange_500">#FF9800</color>
+    <color name="orange_600">#F57C00</color>
+    <color name="red_500">#F44336</color>
+    <color name="gray_100">#F5F5F5</color>
+    <color name="gray_300">#E0E0E0</color>
+    <color name="gray_400">#BDBDBD</color>
+    <color name="gray_500">#9E9E9E</color>
+    <color name="gray_600">#757575</color>
+    <color name="gray_700">#616161</color>
+    <color name="purple_500">#9C27B0</color>
+    
+    <!-- Custom Colors -->
+    <color name="my_item_color">#2196F3</color>
+    <color name="other_item_color">#FF9800</color>
+</resources> 

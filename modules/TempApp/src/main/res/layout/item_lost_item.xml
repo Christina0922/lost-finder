@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- 내 분실물 표시 -->
+        <TextView
+            android:id="@+id/tvMyItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="내 분실물"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/blue_500"
+            android:background="@drawable/bg_my_item"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone" />
+
+        <!-- 설명 -->
+        <TextView
+            android:id="@+id/tvDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="분실물 설명"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginBottom="8dp" />
+
+        <!-- 등록 시간 -->
+        <TextView
+            android:id="@+id/tvRegisteredAt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="등록 시간"
+            android:textSize="14sp"
+            android:textColor="@color/gray_700"
+            android:layout_marginBottom="4dp" />
+
+        <!-- 위치 정보 -->
+        <TextView
+            android:id="@+id/tvLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="위치 정보"
+            android:textSize="14sp"
+            android:textColor="@color/gray_700" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView> 

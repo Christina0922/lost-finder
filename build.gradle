@@ -1,0 +1,9 @@
+// 루트 빌드 스크립트 (필요 시 프로젝트 공통 설정만 작성)
+plugins {
+    // 루트 프로젝트에 필요한 플러그인이 없으면 생략 가능
+    // 예: id("org.jetbrains.kotlin.jvm") version "1.9.10"
+}
+
+allprojects {
+    // 이 부분은 repositories 설정 없이 유지
+}

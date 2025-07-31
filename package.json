@@ -1,0 +1,25 @@
+{
+  "name": "lost-finder",
+  "version": "1.0.0",
+  "description": "Lost Finder Application",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "cd server && set PORT=5000 && node server.js",
+    "server": "cd server && set PORT=5000 && node server.js",
+    "dev": "cd server && set PORT=5000 && node server.js",
+    "build": "cd client && npm run build",
+    "client": "cd client && set PORT=3000 && npm start",
+    "install-all": "npm install && cd server && npm install && cd ../client && npm install"
+  },
+  "keywords": [
+    "lost",
+    "finder",
+    "react",
+    "node"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "twilio": "^5.8.0"
+  }
+}

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.tempapp">
+
+    <!-- ✅ 인터넷과 위치 권한 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <application
+        android:name=".MyApplication"
+        android:allowBackup="true"
+        android:label="분실물 찾기"
+        android:theme="@style/Theme.TempApp"
+        android:supportsRtl="true"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:usesCleartextTraffic="true">
+
+        <!-- ✅ 카카오맵 API 키 -->
+        <meta-data
+            android:name="com.kakao.sdk.AppKey"
+            android:value="9fe99f7ebec8304675356da0a188c830" />
+
+        <!-- ✅ MainActivity -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- ✅ RegisterActivity -->
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false" />
+
+        <!-- ✅ MapActivity -->
+        <activity
+            android:name=".MapActivity"
+            android:exported="false" />
+
+        <!-- ✅ ListActivity -->
+        <activity
+            android:name=".ListActivity"
+            android:exported="false" />
+
+        <!-- ✅ WebViewActivity -->
+        <activity
+            android:name=".WebViewActivity"
+            android:exported="false" />
+
+        <!-- ✅ SettingsActivity -->
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
+
+        <!-- ✅ SuccessStoriesActivity -->
+        <activity
+            android:name=".SuccessStoriesActivity"
+            android:exported="false" />
+
+        <!-- ✅ GameActivity -->
+        <activity
+            android:name=".GameActivity"
+            android:exported="false" />
+
+    </application>
+
+</manifest>
