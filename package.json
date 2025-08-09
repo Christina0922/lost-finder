@@ -2,14 +2,16 @@
   "name": "lost-finder",
   "version": "1.0.0",
   "description": "Lost Finder Application",
+  "private": true,
   "main": "server/server.js",
   "scripts": {
-    "start": "cd server && set PORT=5000 && node server.js",
-    "server": "cd server && set PORT=5000 && node server.js",
-    "dev": "cd server && set PORT=5000 && node server.js",
-    "build": "cd client && npm run build",
-    "client": "cd client && set PORT=3000 && npm start",
-    "install-all": "npm install && cd server && npm install && cd ../client && npm install"
+    "install-all": "npm install && npm install --prefix server && npm install --prefix client",
+    "server": "npm run start --prefix server",
+    "client": "npm run start --prefix client",
+    "build": "npm run build --prefix client",
+    "dev": "concurrently -k -n server,client -c auto \"npm run start --prefix server\" \"npm run start --prefix client\"",
+    "dev:strict": "concurrently -k -n server,client -c auto \"npm run start --prefix server\" \"wait-on http://localhost:5000/health && npm run start --prefix client\"",
+    "start": "npm run dev"
   },
   "keywords": [
     "lost",
@@ -19,7 +21,9 @@
   ],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "twilio": "^5.8.0"
+  "dependencies": {},
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "wait-on": "^8.0.0"
   }
 }

@@ -10,7 +10,9 @@
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
-        android:label="분실물 찾기"
+    android:icon="@mipmap/ic_launcher"
+    android:roundIcon="@mipmap/ic_launcher"
+        android:label="LostFinder"
         android:theme="@style/Theme.TempApp"
         android:supportsRtl="true"
         android:networkSecurityConfig="@xml/network_security_config"

@@ -24,34 +24,19 @@
 }
 
 .main-title {
-  color: #e91e63;
+  color: #c2185b;
   font-size: 2.5rem;
   font-weight: 800;
-  margin-bottom: 8px; /* 15px에서 8px로 줄임 */
+  margin-bottom: 8px;
   font-family: 'Gmarket Sans', sans-serif;
   letter-spacing: 1.5px;
-  text-shadow: 3px 3px 6px rgba(233, 30, 99, 0.3);
-  background: linear-gradient(45deg, #e91e63, #ff6b9d);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  background: white;
   padding: 15px 25px;
   border-radius: 25px;
-  position: relative;
   display: inline-block;
-}
-
-.main-title::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255, 182, 193, 0.1) 0%, rgba(255, 107, 157, 0.1) 100%);
-  border-radius: 25px;
-  z-index: -1;
-  border: 1px solid rgba(233, 30, 99, 0.2);
+  border: 2px solid #e91e63;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  text-shadow: none;
 }
 
 .main-desc {

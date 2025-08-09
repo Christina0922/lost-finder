@@ -1,27 +1,24 @@
+// C:\LostFinderProject\client\src\pages\MainPage.tsx
 import React from 'react';
 import { Link } from 'react-router-dom';
+import type { User } from '../types';
 import './MainPage.css';
-import type { User } from '../App';
 import BottomBanner from '../components/BottomBanner';
 
 interface MainPageProps {
-  currentUser: User | null;
-  lostItems: any[];
-  onAddItem: (item: any) => void;
-  theme: 'light' | 'dark';
+  currentUser?: User | null;
 }
 
-const MainPage: React.FC<MainPageProps> = ({ currentUser, lostItems, onAddItem, theme }) => {
+const MainPage: React.FC<MainPageProps> = ({ currentUser = null }) => {
   return (
-    <div className="main-container" style={{ paddingTop: '8px' }}>
-      <h1 className="main-title">분실물 찾기 서비스</h1>
-              <p className="main-desc">지금 바로 등록하고 찾아보세요!</p>
-      <div className="button-group">
-        <Link to="/edit/new" className="btn primary">등록하기</Link>
-        <Link to="/list" className="btn secondary">목록 보기</Link>
-      </div>
-      <hr className="main-divider" />
-      {/* ✅ 하단 배너 삽입 */}
+    <div className="main-page">
+      <h1>LostFinder 메인</h1>
+      <p>{currentUser ? `${currentUser.username} 님 환영합니다` : '로그인하지 않음'}</p>
+      <nav className="nav">
+        <Link to="/list">목록</Link>
+        <Link to="/add">등록</Link>
+        <Link to="/game">게임</Link>
+      </nav>
       <BottomBanner />
     </div>
   );

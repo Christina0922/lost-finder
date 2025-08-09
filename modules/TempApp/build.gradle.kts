@@ -44,6 +44,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.activity:activity-ktx:1.9.0")
+    implementation("androidx.browser:browser:1.8.0")
     
     // 카카오맵 SDK (Daum Maps) - .aar 파일 사용
     implementation(files("libs/android-2.12.14.aar"))

@@ -15,8 +15,10 @@ class WebViewActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_webview)
 
-        val url = intent.getStringExtra("url") ?: "http://localhost:3000"
+        val url = intent.getStringExtra("url") ?: "http://192.168.45.27:3000"
         setupWebView(url)
+        setupBackButton()
+        updateTitle(url)
     }
 
     private fun setupWebView(url: String) {
@@ -54,5 +56,23 @@ class WebViewActivity : AppCompatActivity() {
         }
 
         webView.loadUrl(url)
+    }
+
+    private fun setupBackButton() {
+        findViewById<android.widget.ImageButton>(R.id.btnBack).setOnClickListener {
+            finish()
+        }
+    }
+
+    private fun updateTitle(url: String) {
+        val titleTextView = findViewById<android.widget.TextView>(R.id.tvTitle)
+        val title = when {
+            url.contains("/login") -> "로그인"
+            url.contains("/signup") -> "회원가입"
+            url.contains("/register") -> "분실물 등록"
+            url.contains("/list") -> "분실물 목록"
+            else -> "LostFinder"
+        }
+        titleTextView.text = title
     }
 } 

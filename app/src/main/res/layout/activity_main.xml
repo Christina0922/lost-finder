@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#F2F2F7">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- 상단 헤더 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:padding="16dp"
+            android:background="#6A00FF"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="분실물 찾기"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="20sp" />
+        </LinearLayout>
+
+        <!-- 웹 페이지 바 -->
+        <LinearLayout
+            android:id="@+id/btnWebPage"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="#20A4F3"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="웹 페이지"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <!-- 안내 문구 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="잃어버린 물건을 쉽게 찾아보세요"
+            android:textColor="#666666"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:padding="16dp" />
+
+        <!-- 카드 컨테이너 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:orientation="vertical">
+
+            <!-- 1. 분실물 등록하기 -->
+            <LinearLayout
+                android:id="@+id/btnRegister"
+                android:layout_width="match_parent"
+                android:layout_height="86dp"
+                android:layout_marginBottom="12dp"
+                android:background="@android:color/white"
+                android:elevation="2dp"
+                android:padding="14dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:src="@mipmap/ic_launcher_round" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:paddingLeft="12dp"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="분실물 등록하기"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="#222222" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="잃어버린 물건을 등록하세요"
+                        android:textSize="13sp"
+                        android:textColor="#777777" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="→"
+                    android:textSize="22sp"
+                    android:textColor="#999999"
+                    android:gravity="center_vertical" />
+            </LinearLayout>
+
+            <!-- 2. 목록 보기 -->
+            <LinearLayout
+                android:id="@+id/btnList"
+                android:layout_width="match_parent"
+                android:layout_height="86dp"
+                android:layout_marginBottom="12dp"
+                android:background="@android:color/white"
+                android:elevation="2dp"
+                android:padding="14dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:src="@mipmap/ic_launcher_round" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:paddingLeft="12dp"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="목록 보기"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="#222222" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="등록된 분실물을 확인하세요"
+                        android:textSize="13sp"
+                        android:textColor="#777777" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="→"
+                    android:textSize="22sp"
+                    android:textColor="#999999"
+                    android:gravity="center_vertical" />
+            </LinearLayout>
+
+            <!-- 3. 후기 보기 -->
+            <LinearLayout
+                android:id="@+id/btnReview"
+                android:layout_width="match_parent"
+                android:layout_height="86dp"
+                android:layout_marginBottom="12dp"
+                android:background="@android:color/white"
+                android:elevation="2dp"
+                android:padding="14dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:src="@mipmap/ic_launcher_round" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:paddingLeft="12dp"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="후기 보기"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="#222222" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="다른 사용자들의 후기를 확인하세요"
+                        android:textSize="13sp"
+                        android:textColor="#777777" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="→"
+                    android:textSize="22sp"
+                    android:textColor="#999999"
+                    android:gravity="center_vertical" />
+            </LinearLayout>
+
+            <!-- 4. 기다리면서 게임하기 -->
+            <LinearLayout
+                android:id="@+id/btnGame"
+                android:layout_width="match_parent"
+                android:layout_height="86dp"
+                android:layout_marginBottom="12dp"
+                android:background="@android:color/white"
+                android:elevation="2dp"
+                android:padding="14dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:src="@mipmap/ic_launcher_round" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:paddingLeft="12dp"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="기다리면서 게임하기"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="#222222" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="재미있는 게임을 즐겨보세요"
+                        android:textSize="13sp"
+                        android:textColor="#777777" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="→"
+                    android:textSize="22sp"
+                    android:textColor="#999999"
+                    android:gravity="center_vertical" />
+            </LinearLayout>
+
+            <!-- 5. 쿠팡에서 보기 -->
+            <LinearLayout
+                android:id="@+id/btnCoupang"
+                android:layout_width="match_parent"
+                android:layout_height="86dp"
+                android:layout_marginBottom="16dp"
+                android:background="@android:color/white"
+                android:elevation="2dp"
+                android:padding="14dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:src="@mipmap/ic_launcher_round" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:paddingLeft="12dp"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="쿠팡에서 보기"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="#222222" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="분실 방지 용품을 구매하세요"
+                        android:textSize="13sp"
+                        android:textColor="#777777" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="→"
+                    android:textSize="22sp"
+                    android:textColor="#999999"
+                    android:gravity="center_vertical" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 하단 쿠팡 배너 -->
+        <LinearLayout
+            android:id="@+id/bannerCoupang"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="#FF7A00"
+            android:paddingLeft="16dp"
+            android:paddingRight="12dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="분실 방지 용품 인기 상품 모음"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/btnBannerGo"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:text="쿠팡에서 보기"
+                android:textSize="12sp"
+                android:textColor="#FFFFFF"
+                android:background="#7A2CFF"
+                android:paddingLeft="14dp"
+                android:paddingRight="14dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

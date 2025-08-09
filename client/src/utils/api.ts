@@ -1,4 +1,4 @@
-import type { LostItem, Comment } from '../App';
+import type { LostItem, Comment } from '../types';
 
 // 환경변수에 따라 API URL 설정
 // const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '/api';
@@ -322,7 +322,7 @@ export const getLostItemById = async (id: number) => {
   }, '분실물 상세 조회');
 };
 
-export const createLostItem = async (item: Omit<LostItem, 'id' | 'comments' | 'author_id'>) => {
+export const addLostItem = async (item: Omit<LostItem, 'id' | 'comments' | 'author_id'>) => {
   return safeApiCall(async () => {
     const response = await fetch('/api/lost-items', {
       method: 'POST',
@@ -340,6 +340,10 @@ export const createLostItem = async (item: Omit<LostItem, 'id' | 'comments' | 'a
     const data = await response.json();
     return data;
   }, '분실물 등록');
+};
+
+export const createLostItem = async (item: Omit<LostItem, 'id' | 'comments' | 'author_id'>) => {
+  return addLostItem(item);
 };
 
 export const updateLostItem = async (id: number, item: Partial<LostItem>) => {
@@ -379,6 +383,26 @@ export const deleteLostItem = async (id: number) => {
 };
 
 // 댓글 관련 API
+export const addComment = async (itemId: number, comment: Omit<Comment, 'id' | 'created_at'>) => {
+  return safeApiCall(async () => {
+    const response = await fetch(`/api/lost-items/${itemId}/comments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(comment),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || '댓글 등록에 실패했습니다.');
+    }
+
+    const data = await response.json();
+    return data;
+  }, '댓글 등록');
+};
+
 export const createComment = async (itemId: number, text: string) => {
   return safeApiCall(async () => {
     const response = await fetch(`/api/lost-items/${itemId}/comments`, {
@@ -426,4 +450,4 @@ export const getCommentsByItemId = async (itemId: number) => {
     const data = await response.json();
     return data;
   }, '댓글 목록 조회');
-}; 
+};

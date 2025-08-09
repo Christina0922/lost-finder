@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/white"
-    android:padding="20dp">
+    android:background="@color/white">
 
     <!-- 상단 헤더 -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginBottom="20dp">
+        android:background="@color/blue_500"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
 
         <ImageButton
             android:id="@+id/btnBack"
@@ -21,130 +21,28 @@
             android:layout_height="48dp"
             android:src="@android:drawable/ic_menu_revert"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:tint="@color/gray_600"
+            android:tint="@color/white"
             android:contentDescription="뒤로가기" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="분실물 찾기 게임"
-            android:textSize="24sp"
+            android:text="Match-3 게임"
+            android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:gravity="center" />
 
     </LinearLayout>
 
-    <!-- 게임 정보 -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/gray_100"
-        android:padding="16dp"
-        android:layout_marginBottom="20dp">
-
-        <TextView
-            android:id="@+id/tvScore"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="점수: 0"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
-            android:id="@+id/tvTime"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="시간: 60초"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
-            android:id="@+id/tvFoundItems"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="찾은 물건: 0개"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@color/black" />
-
-    </LinearLayout>
-
-    <!-- 게임 영역 -->
-    <LinearLayout
+    <!-- WebView 게임 영역 -->
+    <WebView
+        android:id="@+id/webView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="vertical"
-        android:gravity="center">
-
-        <TextView
-            android:id="@+id/tvCurrentItem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="게임을 시작하세요!"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="@color/blue_500"
-            android:gravity="center"
-            android:layout_marginBottom="30dp"
-            android:visibility="gone" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnStartGame"
-            android:layout_width="200dp"
-            android:layout_height="80dp"
-            android:text="게임 시작"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:cornerRadius="40dp"
-            app:backgroundTint="@color/green_500" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnFindItem"
-            android:layout_width="200dp"
-            android:layout_height="80dp"
-            android:text="찾았어요!"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:cornerRadius="40dp"
-            app:backgroundTint="@color/blue_500"
-            android:visibility="gone" />
-
-    </LinearLayout>
-
-    <!-- 게임 설명 -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/gray_100"
-        android:padding="16dp"
-        android:layout_marginTop="20dp">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="게임 방법"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="• 60초 동안 분실물을 찾아보세요\n• 화면에 나타나는 물건을 찾으면 +10점\n• 시간이 끝나면 게임이 종료됩니다"
-            android:textSize="14sp"
-            android:textColor="@color/gray_600"
-            android:lineSpacingExtra="4dp" />
-
-    </LinearLayout>
+        android:scrollbars="none"
+        android:overScrollMode="never" />
 
 </LinearLayout> 

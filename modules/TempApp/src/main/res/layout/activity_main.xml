@@ -1,208 +1,413 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="20dp"
-    android:background="@color/white">
+    android:fillViewport="true"
+    android:background="#F2F2F7">
 
-    <!-- 상단 헤더 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="30dp">
+        android:orientation="vertical">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="분실물 찾기"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:gravity="center" />
+                 <!-- 상단 헤더 -->
+         <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:background="#10B981"
+             android:orientation="vertical">
+             
+             <!-- LostFinder 제목 -->
+             <LinearLayout
+                 android:layout_width="match_parent"
+                 android:layout_height="60dp"
+                 android:padding="16dp"
+                 android:gravity="center_vertical"
+                 android:orientation="horizontal">
+                 
+                 <TextView
+                     android:id="@+id/tvTitle"
+                     android:layout_width="0dp"
+                     android:layout_height="wrap_content"
+                     android:layout_weight="1"
+                     android:text="🔍 LostFinder"
+                     android:textColor="#FFFFFF"
+                     android:textStyle="bold"
+                     android:textSize="24sp"
+                     android:clickable="true"
+                     android:focusable="true"
+                     android:background="?android:attr/selectableItemBackground" />
+             </LinearLayout>
+             
+                           <!-- 버튼들 -->
+              <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="78dp"
+                  android:padding="16dp"
+                  android:gravity="center"
+                  android:orientation="horizontal">
 
-        <ImageButton
-            android:id="@+id/btnSettings"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@android:drawable/ic_menu_manage"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:tint="@color/gray_600"
-            android:contentDescription="설정" />
+                         <!-- 분실물 찾기 버튼 -->
+                           <LinearLayout
+                  android:id="@+id/btnSearch"
+                  android:layout_width="0dp"
+                  android:layout_height="78dp"
+                  android:layout_weight="1"
+                  android:background="@drawable/rounded_button_green"
+                  android:padding="6dp"
+                  android:gravity="center"
+                  android:layout_marginEnd="4dp">
 
-    </LinearLayout>
+                                                                       <TextView
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:text="분실물 찾기"
+                       android:textColor="#000000"
+                       android:textStyle="bold"
+                       android:textSize="14sp"
+                       android:alpha="1.0" />
+             </LinearLayout>
 
-    <!-- 로그인 전 상태 -->
-    <LinearLayout
-        android:id="@+id/loginBeforeLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:visibility="visible">
+             <!-- 이전 화면 버튼 -->
+                           <LinearLayout
+                  android:id="@+id/btnBack"
+                  android:layout_width="0dp"
+                  android:layout_height="78dp"
+                  android:layout_weight="1"
+                  android:background="@drawable/rounded_button_gray"
+                  android:padding="6dp"
+                  android:gravity="center"
+                  android:layout_marginEnd="4dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="로그인이 필요합니다"
-            android:textSize="16sp"
-            android:textColor="@color/gray_600"
-            android:gravity="center"
-            android:layout_marginBottom="20dp" />
+                                   <TextView
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="이전"
+                      android:textColor="#333333"
+                      android:textStyle="bold"
+                      android:textSize="14sp" />
+             </LinearLayout>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnLogin"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="로그인"
-            android:textSize="16sp"
-            android:layout_marginBottom="12dp"
-            app:cornerRadius="8dp"
-            app:backgroundTint="@color/blue_500" />
+             <!-- 로그인 버튼 -->
+                           <LinearLayout
+                  android:id="@+id/btnLogin"
+                  android:layout_width="0dp"
+                  android:layout_height="78dp"
+                  android:layout_weight="1"
+                  android:background="@drawable/rounded_button_green"
+                  android:padding="6dp"
+                  android:gravity="center"
+                  android:layout_marginEnd="4dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnSignup"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="회원가입"
-            android:textSize="16sp"
-            android:layout_marginBottom="20dp"
-            app:cornerRadius="8dp"
-            app:backgroundTint="@color/green_500" />
+                                                                       <TextView
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:text="로그인"
+                       android:textColor="#000000"
+                       android:textStyle="bold"
+                       android:textSize="13sp"
+                       android:alpha="1.0" />
+             </LinearLayout>
 
-    </LinearLayout>
+             <!-- 설정 버튼 -->
+                           <LinearLayout
+                  android:id="@+id/btnSettings"
+                  android:layout_width="0dp"
+                  android:layout_height="78dp"
+                  android:layout_weight="1"
+                  android:background="@drawable/rounded_button_green"
+                  android:padding="6dp"
+                  android:gravity="center">
 
-    <!-- 로그인 후 상태 -->
-    <LinearLayout
-        android:id="@+id/loginAfterLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone">
+                                                                       <TextView
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:text="설정"
+                       android:textColor="#000000"
+                       android:textStyle="bold"
+                       android:textSize="13sp"
+                                              android:alpha="1.0" />
+               </LinearLayout>
+             </LinearLayout>
+         </LinearLayout>
 
-        <!-- 사용자 정보 -->
+                 <!-- 안내 문구 -->
+         <TextView
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:text="잃어버린 물건을 쉽게 찾으세요"
+             android:textColor="#555555"
+             android:textSize="16sp"
+             android:gravity="center"
+             android:padding="12dp"
+             android:layout_marginTop="8dp" />
+
+        <!-- 카드 컨테이너 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="20dp">
-
-            <TextView
-                android:id="@+id/tvUsername"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="사용자님"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/black" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnLogout"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:text="로그아웃"
-                android:textSize="14sp"
-                app:cornerRadius="20dp"
-                app:backgroundTint="@color/gray_400" />
-
-        </LinearLayout>
-
-        <!-- 메뉴 버튼들 -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnRegister"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="분실물 등록하기"
-            android:textSize="16sp"
-            android:layout_marginBottom="12dp"
-            app:cornerRadius="8dp"
-            app:backgroundTint="@color/green_500" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnListView"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="목록 보기"
-            android:textSize="16sp"
-            android:layout_marginBottom="12dp"
-            app:cornerRadius="8dp"
-            app:backgroundTint="@color/blue_500" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnReviews"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="후기 보기"
-            android:textSize="16sp"
-            android:layout_marginBottom="12dp"
-            app:cornerRadius="8dp"
-            app:backgroundTint="@color/orange_500" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnGame"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="기다리면서 게임하기"
-            android:textSize="16sp"
-            android:layout_marginBottom="12dp"
-            app:cornerRadius="8dp"
-            app:backgroundTint="@color/purple_500" />
-
-    </LinearLayout>
-
-    <!-- 하단 광고 배너 -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@drawable/bg_ad_banner"
-        android:padding="12dp"
-        android:layout_marginTop="8dp"
-        android:gravity="center_vertical">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="👀 분실 방지 용품 인기 상품 모음"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="@color/white"
-                android:gravity="start" />
+                         <!-- 1. 분실물 등록하기 -->
+                           <LinearLayout
+                  android:id="@+id/btnRegister"
+                  android:layout_width="match_parent"
+                  android:layout_height="80dp"
+                  android:layout_marginTop="16dp"
+                  android:layout_marginBottom="16dp"
+                  android:background="@drawable/rounded_card"
+                  android:elevation="3dp"
+                  android:padding="16dp"
+                  android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="AirTag, 가방 위치 추적기, 열쇠고리형 블루투스 위치기기"
-                android:textSize="12sp"
-                android:textColor="@color/white"
-                android:gravity="start"
-                android:layout_marginTop="2dp" />
+                                   <TextView
+                      android:layout_width="42dp"
+                      android:layout_height="42dp"
+                      android:text="➕"
+                      android:textSize="24sp"
+                      android:textColor="#10B981"
+                      android:gravity="center" />
+
+                 <LinearLayout
+                     android:layout_width="0dp"
+                     android:layout_height="match_parent"
+                     android:layout_weight="1"
+                     android:paddingLeft="12dp"
+                     android:orientation="vertical"
+                     android:gravity="center_vertical">
+
+                     <TextView
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:text="분실물 등록하기"
+                         android:textStyle="bold"
+                         android:textSize="18sp"
+                         android:textColor="#222222" />
+
+                                           <TextView
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:text="분실물을 등록하세요"
+                          android:textSize="15sp"
+                          android:textColor="#555555" />
+                 </LinearLayout>
+
+                 <TextView
+                     android:layout_width="wrap_content"
+                     android:layout_height="match_parent"
+                     android:text="→"
+                     android:textSize="22sp"
+                     android:textColor="#999999"
+                     android:gravity="center_vertical" />
+             </LinearLayout>
+
+                         <!-- 2. 목록 보기 -->
+                           <LinearLayout
+                  android:id="@+id/btnList"
+                  android:layout_width="match_parent"
+                  android:layout_height="80dp"
+                  android:layout_marginTop="16dp"
+                  android:layout_marginBottom="16dp"
+                  android:background="@drawable/rounded_card"
+                  android:elevation="3dp"
+                  android:padding="16dp"
+                  android:orientation="horizontal">
+
+                 <TextView
+                     android:layout_width="42dp"
+                     android:layout_height="42dp"
+                     android:text="📋"
+                     android:textSize="24sp"
+                     android:textColor="#10B981"
+                     android:gravity="center" />
+
+                 <LinearLayout
+                     android:layout_width="0dp"
+                     android:layout_height="match_parent"
+                     android:layout_weight="1"
+                     android:paddingLeft="12dp"
+                     android:orientation="vertical"
+                     android:gravity="center_vertical">
+
+                     <TextView
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:text="목록 보기"
+                         android:textStyle="bold"
+                         android:textSize="18sp"
+                         android:textColor="#222222" />
+
+                                           <TextView
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:text="등록된 분실물을 확인하세요"
+                          android:textSize="15sp"
+                          android:textColor="#555555" />
+                 </LinearLayout>
+
+                 <TextView
+                     android:layout_width="wrap_content"
+                     android:layout_height="match_parent"
+                     android:text="→"
+                     android:textSize="22sp"
+                     android:textColor="#999999"
+                     android:gravity="center_vertical" />
+             </LinearLayout>
+
+                         <!-- 3. 후기 보기 -->
+                           <LinearLayout
+                  android:id="@+id/btnReview"
+                  android:layout_width="match_parent"
+                  android:layout_height="80dp"
+                  android:layout_marginTop="16dp"
+                  android:layout_marginBottom="16dp"
+                  android:background="@drawable/rounded_card"
+                  android:elevation="3dp"
+                  android:padding="16dp"
+                  android:orientation="horizontal">
+
+                 <TextView
+                     android:layout_width="42dp"
+                     android:layout_height="42dp"
+                     android:text="💬"
+                     android:textSize="24sp"
+                     android:textColor="#10B981"
+                     android:gravity="center" />
+
+                 <LinearLayout
+                     android:layout_width="0dp"
+                     android:layout_height="match_parent"
+                     android:layout_weight="1"
+                     android:paddingLeft="12dp"
+                     android:orientation="vertical"
+                     android:gravity="center_vertical">
+
+                     <TextView
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:text="분실물 후기 보기"
+                         android:textStyle="bold"
+                         android:textSize="18sp"
+                         android:textColor="#222222" />
+
+                                           <TextView
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:text="성공 사례 먼저 읽기"
+                          android:textSize="15sp"
+                          android:textColor="#555555" />
+                 </LinearLayout>
+
+                 <TextView
+                     android:layout_width="wrap_content"
+                     android:layout_height="match_parent"
+                     android:text="→"
+                     android:textSize="22sp"
+                     android:textColor="#999999"
+                     android:gravity="center_vertical" />
+             </LinearLayout>
+
+             <!-- 4. 기다리면서 게임하기 -->
+                           <LinearLayout
+                  android:id="@+id/btnGame"
+                  android:layout_width="match_parent"
+                  android:layout_height="80dp"
+                  android:layout_marginTop="16dp"
+                  android:layout_marginBottom="16dp"
+                  android:background="@drawable/rounded_card"
+                  android:elevation="1dp"
+                  android:padding="16dp"
+                  android:orientation="horizontal">
+
+                                   <TextView
+                      android:layout_width="42dp"
+                      android:layout_height="42dp"
+                      android:text="🎮"
+                      android:textSize="24sp"
+                      android:textColor="#6B7280"
+                      android:gravity="center" />
+
+                 <LinearLayout
+                     android:layout_width="0dp"
+                     android:layout_height="match_parent"
+                     android:layout_weight="1"
+                     android:paddingLeft="12dp"
+                     android:orientation="vertical"
+                     android:gravity="center_vertical">
+
+                     <TextView
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:text="기다리면서 게임하기"
+                         android:textStyle="bold"
+                         android:textSize="18sp"
+                         android:textColor="#222222" />
+
+                                           <TextView
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:text="잠깐 쉬며 마음 진정"
+                          android:textSize="15sp"
+                          android:textColor="#777777" />
+                 </LinearLayout>
+
+                 <TextView
+                     android:layout_width="wrap_content"
+                     android:layout_height="match_parent"
+                     android:text="→"
+                     android:textSize="22sp"
+                     android:textColor="#999999"
+                     android:gravity="center_vertical" />
+             </LinearLayout>
+
+            
 
         </LinearLayout>
 
-        <Button
-            android:id="@+id/btnCoupang"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:text="쿠팡에서 보기"
-            android:textSize="12sp"
-            android:textColor="@color/white"
-            android:background="@drawable/bg_ad_button_white"
-            android:layout_marginStart="8dp" />
+                 <!-- 하단 쿠팡 배너 -->
+         <LinearLayout
+             android:id="@+id/bannerCoupang"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:background="#FFE4B5"
+             android:paddingLeft="16dp"
+             android:paddingRight="12dp"
+             android:paddingTop="12dp"
+             android:paddingBottom="12dp"
+             android:layout_marginBottom="16dp"
+             android:orientation="vertical">
+
+                                      <!-- 메인 텍스트와 버튼 -->
+             <LinearLayout
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:orientation="horizontal"
+                 android:gravity="center_vertical">
+
+                 <TextView
+                     android:layout_width="0dp"
+                     android:layout_height="wrap_content"
+                     android:layout_weight="1"
+                     android:text="분실 방지 용품\n인기 상품 모음"
+                     android:textColor="#000000"
+                     android:textStyle="bold"
+                     android:textSize="18sp"
+                     android:gravity="center" />
+
+                 <Button
+                     android:id="@+id/btnBannerGo"
+                     android:layout_width="wrap_content"
+                     android:layout_height="42dp"
+                     android:text="쿠팡에서 보기 ↗"
+                     android:textSize="16sp"
+                     android:textColor="#FFFFFF"
+                     android:background="#007bff"
+                     android:paddingLeft="16dp"
+                     android:paddingRight="16dp" />
+             </LinearLayout>
+        </LinearLayout>
 
     </LinearLayout>
-
-</LinearLayout>
+</ScrollView>

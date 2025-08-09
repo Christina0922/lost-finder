@@ -29,118 +29,51 @@ class RegisterActivity : AppCompatActivity() {
         lostItemStore = LostItemStore(this)
         setupWebView()
         setupButtons()
+        setupHeader()
     }
 
     private fun setupWebView() {
-        val webView = findViewById<WebView>(R.id.webView)
-        webView.settings.javaScriptEnabled = true
-        webView.settings.domStorageEnabled = true
-        webView.settings.allowFileAccess = true
-        webView.settings.allowContentAccess = true
-        webView.settings.loadWithOverviewMode = true
-        webView.settings.useWideViewPort = true
-        webView.settings.mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-
-        webView.webChromeClient = object : WebChromeClient() {
-            override fun onConsoleMessage(message: String?, lineNumber: Int, sourceID: String?) {
-                Log.d("WebView Console", "$message -- From line $lineNumber of $sourceID")
-            }
-        }
-
-        webView.webViewClient = object : WebViewClient() {
-            override fun onPageFinished(view: WebView?, url: String?) {
-                super.onPageFinished(view, url)
-                Log.d("RegisterActivity", "✅ 지도 로딩 완료")
-                injectLocationSelectionScript()
-            }
-
-            override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
-                url?.let { currentUrl ->
-                    if (currentUrl.startsWith("kakaomap://") || currentUrl.startsWith("daummaps://")) {
-                        try {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(currentUrl))
-                            startActivity(intent)
-                            return true
-                        } catch (e: ActivityNotFoundException) {
-                            Toast.makeText(this@RegisterActivity, "카카오맵 앱이 설치되어 있지 않습니다.", Toast.LENGTH_SHORT).show()
-                            return false
-                        }
-                    }
-                }
-                return false
-            }
-        }
-
-        // 카카오맵 로드
-        val kakaoMapUrl = "https://map.kakao.com/"
-        webView.loadUrl(kakaoMapUrl)
+        // WebView는 현재 레이아웃에 없으므로 주석 처리
+        // 나중에 지도 기능이 필요하면 추가
     }
 
     private fun injectLocationSelectionScript() {
-        val script = """
-            (function() {
-                // 지도 클릭 이벤트 추가
-                if (typeof kakao !== 'undefined' && kakao.maps) {
-                    kakao.maps.load(function() {
-                        var map = new kakao.maps.Map(document.getElementById('map'), {
-                            center: new kakao.maps.LatLng($selectedLatitude, $selectedLongitude),
-                            level: 7
-                        });
-                        
-                        // 지도 클릭 이벤트
-                        kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
-                            var latlng = mouseEvent.latLng;
-                            selectedLatitude = latlng.getLat();
-                            selectedLongitude = latlng.getLng();
-                            
-                            // 마커 추가
-                            var marker = new kakao.maps.Marker({
-                                position: latlng
-                            });
-                            marker.setMap(map);
-                            
-                            // Android에 좌표 전달
-                            Android.onLocationSelected(selectedLatitude, selectedLongitude);
-                        });
-                    });
-                }
-            })();
-        """.trimIndent()
-
-        val webView = findViewById<WebView>(R.id.webView)
-        webView.evaluateJavascript(script, null)
+        // WebView 관련 스크립트 주석 처리
     }
 
     private fun setupButtons() {
-        findViewById<android.widget.Button>(R.id.btnRegister).setOnClickListener {
-            val description = findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etDescription).text.toString().trim()
+        findViewById<android.widget.Button>(R.id.btnSubmit).setOnClickListener {
+            val title = findViewById<android.widget.EditText>(R.id.etTitle).text.toString().trim()
+            val address = findViewById<android.widget.EditText>(R.id.etAddress).text.toString().trim()
+            val description = findViewById<android.widget.EditText>(R.id.etDesc).text.toString().trim()
             
             // 강화된 유효성 검사
             when {
-                description.isEmpty() -> {
-                    Toast.makeText(this, "설명을 입력해주세요.", Toast.LENGTH_SHORT).show()
-                    findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etDescription).requestFocus()
+                title.isEmpty() -> {
+                    Toast.makeText(this, "제목을 입력해주세요.", Toast.LENGTH_SHORT).show()
+                    findViewById<android.widget.EditText>(R.id.etTitle).requestFocus()
                     return@setOnClickListener
                 }
-                description.length < 3 -> {
-                    Toast.makeText(this, "설명은 최소 3글자 이상 입력해주세요.", Toast.LENGTH_SHORT).show()
-                    findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etDescription).requestFocus()
+                address.isEmpty() -> {
+                    Toast.makeText(this, "분실 주소를 입력해주세요.", Toast.LENGTH_SHORT).show()
+                    findViewById<android.widget.EditText>(R.id.etAddress).requestFocus()
                     return@setOnClickListener
                 }
-                description.length > 100 -> {
-                    Toast.makeText(this, "설명은 최대 100글자까지 입력 가능합니다.", Toast.LENGTH_SHORT).show()
-                    findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etDescription).requestFocus()
+                title.length < 2 -> {
+                    Toast.makeText(this, "제목은 최소 2글자 이상 입력해주세요.", Toast.LENGTH_SHORT).show()
+                    findViewById<android.widget.EditText>(R.id.etTitle).requestFocus()
                     return@setOnClickListener
                 }
-                selectedLatitude == 37.5665 && selectedLongitude == 126.9780 -> {
-                    Toast.makeText(this, "지도에서 위치를 선택해주세요.", Toast.LENGTH_SHORT).show()
+                address.length < 5 -> {
+                    Toast.makeText(this, "주소는 최소 5글자 이상 입력해주세요.", Toast.LENGTH_SHORT).show()
+                    findViewById<android.widget.EditText>(R.id.etAddress).requestFocus()
                     return@setOnClickListener
                 }
             }
 
-            // 분실물 등록 (점수 시스템 추가)
+            // 분실물 등록
             val lostItem = LostItem(
-                description = description,
+                description = "$title - $address${if (description.isNotEmpty()) " - $description" else ""}",
                 latitude = selectedLatitude,
                 longitude = selectedLongitude,
                 isMyItem = true
@@ -148,15 +81,9 @@ class RegisterActivity : AppCompatActivity() {
 
             lostItemStore.addLostItem(lostItem)
             
-            // 점수 계산 및 표시
-            val score = calculateScore(description)
-            Toast.makeText(this, "분실물이 등록되었습니다! (+${score}점)", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "분실물이 등록되었습니다!", Toast.LENGTH_LONG).show()
             
             // 메인 화면으로 돌아가기
-            finish()
-        }
-
-        findViewById<android.widget.ImageButton>(R.id.btnBack).setOnClickListener {
             finish()
         }
     }
@@ -167,26 +94,18 @@ class RegisterActivity : AppCompatActivity() {
         selectedLongitude = lng
         Log.d("RegisterActivity", "위치 선택됨: $lat, $lng")
     }
-    
-    // 점수 계산 함수
-    private fun calculateScore(description: String): Int {
-        var score = 10 // 기본 점수
-        
-        // 설명 길이에 따른 보너스 점수
-        when {
-            description.length >= 20 -> score += 5
-            description.length >= 10 -> score += 3
-            description.length >= 5 -> score += 1
+
+    private fun setupHeader() {
+        // LostFinder 타이틀 클릭 → 초기화면으로
+        findViewById<android.widget.TextView>(R.id.tvTitle).setOnClickListener {
+            finish()
         }
-        
-        // 특정 키워드에 따른 보너스 점수
-        val keywords = listOf("지갑", "핸드폰", "노트북", "카드", "열쇠", "가방", "시계", "반지")
-        keywords.forEach { keyword ->
-            if (description.contains(keyword)) {
-                score += 2
-            }
+
+        // 초기화면으로 가기 버튼
+        findViewById<android.widget.LinearLayout>(R.id.btnHome).setOnClickListener {
+            finish()
         }
-        
-        return score
     }
+    
+
 } 

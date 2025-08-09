@@ -2,50 +2,29 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './RegisterPage.css';
 
+import { login } from '../utils/api';
+import type { User } from '../types';
+
 interface LoginPageProps {
-  onLogin: (email: string, password: string) => Promise<boolean>;
-  theme: 'light' | 'dark';
+  currentUser: User | null;
+  onLogin: (user: User) => void;
 }
 
-function LoginPage({ onLogin, theme }: LoginPageProps) {
+function LoginPage({ currentUser, onLogin }: LoginPageProps) {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [emailError, setEmailError] = useState('');
 
-  // 이메일 유효성 검사 함수
-  const validateEmail = (email: string): { isValid: boolean; error: string } => {
-    if (!email) {
-      return { isValid: false, error: '' };
-    }
-    
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return { isValid: false, error: '올바른 이메일 형식을 입력해주세요.' };
-    }
-    
-    return { isValid: true, error: '' };
-  };
-
   // 이메일 변경 핸들러
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newEmail = e.target.value;
-    setEmail(newEmail);
-    
-    const validation = validateEmail(newEmail);
-    setEmailError(validation.error);
+    setEmail(e.target.value);
+    setEmailError(''); // 에러 메시지 제거
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    
-    // 이메일 유효성 검사
-    const emailValidation = validateEmail(email);
-    if (!emailValidation.isValid) {
-      setEmailError(emailValidation.error);
-      return;
-    }
     
     if (!email.trim() || !password.trim()) {
       alert('이메일과 비밀번호를 모두 입력해주세요.');
@@ -54,10 +33,9 @@ function LoginPage({ onLogin, theme }: LoginPageProps) {
     
     setIsLoading(true);
     try {
-      const success = await onLogin(email, password);
-      if (success) {
-        navigate('/'); // 로그인 성공 시 메인 페이지로 이동
-      }
+      const user = await login(email, password);
+      onLogin(user);
+      navigate('/'); // 로그인 성공 시 메인 페이지로 이동
     } catch (error) {
       console.error('로그인 오류:', error);
       alert('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
@@ -80,7 +58,7 @@ function LoginPage({ onLogin, theme }: LoginPageProps) {
         textAlign: 'center',
         marginBottom: '16px',
         fontSize: 'min(24px, 6vw)',
-        color: theme === 'dark' ? '#fff' : '#333'
+        color: '#333'
       }}>🔐 로그인</h1>
       
       <form onSubmit={handleSubmit} style={{
@@ -94,7 +72,7 @@ function LoginPage({ onLogin, theme }: LoginPageProps) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           <label htmlFor="email" style={{
             fontSize: 'min(14px, 3.5vw)',
-            color: theme === 'dark' ? '#fff' : '#333'
+            color: '#333'
           }}>📧 이메일</label>
           <input
             type="email"
@@ -128,7 +106,7 @@ function LoginPage({ onLogin, theme }: LoginPageProps) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           <label htmlFor="password" style={{
             fontSize: 'min(14px, 3.5vw)',
-            color: theme === 'dark' ? '#fff' : '#333'
+            color: '#333'
           }}>🔒 비밀번호</label>
           <input
             type="password"
@@ -182,7 +160,7 @@ function LoginPage({ onLogin, theme }: LoginPageProps) {
         </Link>
         <span style={{ 
           fontSize: 'min(14px, 3.5vw)',
-          color: theme === 'dark' ? '#fff' : '#333'
+          color: '#333'
         }}>
           계정이 없으신가요? <Link to="/signup" style={{ color: '#007bff', textDecoration: 'none' }}>📝 회원가입</Link>
         </span>
