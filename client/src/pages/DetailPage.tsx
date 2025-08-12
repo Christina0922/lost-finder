@@ -18,14 +18,18 @@ const DetailPage: React.FC<DetailPageProps> = ({ currentUser }) => {
   useEffect(() => {
     (async () => {
       if (!id) return;
-      const found = await getLostItemById(Number(id));
-      setItem(found);
+      try {
+        const found = await getLostItemById(id);
+        setItem(found);
+      } catch (error) {
+        console.error('아이템을 불러오는 중 오류:', error);
+      }
     })();
   }, [id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!item || !text.trim() || !currentUser) return;
+    if (!item || !text.trim() || !currentUser || !id) return;
 
     const c: Omit<Comment, 'id' | 'created_at'> = {
       author_id: currentUser.id,
@@ -33,7 +37,7 @@ const DetailPage: React.FC<DetailPageProps> = ({ currentUser }) => {
       author_email: currentUser.email,
       text: text.trim(),
     };
-    await addComment(Number(id), c);
+    await addComment(id, c);
     
     // 댓글 등록 후 초기 화면으로 돌아가기
     window.location.href = '/';

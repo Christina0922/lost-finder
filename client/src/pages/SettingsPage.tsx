@@ -5,9 +5,11 @@ import type { User } from '../types';
 
 interface SettingsPageProps {
   currentUser: User | null;
+  theme: 'light' | 'dark';
+  setTheme: (theme: 'light' | 'dark') => void;
 }
 
-const SettingsPage: React.FC<SettingsPageProps> = ({ currentUser }) => {
+const SettingsPage: React.FC<SettingsPageProps> = ({ currentUser, theme, setTheme }) => {
   const navigate = useNavigate();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -101,6 +103,41 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ currentUser }) => {
 
         {currentUser ? (
           <div>
+            {/* 테마 설정 */}
+            <div style={{ 
+              backgroundColor: '#f8f9fa', 
+              padding: '20px', 
+              borderRadius: '8px', 
+              marginBottom: '20px' 
+            }}>
+              <h2 style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                color: '#333',
+                marginBottom: '16px'
+              }}>🎨 테마 설정</h2>
+              
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <label style={{ fontSize: '16px', color: '#333' }}>
+                  {theme === 'light' ? '☀️ 라이트 모드' : '🌙 다크 모드'}
+                </label>
+                <button
+                  onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                  style={{
+                    padding: '8px 16px',
+                    backgroundColor: '#007bff',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                >
+                  {theme === 'light' ? '다크 모드로 변경' : '라이트 모드로 변경'}
+                </button>
+              </div>
+            </div>
+
             {/* 알림 설정 */}
             <div style={{ 
               backgroundColor: '#f8f9fa', 

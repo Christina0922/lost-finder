@@ -42,96 +42,91 @@ function useToast() {
 /** =========================
  *  더미 페이지(리스트/홈)
  *  =======================*/
-function Home() {
+function Home({ theme, setTheme, currentUser, setCurrentUser }: {
+  theme: 'light' | 'dark';
+  setTheme: (t: 'light' | 'dark') => void;
+  currentUser: User | null;
+  setCurrentUser: (user: User | null) => void;
+}) {
   const handleCoupangClick = () => {
     const url = nextCoupangLink();
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   return (
-    <div style={{ 
-      backgroundColor: '#F0FDF4', 
-      minHeight: '100vh',
-      paddingBottom: '80px'
-    }}>
+    <>
+      <Header theme={theme} setTheme={setTheme} currentUser={currentUser} setCurrentUser={setCurrentUser} />
       <div style={{ 
-        maxWidth: '480px', 
-        margin: '0 auto', 
-        padding: '16px'
+        backgroundColor: '#F0FDF4', 
+        minHeight: '100vh',
+        paddingBottom: '120px'
       }}>
-        {/* 헤더 */}
-        <div style={{
-          backgroundColor: '#10B981',
-          color: 'white',
-          padding: '16px',
-          borderRadius: '12px',
-          marginBottom: '16px'
+        <div style={{ 
+          maxWidth: '480px', 
+          margin: '0 auto', 
+          padding: '16px'
         }}>
-          <h1 style={{ 
-            margin: 0, 
-                fontSize: '24px',
-            fontWeight: 'bold',
-            marginBottom: '12px'
-          }}>LostFinder</h1>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <span style={{ fontSize: '14px', opacity: 0.9 }}>🔍 분실물 찾기</span>
-            <Link to="/login" style={{
-              color: 'white', 
-              textDecoration: 'none',
-              padding: '4px 8px', 
-              backgroundColor: 'rgba(255,255,255,0.2)', 
-              borderRadius: '6px',
-              fontSize: '12px'
-            }}>로그인</Link>
+          {/* 헤더 */}
+          <div style={{
+            backgroundColor: '#10B981',
+            color: 'white',
+            padding: '16px',
+            borderRadius: '12px',
+            marginBottom: '16px'
+          }}>
+            <h1 style={{ 
+              margin: 0, 
+                  fontSize: '24px',
+              fontWeight: 'bold',
+              marginBottom: '12px'
+            }}>LostFinder</h1>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <span style={{ fontSize: '14px', opacity: 0.9 }}>🔍 분실물 찾기</span>
+            </div>
+          </div>
+
+          {/* 안내 문구 */}
+          <div style={{
+            textAlign: 'center',
+            color: '#6B7280',
+                      fontSize: '16px',
+            marginBottom: '24px',
+            padding: '12px'
+          }}>
+            잃어버린 물건을 쉽게 찾아보세요
+                </div>
+
+          {/* 메뉴 카드들 */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <MenuCard
+              icon="🔍+"
+              title="분실물 등록하기"
+              desc="잃어버린 물건을 등록하세요"
+              onClick={() => window.location.href = '/add'}
+            />
+            <MenuCard
+              icon="📋"
+              title="목록 보기"
+              desc="등록된 분실물을 확인하세요"
+              onClick={() => window.location.href = '/list'}
+            />
+            <MenuCard
+              icon="💬"
+              title="분실물 후기 보기"
+              desc="다른 사람들의 후기를 확인하세요"
+              onClick={() => window.location.href = '/review'}
+            />
+
+            <MenuCard
+              icon="🛒"
+              title="분실 방지 용품 인기 상품"
+              desc="쿠팡에서 보기"
+              onClick={handleCoupangClick}
+            />
           </div>
         </div>
-
-        {/* 안내 문구 */}
-        <div style={{
-          textAlign: 'center',
-          color: '#6B7280',
-                    fontSize: '16px',
-          marginBottom: '24px',
-          padding: '12px'
-        }}>
-          잃어버린 물건을 쉽게 찾아보세요
-              </div>
-
-        {/* 메뉴 카드들 */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <MenuCard
-            icon="🔍+"
-            title="분실물 등록하기"
-            desc="잃어버린 물건을 등록하세요"
-            onClick={() => window.location.href = '/add'}
-          />
-          <MenuCard
-            icon="📋"
-            title="목록 보기"
-            desc="등록된 분실물을 확인하세요"
-            onClick={() => window.location.href = '/list'}
-          />
-          <MenuCard
-            icon="💬"
-            title="분실물 후기 보기"
-            desc="다른 사람들의 후기를 확인하세요"
-            onClick={() => window.location.href = '/review'}
-          />
-          <MenuCard
-            icon="📍"
-            title="자주 찾는 장소"
-            desc="학교·카페 등 즐겨찾기"
-            onClick={() => alert('자주 찾는 장소 기능 준비 중입니다.')}
-          />
-          <MenuCard
-            icon="🛒"
-            title="분실 방지 용품 인기 상품"
-            desc="쿠팡에서 보기"
-            onClick={handleCoupangClick}
-          />
-                </div>
-              </div>
-                </div>
+      </div>
+    </>
   );
 }
 
@@ -148,7 +143,8 @@ function MenuCard({ icon, title, desc, onClick }: {
                     width: '100%',
         backgroundColor: 'white',
         borderRadius: '12px',
-        padding: '16px',
+        padding: '20px',
+        minHeight: '80px',
         border: '1px solid #E5E7EB',
                     display: 'flex',
                     alignItems: 'center',
@@ -182,14 +178,13 @@ function MenuCard({ icon, title, desc, onClick }: {
   );
 }
 
-function ListPage() {
+function ListPage({ theme, setTheme, currentUser, setCurrentUser }: {
+  theme: 'light' | 'dark';
+  setTheme: (t: 'light' | 'dark') => void;
+  currentUser: User | null;
+  setCurrentUser: (user: User | null) => void;
+}) {
   const [items, setItems] = useState<LostItem[]>([]);
-  const [currentUser] = useState<User | null>({
-    id: 1,
-    username: '조윤정',
-    email: 'yoonjeong@example.com',
-    password: 'temp123',
-  });
 
   useEffect(() => {
     fetch(`${API_BASE}/lost-items`)
@@ -218,8 +213,10 @@ function ListPage() {
   };
 
   return (
-    <div className="container">
-      <div className="card">
+    <>
+      <Header theme={theme} setTheme={setTheme} currentUser={currentUser} setCurrentUser={setCurrentUser} />
+      <div className="container">
+        <div className="card">
         <h1 style={{
           fontSize: '2.5rem',
           fontWeight: 'bold',
@@ -269,8 +266,9 @@ function ListPage() {
             ))}
           </ul>
         )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -281,42 +279,62 @@ function Header({
   theme,
   setTheme,
   currentUser,
+  setCurrentUser,
 }: {
   theme: 'light' | 'dark';
   setTheme: (t: 'light' | 'dark') => void;
   currentUser?: User | null;
+  setCurrentUser: (user: User | null) => void;
 }) {
   const navigate = useNavigate();
+  
+  // 디버깅용 로그
+  console.log('Header - currentUser:', currentUser);
+  
   return (
-    <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
-      <div 
-        style={{ 
-          fontWeight: 800, 
-          cursor: 'pointer',
-          color: '#007bff'
-        }}
-        onClick={() => navigate('/')}
-      >
-        LostFinder
+    <div style={{ 
+      padding: '12px 16px', 
+      position: 'relative',
+      backgroundColor: 'transparent',
+      borderBottom: 'none'
+    }}>
+      {/* 첫 번째 줄: 홈, 목록, 등록하기 */}
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: 12, 
+        marginBottom: '12px',
+        flexWrap: 'wrap'
+      }}>
+        <Link to="/" className="btn btn-secondary" style={{ minWidth: '60px', textAlign: 'center' }}>홈</Link>
+        <Link to="/list" className="btn btn-secondary" style={{ minWidth: '60px', textAlign: 'center' }}>목록</Link>
+        <Link to="/add" className="btn btn-secondary" style={{ minWidth: '80px', textAlign: 'center' }}>등록하기</Link>
       </div>
-      <Link to="/" className="btn btn-secondary">홈</Link>
-      <Link to="/list" className="btn btn-secondary">목록</Link>
-      <Link to="/add" className="btn btn-secondary">등록</Link>
-      <Link to="/game" className="btn btn-secondary">게임하기</Link>
-      <Link to="/review" className="btn btn-secondary">후기</Link>
-      <Link to="/login" className="btn btn-secondary">로그인</Link>
-      <Link to="/settings" className="btn btn-secondary">설정</Link>
-      <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
-        <button
-          className="btn-secondary"
-          onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-        >
-          테마 전환
-        </button>
+      
+      {/* 두 번째 줄: 후기 쓰기, 로그아웃 */}
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: 12, 
+        marginBottom: '8px',
+        flexWrap: 'wrap'
+      }}>
+        <Link to="/review" className="btn btn-secondary" style={{ minWidth: '80px', textAlign: 'center' }}>후기 쓰기</Link>
         {currentUser ? (
-          <span style={{ color: 'var(--muted)' }}>안녕하세요, {currentUser.username}님</span>
+          <button 
+            className="btn btn-secondary"
+            style={{ minWidth: '80px', textAlign: 'center' }}
+            onClick={() => {
+              console.log('로그아웃 버튼 클릭됨');
+              setCurrentUser(null);
+              console.log('currentUser를 null로 설정함');
+              navigate('/');
+            }}
+          >
+            로그아웃
+          </button>
         ) : (
-          <button className="btn-secondary" onClick={() => navigate('/login')}>로그인</button>
+          <Link to="/login" className="btn btn-secondary" style={{ minWidth: '80px', textAlign: 'center' }}>로그인</Link>
         )}
       </div>
     </div>
@@ -330,18 +348,18 @@ export default function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const { showToastMessage, ToastUI } = useToast();
 
-  // 임시 로그인 사용자(개발용)
-  const [currentUser, setCurrentUser] = useState<User | null>({
-    id: 1,
-    username: '조윤정',
-    email: 'yoonjeong@example.com',
-    password: 'temp123',
-  });
+  // 로그인 상태 관리
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   // body에 테마 속성 적용
   useEffect(() => {
     document.body.setAttribute('data-theme', theme);
   }, [theme]);
+
+  // currentUser 상태 변경 추적
+  useEffect(() => {
+    console.log('App - currentUser 상태 변경됨:', currentUser);
+  }, [currentUser]);
 
   // 분실물 등록 핸들러
   const handleAddItem = async (item: Omit<LostItem, 'id' | 'author_id' | 'comments'>): Promise<boolean> => {
@@ -393,10 +411,9 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <Header theme={theme} setTheme={setTheme} currentUser={currentUser} />
-            <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/list" element={<ListPage />} />
+      <Routes>
+        <Route path="/" element={<Home theme={theme} setTheme={setTheme} currentUser={currentUser} setCurrentUser={setCurrentUser} />} />
+        <Route path="/list" element={<ListPage theme={theme} setTheme={setTheme} currentUser={currentUser} setCurrentUser={setCurrentUser} />} />
         {/* ✅ /add 페이지에서 EditPage가 바로 렌더링되도록 연결 */}
         <Route
           path="/add"
@@ -475,6 +492,8 @@ export default function App() {
           element={
             <SettingsPage
                   currentUser={currentUser}
+                  theme={theme}
+                  setTheme={setTheme}
             />
           }
         />

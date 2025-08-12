@@ -47,10 +47,13 @@ if (coolsmsApiKey && coolsmsApiSecret) {
   console.log('⚠️ CoolSMS 환경변수 미설정. 개발 모드로 진행합니다.');
 }
 
+// === 설정 파일 ===
+const config = require('./config');
+
 // === 앱 기본 설정 ===
 const app = express();
-const FIXED_PORT = 5000;                    // 요청사항: 포트 5000 고정
-const CLIENT_ORIGIN = 'http://localhost:3000'; // 요청사항: 클라 3000만 허용
+const FIXED_PORT = config.serverPort;        // 설정 파일에서 포트 가져오기
+const CLIENT_ORIGIN = [config.clientOrigin]; // 설정 파일에서 클라이언트 오리진 가져오기
 
 app.use(cors({ origin: CLIENT_ORIGIN, credentials: true }));
 app.use(express.json());
@@ -218,26 +221,26 @@ apiRouter.post('/register', async (req, res) => {
 
 apiRouter.post('/login', async (req, res) => {
   try {
-    const { username, password } = req.body;
-    if (!username || !password) return res.status(400).json({ success: false, error: '아이디/비밀번호를 입력해주세요.' });
+    const { email, password } = req.body;
+    if (!email || !password) return res.status(400).json({ success: false, error: '이메일/비밀번호를 입력해주세요.' });
 
     let user = null;
-    try { user = await findUserByUsername(username); }
-    catch { try { user = await findUserByEmail(username); } catch {/* noop */} }
+    try { user = await findUserByEmail(email); }
+    catch { try { user = await findUserByUsername(email); } catch {/* noop */} }
 
     if (!user) {
-      logAuthEvent('login', username, false, '미등록 사용자');
-      return res.status(401).json({ success: false, error: '등록되지 않은 사용자명 또는 이메일입니다.' });
+      logAuthEvent('login', email, false, '미등록 사용자');
+      return res.status(401).json({ success: false, error: '등록되지 않은 이메일입니다.' });
     }
     if (user.password !== password) {
-      loginFailures[username] = loginFailures[username] || { count: 0, lastAttempt: Date.now() };
-      loginFailures[username].count++;
-      loginFailures[username].lastAttempt = Date.now();
-      logAuthEvent('login', username, false, `비밀번호 불일치 (${loginFailures[username].count}회)`, { alert: loginFailures[username].count >= 5 });
+      loginFailures[email] = loginFailures[email] || { count: 0, lastAttempt: Date.now() };
+      loginFailures[email].count++;
+      loginFailures[email].lastAttempt = Date.now();
+      logAuthEvent('login', email, false, `비밀번호 불일치 (${loginFailures[email].count}회)`, { alert: loginFailures[email].count >= 5 });
       return res.status(401).json({ success: false, error: '비밀번호가 일치하지 않습니다.' });
     }
-    if (loginFailures[username]) delete loginFailures[username];
-    logAuthEvent('login', username, true, '로그인 성공');
+    if (loginFailures[email]) delete loginFailures[email];
+    logAuthEvent('login', email, true, '로그인 성공');
 
     res.json({ success: true, message: '로그인되었습니다.', user: { id: user.id, username: user.username, email: user.email, phone: user.phone } });
   } catch (e) {
@@ -593,10 +596,10 @@ app.use((err, _req, res, _next) => {
 // ==============================
 // 서버 시작 (고정 포트 5000, 자동 재시도/증분 금지)
 // ==============================
-const server = app.listen(FIXED_PORT, '0.0.0.0', () => {
-  console.log(`🚀 서버 실행: http://localhost:${FIXED_PORT}`);
-  console.log(`📡 API: http://localhost:${FIXED_PORT}/api`);
-  console.log(`🏥 헬스: http://localhost:${FIXED_PORT}/health`);
+const server = app.listen(FIXED_PORT, '192.168.45.27', () => {
+  console.log(`🚀 서버 실행: http://192.168.45.27:${FIXED_PORT}`);
+  console.log(`📡 API: http://192.168.45.27:${FIXED_PORT}/api`);
+  console.log(`🏥 헬스: http://192.168.45.27:${FIXED_PORT}/health`);
 }).on('error', (err) => {
   if (err && err.code === 'EADDRINUSE') {
     console.error(`[server] 포트 ${FIXED_PORT}가 이미 사용 중입니다. 점유 프로세스를 종료한 뒤 다시 실행하세요.`);
