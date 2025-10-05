@@ -1,15 +1,7 @@
-import { ReportHandler } from 'web-vitals';
-
-const reportWebVitals = (onPerfEntry?: ReportHandler) => {
-  if (onPerfEntry && onPerfEntry instanceof Function) {
-    import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-      getCLS(onPerfEntry);
-      getFID(onPerfEntry);
-      getFCP(onPerfEntry);
-      getLCP(onPerfEntry);
-      getTTFB(onPerfEntry);
-    });
-  }
+// web-vitals 임시 비활성화
+const reportWebVitals = (onPerfEntry?: any) => {
+  // web-vitals 기능 임시 비활성화
+  console.log('Web Vitals disabled');
 };
 
 export default reportWebVitals;

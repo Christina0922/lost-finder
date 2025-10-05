@@ -47,9 +47,31 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "로그아웃되었습니다", Toast.LENGTH_SHORT).show()
         }
 
-        // 로그인 버튼은 기존 동작대로 두시되(필요 시 수정), 쿠팡은 푸터 버튼에서만 열리도록 연결
+        // 로그인 버튼 클릭 시 즉시 로그인 처리
         findViewById<com.google.android.material.button.MaterialButton>(R.id.btnSubmitLogin).setOnClickListener {
-            Toast.makeText(this, "로그인 버튼 클릭", Toast.LENGTH_SHORT).show()
+            // 이메일과 비밀번호 검증
+            val email = findViewById<TextView>(R.id.etEmail).text.toString()
+            val password = findViewById<TextView>(R.id.etPassword).text.toString()
+            
+            if (email == "yoonjeongc@gmail.com" && password == "skinner1") {
+                // 로그인 성공 - 바로 메인 화면으로 이동
+                Toast.makeText(this, "로그인 성공! 🎉", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this, MainActivity::class.java))
+                finish()
+            } else {
+                // 로그인 실패 - 오류 메시지 표시
+                Toast.makeText(this, "이메일 또는 비밀번호가 틀렸습니다", Toast.LENGTH_SHORT).show()
+            }
+        }
+        
+        // 삼성패스 팝업 차단
+        findViewById<TextView>(R.id.etEmail).apply {
+            inputType = android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+            importantForAutofill = android.view.View.IMPORTANT_FOR_AUTOFILL_NO
+        }
+        findViewById<TextView>(R.id.etPassword).apply {
+            inputType = android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+            importantForAutofill = android.view.View.IMPORTANT_FOR_AUTOFILL_NO
         }
         // ✅ 푸터 버튼 → 쿠팡 링크 순환 오픈
         findViewById<com.google.android.material.button.MaterialButton>(R.id.btnBannerGo).setOnClickListener {

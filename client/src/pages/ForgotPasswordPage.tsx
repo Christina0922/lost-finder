@@ -1,347 +1,56 @@
-import React, { useState } from 'react';
-import './DetailPage.css'; // 스타일 재사용
+import React, { useState } from "react";
+import { AuthAPI } from "../utils/api";
 
-interface ForgotPasswordPageProps {
-  onVerifyAndResetPassword: (phone: string, code: string) => Promise<string | null>;
-  onSendVerificationCode: (phone: string) => Promise<boolean>;
-  onRequestPasswordResetByEmail: (email: string) => Promise<boolean>;
-  onRequestPasswordResetBySMS: (phone: string) => Promise<boolean>;
-  theme: 'light' | 'dark';
-}
+export default function ForgotPasswordPage() {
+  const [email, setEmail] = useState("");
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-type ResetMethod = 'email' | 'phone';
-
-// 이메일 유효성 검사 함수
-const validateEmail = (email: string): { isValid: boolean; error: string } => {
-  if (!email) {
-    return { isValid: false, error: '이메일 주소를 입력해주세요.' };
-  }
-  
-  if (!email.includes('@')) {
-    return { isValid: false, error: '이메일 주소에 @가 포함되어야 합니다.' };
-  }
-  
-  if (!email.includes('.')) {
-    return { isValid: false, error: '올바른 이메일 주소 형식이 아닙니다.' };
-  }
-  
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return { isValid: false, error: '올바른 이메일 주소 형식이 아닙니다.' };
-  }
-  
-  return { isValid: true, error: '' };
-};
-
-const ForgotPasswordPage = ({ 
-  onVerifyAndResetPassword, 
-  onSendVerificationCode,
-  onRequestPasswordResetByEmail,
-  onRequestPasswordResetBySMS,
-  theme
-}: ForgotPasswordPageProps) => {
-  const [resetMethod, setResetMethod] = useState<ResetMethod>('email');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [code, setCode] = useState('');
-  
-  const [isCodeSent, setIsCodeSent] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isEmailSent, setIsEmailSent] = useState(false);
-  const [isSMSSent, setIsSMSSent] = useState(false);
-  
-  const [message, setMessage] = useState('');
-  const [tempPassword, setTempPassword] = useState('');
-  const [emailError, setEmailError] = useState('');
-
-  // 이메일 입력 시 실시간 검증
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newEmail = e.target.value;
-    setEmail(newEmail);
-    
-    if (newEmail) {
-      const validation = validateEmail(newEmail);
-      setEmailError(validation.error);
-    } else {
-      setEmailError('');
-    }
-  };
-
-  const handleSendCode = async () => {
-    setIsLoading(true);
-    setMessage('');
-    
-    const success = await onSendVerificationCode(phone);
-    
-    setTimeout(() => {
-      if (success) {
-        setMessage('인증번호 6자리를 발송했습니다! 📱 개발모드에서는 콘솔에서 인증번호를 확인하세요.');
-        setIsCodeSent(true);
-      } else {
-        setMessage('가입되지 않은 휴대폰 번호입니다.');
-      }
-      setIsLoading(false);
-    }, 1000);
-  };
-
-  const handleSendEmail = async () => {
-    setIsLoading(true);
-    setMessage('');
-    
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
     try {
-      const success = await onRequestPasswordResetByEmail(email);
-      if (success) {
-        setMessage('비밀번호 재설정 이메일을 발송했습니다! 📧 이메일을 확인해주세요.');
-        setIsEmailSent(true);
-      } else {
-        setMessage('가입되지 않은 이메일 주소입니다.');
-      }
-    } catch (error: any) {
-      setMessage(error.message || '이메일 발송에 실패했습니다.');
+      await AuthAPI.requestReset(email.trim());
+      setSent(true); // 존재여부와 관계없이 성공 처리
+    } catch (e: any) {
+      setError(e.message);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
-  };
-
-  const handleSendSMS = async () => {
-    setIsLoading(true);
-    setMessage('');
-    
-    try {
-      const success = await onRequestPasswordResetBySMS(phone);
-      if (success) {
-        setMessage('비밀번호 재설정 SMS를 발송했습니다! 📱 SMS를 확인해주세요.');
-        setIsSMSSent(true);
-      } else {
-        setMessage('가입되지 않은 휴대폰 번호입니다.');
-      }
-    } catch (error: any) {
-      setMessage(error.message || 'SMS 발송에 실패했습니다.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleVerifyAndReset = async (event: React.FormEvent) => {
-    event.preventDefault();
-    
-    // 인증번호 유효성 검사
-    if (!code || code.length !== 6) {
-      setMessage('❌ 인증번호는 6자리 숫자여야 합니다.');
-      return;
-    }
-    
-    if (!/^\d{6}$/.test(code)) {
-      setMessage('❌ 인증번호는 숫자만 입력 가능합니다.');
-      return;
-    }
-    
-    const newTempPassword = await onVerifyAndResetPassword(phone, code);
-
-    if (newTempPassword) {
-      setMessage('✅ 새로운 임시 비밀번호가 발급되었습니다. 이 비밀번호로 로그인 후 변경해주세요.');
-      setTempPassword(newTempPassword);
-      setIsCodeSent(false); // 다시 처음 단계로
-    } else {
-      setMessage('❌ 잘못된 인증번호입니다. 다시 확인해주세요.');
-      setTempPassword('');
-    }
-  };
-
-  const resetForm = () => {
-    setEmail('');
-    setPhone('');
-    setCode('');
-    setIsCodeSent(false);
-    setIsEmailSent(false);
-    setIsSMSSent(false);
-    setMessage('');
-    setTempPassword('');
   };
 
   return (
-    <div className="form-container-wrapper" style={{ 
-      minHeight: '100vh', 
-      display: 'flex', 
-      flexDirection: 'column',
-      justifyContent: 'center',
-      padding: '20px'
-    }}>
-      <h1 style={{ marginBottom: '16px', fontSize: 'min(24px, 6vw)' }}>🔑 비밀번호 재설정</h1>
-      
-      {!tempPassword && !isEmailSent ? (
-        <>
-          <div className="reset-method-selector" style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: 'min(14px, 3.5vw)' }}>
-              재설정 방법 선택:
-            </label>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: 'min(13px, 3.2vw)' }}>
-                <input
-                  type="radio"
-                  name="resetMethod"
-                  value="email"
-                  checked={resetMethod === 'email'}
-                  onChange={(e) => {
-                    setResetMethod(e.target.value as ResetMethod);
-                    resetForm();
-                  }}
-                />
-                📧 이메일로 재설정
-              </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: 'min(13px, 3.2vw)' }}>
-                <input
-                  type="radio"
-                  name="resetMethod"
-                  value="phone"
-                  checked={resetMethod === 'phone'}
-                  onChange={(e) => {
-                    setResetMethod(e.target.value as ResetMethod);
-                    resetForm();
-                  }}
-                />
-                📱 SMS로 재설정
-              </label>
-            </div>
-          </div>
-
-          {resetMethod === 'email' ? (
-            <div className="form-container" style={{ marginBottom: '16px' }}>
-              <div className="form-group" style={{ marginBottom: '12px' }}>
-                <label htmlFor="email" style={{ fontSize: 'min(14px, 3.5vw)', marginBottom: '6px' }}>📧 이메일 주소</label>
-                <input
-                  type="email"
-                  id="email"
-                  value={email}
-                  onChange={handleEmailChange}
-                  placeholder="가입한 이메일 주소를 입력하세요"
-                  required
-                  style={{ padding: '8px 12px', fontSize: 'min(14px, 3.5vw)' }}
-                />
-                {emailError && <p style={{ color: 'red', fontSize: 'min(12px, 3vw)', marginTop: '4px', marginBottom: '0' }}>{emailError}</p>}
-              </div>
-              
-              <button 
-                type="button" 
-                onClick={handleSendEmail} 
-                disabled={isLoading || !email || !!emailError}
-                className="submit-button"
-                style={{ 
-                  padding: '10px 16px', 
-                  fontSize: 'min(14px, 3.5vw)',
-                  marginTop: '8px'
-                }}
-              >
-                {isLoading ? '발송 중...' : '비밀번호 재설정 이메일 발송'}
-              </button>
-            </div>
-          ) : (
-            <div className="form-container" style={{ marginBottom: '16px' }}>
-              <div className="form-group" style={{ marginBottom: '12px' }}>
-                <label htmlFor="phone" style={{ fontSize: 'min(14px, 3.5vw)', marginBottom: '6px' }}>📱 휴대폰 번호</label>
-                <input
-                  type="tel"
-                  id="phone"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="'-' 없이 숫자만 입력"
-                  required
-                  style={{ padding: '8px 12px', fontSize: 'min(14px, 3.5vw)' }}
-                />
-              </div>
-              
-              <button 
-                type="button" 
-                onClick={handleSendSMS} 
-                disabled={isLoading || !phone}
-                className="submit-button"
-                style={{ 
-                  padding: '10px 16px', 
-                  fontSize: 'min(14px, 3.5vw)',
-                  marginTop: '8px'
-                }}
-              >
-                {isLoading ? '발송 중...' : '인증하고 비밀번호 재설정'}
-              </button>
-            </div>
-          )}
-        </>
-      ) : null}
-
-      {message && (
-        <div className="reset-message" style={{ marginBottom: '16px' }}>
-          <p style={{ fontSize: 'min(14px, 3.5vw)', marginBottom: '8px' }}>{message}</p>
-          {tempPassword && (
-            <div className="temp-password-display">
-              <strong style={{ fontSize: 'min(14px, 3.5vw)' }}>임시 비밀번호: <span className="password-text">{tempPassword}</span></strong>
-              <div style={{ 
-                backgroundColor: '#fff3cd', 
-                border: '1px solid #ffeaa7', 
-                borderRadius: '8px', 
-                padding: '10px', 
-                marginTop: '8px' 
-              }}>
-                <p style={{ margin: 0, color: '#856404', fontSize: 'min(12px, 3vw)' }}>
-                  ⚠️ <strong>보안 주의사항:</strong><br />
-                  • 이 임시 비밀번호는 안전하지 않습니다<br />
-                  • 로그인 후 반드시 새로운 비밀번호로 변경해주세요<br />
-                  • 다른 사람과 공유하지 마세요
-                </p>
-              </div>
-            </div>
-          )}
-          {isEmailSent && (
-            <div style={{ 
-              backgroundColor: '#d4edda', 
-              border: '1px solid #c3e6cb', 
-              borderRadius: '8px', 
-              padding: '12px', 
-              marginTop: '12px' 
-            }}>
-              <p style={{ margin: 0, color: '#155724', fontSize: 'min(13px, 3.2vw)' }}>
-                <strong>✅ 이메일이 발송되었습니다!</strong><br />
-                📧 이메일을 확인하여 임시 비밀번호를 확인하세요.<br />
-                🔐 임시 비밀번호로 로그인 후 반드시 새로운 비밀번호로 변경해주세요.
-              </p>
-            </div>
-          )}
-          {isSMSSent && (
-            <div style={{ 
-              backgroundColor: '#d4edda', 
-              border: '1px solid #c3e6cb', 
-              borderRadius: '8px', 
-              padding: '12px', 
-              marginTop: '12px' 
-            }}>
-              <p style={{ margin: 0, color: '#155724', fontSize: 'min(13px, 3.2vw)' }}>
-                <strong>✅ SMS가 발송되었습니다!</strong><br />
-                📱 SMS를 확인하여 임시 비밀번호를 확인하세요.<br />
-                🔐 임시 비밀번호로 로그인 후 반드시 새로운 비밀번호로 변경해주세요.
-              </p>
-            </div>
-          )}
-        </div>
+    <div className="container" style={{ maxWidth: 420, margin: "24px auto" }}>
+      <h2>비밀번호 재설정</h2>
+      {sent ? (
+        <p>
+          입력하신 이메일로 재설정 링크를 보냈습니다.
+          <br />
+          메일함을 확인해 주세요.
+        </p>
+      ) : (
+        <form onSubmit={onSubmit}>
+          <label style={{ display: "block", marginBottom: 8 }}>이메일</label>
+          <input
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            style={{ width: "100%", padding: 12, marginBottom: 12 }}
+          />
+          {error && <div style={{ color: "crimson", marginBottom: 8 }}>{error}</div>}
+          <button
+            type="submit"
+            disabled={loading || !email}
+            style={{ width: "100%", padding: 12, background: "#ef4444", color: "#fff", border: 0, borderRadius: 8 }}
+          >
+            {loading ? "전송 중..." : "재설정 링크 보내기"}
+          </button>
+        </form>
       )}
-
-      <div style={{ marginTop: '16px', textAlign: 'center' }}>
-        <button 
-          onClick={resetForm}
-          style={{ 
-            background: 'none', 
-            border: '1px solid #007bff', 
-            color: '#007bff', 
-            padding: '8px 16px', 
-            borderRadius: '4px', 
-            cursor: 'pointer',
-            fontSize: 'min(14px, 3.5vw)'
-          }}
-        >
-          처음부터 다시 시작
-        </button>
-      </div>
     </div>
   );
-};
-
-const ForgotPasswordPageComponent = ForgotPasswordPage;
-export default ForgotPasswordPageComponent; 
+}

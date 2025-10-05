@@ -1,44 +1,39 @@
 // C:\LostFinderProject\client\src\types.ts
+
+export type Theme = 'light' | 'dark';
+export type EditMode = 'edit' | 'create';
+
 export interface User {
-  id: number;
-  username: string;
+  id: string;
   email: string;
-  password: string;
-  phoneNumber?: string;
-  isTemporaryPassword?: boolean;
-  role?: 'user' | 'admin';
+  name?: string;
+  username?: string; // 화면에서 username 사용 중이므로 옵션으로 허용
 }
 
-export interface Comment { 
-  id: number; 
-  author_id: number; 
+// Optional User 타입 추가
+export type OptionalUser = User | null | undefined;
+
+export interface Comment {
+  id: number;
+  text: string;
+  author_id: string;
   author_name?: string;
   author_email?: string;
-  text: string; 
-  created_at?: string;
+  created_at: number | string; // epoch ms 또는 ISO 문자열
 }
 
 export interface LostItem {
   id: number;
-  author_id: number;
-  author_name?: string;
-  author_email?: string;
-  item_type: string;
-  description: string;
-  location: string;
-  image_urls: string[];
-  created_at?: string;
-  updated_at?: string;
-  comments?: Comment[];
-}
+  title: string;
+  description?: string;
 
-export interface Notification {
-  id: number;
-  userId: number;
-  itemId: number;
-  message: string;
-  read: boolean;
-}
+  // 화면에서 참조 중인 필드들을 모두 옵션으로 허용
+  item_type?: string;
+  location?: string;
+  date?: string;
+  created_at?: number | string;
+  image_urls?: string[];
 
-export type Theme = 'light' | 'dark';
-export type EditMode = 'create' | 'edit';
+  author_id: string;
+  comments: Comment[];
+}

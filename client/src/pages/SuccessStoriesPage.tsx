@@ -1,326 +1,175 @@
-// pages/SuccessStoriesPage.tsx
-// 👉 사용자가 분실물을 찾은 사례들을 보여주는 후기 페이지
+import React from 'react';
+import type { User } from '../types';
+import TopBar from '../components/TopBar';
+import CoupangBanner from '../components/CoupangBanner';
 
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import "./SuccessStoriesPage.css";
-// import { useUser } from '../lib/useUser';
-import { isAdmin } from "../lib/admin";
-
-interface Story {
-  content: string;
-  name: string;
-  location: string;
-  likes: number;
+interface SuccessStoriesPageProps {
+  currentUser?: User | null;
 }
 
-export default function SuccessStoriesPage() {
-  const navigate = useNavigate();
-  const [stories, setStories] = useState<Story[]>([]);
-  const [content, setContent] = useState("");
-  const [name, setName] = useState("");
-  const [location, setLocation] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-
-  // ✅ 로컬스토리지에서 후기 불러오기
-  useEffect(() => {
-    const saved = localStorage.getItem("successStories");
-    if (saved) {
-      setStories(JSON.parse(saved));
+const SuccessStoriesPage: React.FC<SuccessStoriesPageProps> = ({ currentUser }) => {
+  const successStories = [
+    {
+      id: 1,
+      title: "지갑을 찾았어요! 🎉",
+      author: "김민수",
+      date: "2024-01-15",
+      content: "지하철에서 지갑을 잃어버렸는데, LostFinder를 통해 3일 만에 찾았습니다. 정말 감사해요!",
+      category: "지갑"
+    },
+    {
+      id: 2,
+      title: "핸드폰 복구 성공 📱",
+      author: "이영희",
+      date: "2024-01-10",
+      content: "카페에서 핸드폰을 두고 나왔는데, 좋은 분이 등록해주셔서 바로 연락이 왔어요. 세상에 착한 사람이 많네요!",
+      category: "핸드폰"
+    },
+    {
+      id: 3,
+      title: "가방을 찾았습니다 🎒",
+      author: "박철수",
+      date: "2024-01-08",
+      content: "버스에서 내릴 때 가방을 두고 내렸는데, 운전기사분이 LostFinder에 등록해주셨어요. 정말 고마웠습니다.",
+      category: "가방"
+    },
+    {
+      id: 4,
+      title: "열쇠를 찾았어요! 🔑",
+      author: "최지영",
+      date: "2024-01-05",
+      content: "공원에서 산책하다가 열쇠를 잃어버렸는데, 다른 분이 발견해서 등록해주셨네요. LostFinder 덕분에 집에 들어갈 수 있었어요!",
+      category: "열쇠"
+    },
+    {
+      id: 5,
+      title: "신분증 복구 완료 🆔",
+      author: "정민호",
+      date: "2024-01-03",
+      content: "신분증을 잃어버려서 정말 당황했는데, LostFinder를 통해 찾을 수 있었습니다. 정말 감사합니다!",
+      category: "신분증"
     }
-  }, []);
-
-  // ✅ 후기 제출 처리
-  const handleSubmit = () => {
-    if (!content.trim() || !name.trim() || !location.trim()) return;
-    const newStory: Story = {
-      content,
-      name,
-      location,
-      likes: 0,
-    };
-    const updated = [newStory, ...stories];
-    setStories(updated);
-    localStorage.setItem("successStories", JSON.stringify(updated));
-    setContent("");
-    setName("");
-    setLocation("");
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3000); // 3초 후 문구 사라짐
-  };
-
-  // ✅ 관리자용 후기 삭제 함수
-  const handleDelete = (index: number) => {
-    const updated = [...stories];
-    updated.splice(index, 1);
-    setStories(updated);
-    localStorage.setItem("successStories", JSON.stringify(updated));
-  };
-
-  const handleLike = (index: number) => {
-    const updated = [...stories];
-    updated[index].likes = (updated[index].likes || 0) + 1;
-    setStories(updated);
-    localStorage.setItem("successStories", JSON.stringify(updated));
-  };
+  ];
 
   return (
-    <main style={{ 
-      maxWidth: 'min(600px, 90vw)', 
-      margin: '0 auto', 
-      padding: 'min(20px, 3vw) min(16px, 4vw)', 
-      display: 'flex', 
-      flexDirection: 'column', 
-      gap: 'min(20px, 3vw)' 
-    }}>
-      <h1 style={{ fontSize: 'min(20px, 5vw)', fontWeight: 'bold', textAlign: 'center', marginBottom: '8px' }}>📦 감동 후기 모음</h1>
-      <p style={{ 
-        fontSize: 'min(14px, 3.5vw)', 
-        color: '#374151', 
-        textAlign: 'center', 
-        marginBottom: '8px', 
-        fontWeight: '600',
-        lineHeight: '1.4'
-      }}>
-        이곳은 다시 만난 소중한 물건과<br />
-        따뜻한 이야기들이 모이는 공간입니다.<br />
-        당신의 경험이 누군가에게 큰 희망이 될 수 있어요.
-      </p>
-      <p style={{ 
-        fontSize: 'min(12px, 3vw)', 
-        color: '#374151', 
-        textAlign: 'center', 
-        marginBottom: '12px' 
-      }}>
-        지금까지 총 <strong>{stories.length}</strong>개의 따뜻한 후기가 등록되었습니다.
-      </p>
-
-      {/* ✅ 작성 폼 */}
-      <div style={{ 
-        backgroundColor: '#f3f4f6', 
-        padding: 'min(16px, 4vw)', 
-        borderRadius: '12px', 
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-        width: '100%',
-        boxSizing: 'border-box'
-      }}>
-        <h2 style={{ 
-          fontSize: 'min(16px, 4vw)', 
-          fontWeight: '600', 
-          marginBottom: '12px', 
-          textAlign: 'center' 
-        }}>📝 나도 후기 남기기</h2>
-        {submitted && (
-          <p style={{ 
-            color: '#059669', 
-            fontWeight: '500', 
-            textAlign: 'center', 
-            marginBottom: '12px',
-            fontSize: 'min(12px, 3vw)'
-          }}>
-            감사합니다! 후기가 제출되었습니다.
-          </p>
-        )}
-        <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <textarea
-            placeholder="후기 내용을 입력해 주세요"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '8px',
-              border: '1px solid #ddd',
-              borderRadius: '6px',
-              fontSize: 'min(13px, 3.2vw)',
-              minHeight: '80px',
-              resize: 'vertical',
-              fontFamily: 'inherit',
-              boxSizing: 'border-box'
-            }}
-            required
-          />
-          <input
-            type="text"
-            placeholder="이름 또는 닉네임"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '8px',
-              border: '1px solid #ddd',
-              borderRadius: '6px',
-              fontSize: 'min(13px, 3.2vw)',
-              fontFamily: 'inherit',
-              boxSizing: 'border-box'
-            }}
-            required
-          />
-          <input
-            type="text"
-            placeholder="지역 (예: 서울 강남구)"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '8px',
-              border: '1px solid #ddd',
-              borderRadius: '6px',
-              fontSize: 'min(13px, 3.2vw)',
-              fontFamily: 'inherit',
-              boxSizing: 'border-box'
-            }}
-            required
-          />
-          <button
-            type="submit"
-            style={{
-              width: '100%',
-              padding: '8px',
-              backgroundColor: '#007bff',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: 'min(14px, 3.5vw)',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'background-color 0.3s',
-              boxSizing: 'border-box'
-            }}
-          >
-            후기 남기기
-          </button>
-        </form>
-      </div>
-
-      {/* ✅ 후기 리스트 출력 */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        {stories.length === 0 ? (
-          <>
-            <p style={{ 
-              textAlign: 'center', 
-              color: '#222', 
-              fontWeight: '700', 
-              fontSize: 'min(14px, 3.5vw)', 
-              marginBottom: '4px' 
-            }}>아직 후기가 없습니다. 첫 후기를 남겨보세요!</p>
-          </>
-        ) : (
-          stories.map((story, idx) => (
+    <div style={{ paddingBottom: 92 }}>
+      <TopBar isLoggedIn={!!currentUser} />
+      
+      <div style={{ padding: '16px' }}>
+        <h2 style={{ marginBottom: '16px', textAlign: 'center' }}>
+          🏆 성공 사례
+        </h2>
+        
+        <p style={{ 
+          textAlign: 'center', 
+          color: '#666', 
+          marginBottom: '24px',
+          fontSize: '14px',
+          lineHeight: '1.5'
+        }}>
+          LostFinder를 통해 분실물을 찾은 감동적인 이야기들을 모았습니다.
+          <br />
+          여러분의 이야기도 들려주세요!
+        </p>
+        
+        <div style={{ display: 'grid', gap: '16px' }}>
+          {successStories.map((story) => (
             <div
-              key={idx}
+              key={story.id}
               style={{
-                backgroundColor: 'white',
-                padding: '12px',
-                borderRadius: '8px',
-                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                marginBottom: '8px',
-                border: '1px solid #f3f4f6',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '6px'
+                padding: '20px',
+                background: '#fff',
+                borderRadius: '12px',
+                border: '1px solid #e0e0e0',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
               }}
             >
-              <p style={{ color: '#374151', fontWeight: '500', fontSize: 'min(13px, 3.2vw)' }}>"{story.content}"</p>
               <div style={{ 
                 display: 'flex', 
                 justifyContent: 'space-between', 
-                alignItems: 'center', 
-                fontSize: 'min(11px, 2.8vw)', 
-                color: '#6b7280' 
+                alignItems: 'flex-start',
+                marginBottom: '12px'
               }}>
-                <span>– {story.name}, {story.location}</span>
-                <button
-                  onClick={() => handleLike(idx)}
-                  style={{
-                    color: '#ec4899',
-                    fontWeight: 'bold',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '3px',
-                    border: 'none',
-                    background: 'none',
-                    cursor: 'pointer',
-                    fontSize: 'min(11px, 2.8vw)'
-                  }}
-                  aria-label="공감하기"
-                >
-                  ❤️ <span>{story.likes || 0}</span>
-                </button>
+                <h3 style={{ 
+                  margin: 0, 
+                  fontSize: '16px', 
+                  color: '#333',
+                  flex: 1
+                }}>
+                  {story.title}
+                </h3>
+                <span style={{
+                  background: '#007bff',
+                  color: '#fff',
+                  padding: '4px 8px',
+                  borderRadius: '12px',
+                  fontSize: '12px',
+                  fontWeight: 'bold'
+                }}>
+                  {story.category}
+                </span>
+              </div>
+              
+              <p style={{ 
+                margin: '0 0 12px 0', 
+                fontSize: '14px', 
+                color: '#555',
+                lineHeight: '1.5'
+              }}>
+                {story.content}
+              </p>
+              
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between',
+                fontSize: '12px',
+                color: '#888'
+              }}>
+                <span>작성자: {story.author}</span>
+                <span>{story.date}</span>
               </div>
             </div>
-          ))
-        )}
-      </div>
-
-      <div style={{ 
-        textAlign: 'center', 
-        marginTop: '8px', 
-        paddingTop: '8px', 
-        borderTop: '1px solid #e9ecef',
-        width: '100%'
-      }}>
-        <p style={{ 
-          fontSize: 'min(14px, 3.5vw)', 
-          color: '#6c757d', 
-          marginBottom: '12px', 
-          lineHeight: '1.4' 
+          ))}
+        </div>
+        
+        <div style={{ 
+          marginTop: '32px',
+          padding: '20px',
+          background: '#f8f9fa',
+          borderRadius: '12px',
+          textAlign: 'center'
         }}>
-          여러분의 따뜻한 마음이 누군가에게 큰 도움이 됩니다
-        </p>
-        <button 
-          onClick={() => navigate("/")}
-          style={{
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            padding: 'min(8px, 2vw) min(16px, 4vw)',
-            borderRadius: '6px',
-            fontSize: 'min(14px, 3.5vw)',
-            fontWeight: '600',
-            cursor: 'pointer',
-            transition: 'background-color 0.3s',
-            boxSizing: 'border-box'
-          }}
-        >
-          홈으로 돌아가기
-        </button>
+          <h3 style={{ margin: '0 0 12px 0', color: '#333' }}>
+            💬 여러분의 이야기를 들려주세요!
+          </h3>
+          <p style={{ margin: '0 0 16px 0', color: '#666', fontSize: '14px' }}>
+            LostFinder를 통해 분실물을 찾은 경험이 있으시다면,
+            <br />
+            다른 분들에게 희망을 주는 이야기를 공유해주세요.
+          </p>
+          <button
+            style={{
+              background: '#28a745',
+              color: '#fff',
+              border: 'none',
+              padding: '12px 24px',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              cursor: 'pointer'
+            }}
+            onClick={() => alert('후기 작성 기능은 준비 중입니다!')}
+          >
+            후기 작성하기
+          </button>
+        </div>
+        
+        <div style={{ marginTop: '40px' }}>
+          <CoupangBanner />
+        </div>
       </div>
-
-      <div style={{ 
-        marginTop: '20px', 
-        textAlign: 'center',
-        width: '100%'
-      }}>
-        <a
-          href="https://3match-game-865e.vercel.app"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: 'block',
-            width: '100%',
-            backgroundColor: '#fef3c7',
-            border: '1px solid #f59e0b',
-            color: '#92400e',
-            textAlign: 'center',
-            fontWeight: '600',
-            padding: '8px',
-            borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-            textDecoration: 'none',
-            fontSize: 'min(14px, 3.5vw)',
-            transition: 'transform 0.2s ease',
-            boxSizing: 'border-box'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'scale(1.02)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'scale(1)';
-          }}
-        >
-          기다리는 동안, 퍼즐 게임 한 판 어때요?
-        </a>
-      </div>
-    </main>
+    </div>
   );
-} 
+};
+
+export default SuccessStoriesPage;

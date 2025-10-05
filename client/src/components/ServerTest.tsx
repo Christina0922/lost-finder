@@ -27,7 +27,7 @@ const ServerTest: React.FC = () => {
 
     setLoading(true);
     try {
-      const result = await sendSMS(phone, message);
+      const result = await sendSMS(phone);
       setStatus(`✅ SMS 발송 성공: ${JSON.stringify(result, null, 2)}`);
     } catch (error) {
       setStatus(`❌ SMS 발송 실패: ${error}`);

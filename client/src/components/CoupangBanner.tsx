@@ -1,61 +1,77 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
+import { nextCoupangLink } from '../utils/coupang';
 
-type CoupangBannerProps = {
-  coupangLinks: string[]; // 쿠팡 파트너스 링크 배열
-};
+/**
+ * 쿠팡 링크 5개 정의
+ */
+const coupangTitles = [
+  "🔒 레오바니 자물쇠",
+  "🚨 뇌울림 3.0 PRO 도난방지 경보기",
+  "📍 갤럭시 스마트태그2 위치추적", 
+  "🍏 Apple 에어태그",
+  "🧷 스프링 고리형 스트랩 (5개)",
+];
 
-export default function CoupangBanner({ coupangLinks }: CoupangBannerProps) {
-  const [idx, setIdx] = useState(0);
-  const anchorRef = useRef<HTMLAnchorElement | null>(null);
-
-  // 새로고침해도 이어서 번갈아가도록 인덱스 복원
-  useEffect(() => {
-    const saved = Number(localStorage.getItem("coupangIdx") || "0");
-    setIdx(Number.isFinite(saved) ? saved % Math.max(coupangLinks.length, 1) : 0);
-  }, [coupangLinks.length]);
-
-  const handleClick = () => {
-    if (!coupangLinks.length) return;
-
-    const currentUrl = coupangLinks[idx % coupangLinks.length];
-    
-    // 새 창에서 쿠팡 링크 열기
-    window.open(currentUrl, "_blank", "noopener,noreferrer");
-
-    // 다음 링크로 순환
-    const nextIdx = (idx + 1) % coupangLinks.length;
-    setIdx(nextIdx);
-    localStorage.setItem("coupangIdx", String(nextIdx));
+/**
+ * 쿠팡 배너 컴포넌트
+ */
+export default function CoupangBanner() {
+  const handleCoupangClick = () => {
+    const url = nextCoupangLink();
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
-  return (
-    <div className="ad-banner">
-      <div className="ad-content">
-        <div className="ad-icon">🔍</div>
-        <div className="ad-text">
-          <h4>👀 분실 방지 용품 인기 상품 모음</h4>
-          <p>AirTag, 가방 위치 추적기, 열쇠고리형 블루투스 위치기기</p>
-        </div>
-        <button
-          type="button"
-          onClick={handleClick}
-          className="ad-button"
-          style={{ color: "#111" }}
-          title="쿠팡에서 보기"
-        >
-          쿠팡에서 보기
-        </button>
-      </div>
+  // 현재 시각 기준으로 제목 인덱스를 계산
+  const selectedTitle = React.useMemo(() => {
+    const hourIndex = Math.floor(Date.now() / (1000 * 60 * 60)); // 현재 시각(시 단위)
+    const idx = hourIndex % coupangTitles.length; // 5개 순환
+    return coupangTitles[idx];
+  }, []);
 
-      {/* 실제로 링크를 여는 숨은 앵커 */}
-      <a
-        ref={anchorRef}
-        href="#"
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{ position: 'absolute', left: '-9999px', visibility: 'hidden' }}
-        aria-hidden="true"
-      />
+  return (
+    <div
+      style={{
+        margin: "20px auto",
+        textAlign: "center",
+        backgroundColor: "#f9fafb",
+        padding: "16px",
+        borderRadius: "12px",
+        boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+        width: "90%",
+        maxWidth: "480px",
+      }}
+    >
+      <button
+        onClick={handleCoupangClick}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "8px",
+          fontSize: "1.1rem",
+          color: "#0074E9",
+          fontWeight: 600,
+          textDecoration: "none",
+          lineHeight: "1.5",
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          padding: "8px 16px",
+          borderRadius: "8px",
+          transition: "background-color 0.2s",
+          textAlign: "center",
+          width: "100%",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = "#f0f8ff";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = "transparent";
+        }}
+      >
+        <span>{selectedTitle}</span>
+        <span style={{ fontSize: "0.9rem", color: "#666" }}>쿠팡으로 이동하기</span>
+      </button>
     </div>
   );
-} 
+}

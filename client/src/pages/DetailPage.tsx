@@ -1,13 +1,13 @@
 // C:\LostFinderProject\client\src\pages\DetailPage.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import KakaoMapComponent from '../components/KakaoMapComponent';
 import type { LostItem, Comment, User } from '../types';
 import { getLostItemById, addComment } from '../utils/api';
-import './DetailPage.css';
+import CoupangBanner from '../components/CoupangBanner'; // ✅ 추가
 
 interface DetailPageProps {
-  currentUser: User | null;
+  currentUser: User;
 }
 
 const DetailPage: React.FC<DetailPageProps> = ({ currentUser }) => {
@@ -27,81 +27,66 @@ const DetailPage: React.FC<DetailPageProps> = ({ currentUser }) => {
     })();
   }, [id]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!item || !text.trim() || !currentUser || !id) return;
+  const handleAddComment = async () => {
+    if (!id || !text.trim()) return;
 
-    const c: Omit<Comment, 'id' | 'created_at'> = {
-      author_id: currentUser.id,
-      author_name: currentUser.username,
-      author_email: currentUser.email,
-      text: text.trim(),
-    };
-    await addComment(id, c);
-    
-    // 댓글 등록 후 초기 화면으로 돌아가기
-    window.location.href = '/';
+    try {
+      await addComment(id, { text: text.trim() });
+      
+      // 댓글 등록 성공 알림
+      alert('댓글이 등록되었습니다! 분실물 주인에게 알림이 전송되었습니다.');
+      
+      // 페이지 새로고침으로 댓글 목록 업데이트
+      window.location.reload();
+    } catch (error) {
+      console.error('댓글 등록 실패:', error);
+      alert('댓글 등록에 실패했습니다. 다시 시도해주세요.');
+    }
   };
 
-  if (!item) return <div>로딩 중...</div>;
+  if (!item) return <div style={{ padding: 16 }}>불러오는 중…</div>;
 
   return (
-    <div className="detail-page">
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px', padding: '8px 12px', backgroundColor: '#007bff', borderRadius: '4px' }}>
-        <button 
-          onClick={() => window.history.back()} 
-          style={{ 
-            marginRight: '12px', 
-            padding: '4px 8px', 
-            border: 'none', 
-            borderRadius: '4px', 
-            backgroundColor: 'transparent', 
-            color: 'white', 
-            cursor: 'pointer',
-            fontSize: '14px'
-          }}
-        >
-          ← 뒤로
-        </button>
-        <h1 style={{ margin: 0, color: 'white', fontSize: '18px' }}>{item.description}</h1>
-      </div>
-      
+    <div style={{ padding: 16 }}>
+      <h2>{item.title || item.item_type || '분실물 상세'}</h2>
+
       <div className="item-info">
-        <p><strong>분실물 종류:</strong> {item.item_type}</p>
-        <p><strong>분실 위치:</strong> {item.location}</p>
-        <p><strong>등록일:</strong> {new Date(item.created_at || '').toLocaleDateString()}</p>
+        <p><strong>분실물 종류:</strong> {item.item_type || ''}</p>
+        <p><strong>분실 위치:</strong> {item.location || ''}</p>
+        <p><strong>등록일:</strong> {item.created_at ? new Date(item.created_at).toLocaleDateString() : ''}</p>
       </div>
 
-      {/* 위치가 필요하면 KakaoMapComponent 사용 */}
       <div style={{ margin: '16px 0' }}>
-        <KakaoMapComponent 
-          location={item.location}
-          itemType={item.item_type}
+        <KakaoMapComponent
+          location={item.location || ''}     // ✔ string 보장
+          itemType={item.item_type || ''}    // ✔ string 보장
           description={item.description || ''}
         />
       </div>
 
-      <h2>댓글</h2>
-      <div className="comments">
-        {item.comments?.map((comment) => (
+      <div>
+        <h3>댓글</h3>
+        {item.comments?.map((comment: Comment) => (
           <div key={comment.id} className="comment">
             <p><strong>{comment.author_name || '익명'}:</strong> {comment.text}</p>
-            <small>{new Date(comment.created_at || '').toLocaleDateString()}</small>
+            <small>{comment.created_at ? new Date(comment.created_at).toLocaleDateString() : ''}</small>
           </div>
         ))}
-      </div>
 
-      {currentUser && (
-        <form onSubmit={handleSubmit} className="comment-form">
-          <textarea
+        <div style={{ marginTop: 8 }}>
+          <input
+            placeholder="댓글을 입력하세요"
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="댓글을 입력하세요..."
-            required
           />
-          <button type="submit">댓글 작성</button>
-        </form>
-      )}
+          <button onClick={handleAddComment}>등록</button>
+        </div>
+      </div>
+
+      {/* ✅ 쿠팡 배너 추가 (1시간마다 자동 교체, 1개만 표시) */}
+      <div style={{ marginTop: 40, textAlign: 'center' }}>
+        <CoupangBanner />
+      </div>
     </div>
   );
 };

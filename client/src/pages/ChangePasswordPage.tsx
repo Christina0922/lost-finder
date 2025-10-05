@@ -1,139 +1,262 @@
-import React, { useState, useEffect } from 'react';
+// C:\LostFinderProject\client\src\pages\ChangePasswordPage.tsx
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { changePassword } from '../utils/api';
-import './DetailPage.css'; // 스타일 재사용
+import type { User } from '../types';
+import { changePassword as apiChangePassword } from '../utils/api';
+import TopBar from '../components/TopBar';
+import CoupangBanner from '../components/CoupangBanner';
 
 interface ChangePasswordPageProps {
-  currentUser: any;
-  onChangePassword: (newPassword: string) => boolean;
+  currentUser?: User;
+  onChangePassword?: (oldPw: string, newPw: string) => Promise<boolean>;
 }
 
 const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ currentUser, onChangePassword }) => {
   const navigate = useNavigate();
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [message, setMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [oldPw, setOldPw] = useState('');
+  const [newPw, setNewPw] = useState('');
+  const [confirmPw, setConfirmPw] = useState('');
+  const [err, setErr] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    // 로그인하지 않은 사용자는 메인 페이지로 리디렉션
-    if (!currentUser) {
-      navigate('/');
-    }
-  }, [currentUser, navigate]);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErr('');
+    setIsSubmitting(true);
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    
-    if (newPassword.length < 6) {
-      setMessage('비밀번호는 최소 6자 이상이어야 합니다.');
-      return;
-    }
-    
-    if (newPassword !== confirmPassword) {
-      setMessage('비밀번호가 일치하지 않습니다.');
+    // 비밀번호 확인 검증
+    if (newPw !== confirmPw) {
+      setErr('새 비밀번호가 일치하지 않습니다.');
+      setIsSubmitting(false);
       return;
     }
 
-    setIsLoading(true);
-    setMessage('');
+    // 비밀번호 길이 검증
+    if (newPw.length < 6) {
+      setErr('새 비밀번호는 6자 이상이어야 합니다.');
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
-      // 임시 비밀번호 사용자는 현재 비밀번호 확인 생략
-      const currentPwd = currentUser.isTemporaryPassword ? '' : currentPassword;
-      
-      // 서버에 비밀번호 변경 요청
-      await changePassword(currentPwd, newPassword);
-      
-      // 로컬 상태도 업데이트
-      onChangePassword(newPassword);
-      
-      setMessage('비밀번호가 성공적으로 변경되었습니다!');
-      setTimeout(() => {
-        navigate('/');
-      }, 2000);
+      const ok =
+        (await onChangePassword?.(oldPw, newPw)) ??
+        (await apiChangePassword(oldPw, newPw)).ok;
+
+      if (ok) {
+        alert('비밀번호가 성공적으로 변경되었습니다!');
+        navigate('/settings');
+      } else {
+        setErr('현재 비밀번호가 올바르지 않습니다.');
+      }
     } catch (error: any) {
-      setMessage(error.message || '비밀번호 변경 중 오류가 발생했습니다.');
+      setErr(error?.message || '비밀번호 변경 중 오류가 발생했습니다.');
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
-  // 로그인하지 않은 사용자는 렌더링하지 않음
-  if (!currentUser) {
-    return null;
-  }
-
   return (
-    <div className="form-container-wrapper">
-      <h1>비밀번호 변경</h1>
-      {currentUser.isTemporaryPassword && (
-        <div style={{ 
-          backgroundColor: '#fff3cd', 
-          border: '1px solid #ffeaa7', 
-          borderRadius: '8px', 
-          padding: '16px', 
-          marginBottom: '20px' 
-        }}>
-          <p style={{ margin: 0, color: '#856404' }}>
-            <strong>보안을 위해 새로운 비밀번호를 설정해주세요.</strong>
-          </p>
-        </div>
-      )}
+    <div style={{ paddingBottom: 92 }}>
+      <TopBar isLoggedIn={!!currentUser} />
       
-      <form onSubmit={handleSubmit} className="form-container">
-        {!currentUser.isTemporaryPassword && (
-          <div className="form-group">
-            <label htmlFor="current-password">현재 비밀번호</label>
-            <input
-              type="password"
-              id="current-password"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="현재 비밀번호를 입력하세요"
-              required
-            />
-          </div>
-        )}
+      <div style={{ padding: '16px 16px 24px' }}>
+        <h2 style={{ margin: '0 0 16px 0', color: '#1e293b', textAlign: 'center' }}>
+          🔐 비밀번호 변경
+        </h2>
         
-        <div className="form-group">
-          <label htmlFor="new-password">새 비밀번호</label>
-          <input
-            type="password"
-            id="new-password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            placeholder="최소 6자 이상"
-            required
-            minLength={6}
-          />
-        </div>
-        
-        <div className="form-group">
-          <label htmlFor="confirm-password">새 비밀번호 확인</label>
-          <input
-            type="password"
-            id="confirm-password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="비밀번호를 다시 입력하세요"
-            required
-          />
-        </div>
-        
-        <button type="submit" className="submit-button" disabled={isLoading}>
-          {isLoading ? '변경 중...' : '비밀번호 변경'}
-        </button>
-      </form>
+        <p style={{ 
+          color: '#6b7280', 
+          textAlign: 'center', 
+          margin: '0 0 24px 0',
+          fontSize: 14
+        }}>
+          계정 보안을 위해 비밀번호를 변경하세요
+        </p>
 
-      {message && (
-        <div className="reset-message">
-          <p>{message}</p>
+        {/* 비밀번호 변경 폼 */}
+        <div style={{
+          background: '#fff',
+          border: '1px solid #e2e8f0',
+          borderRadius: 12,
+          padding: 20,
+          marginBottom: 24,
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+        }}>
+          <form onSubmit={handleSubmit}>
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: 8, 
+                color: '#374151', 
+                fontWeight: 500,
+                fontSize: 14
+              }}>
+                현재 비밀번호
+              </label>
+              <input
+                type="password"
+                value={oldPw}
+                onChange={(e) => setOldPw(e.target.value)}
+                required
+                placeholder="현재 비밀번호를 입력하세요"
+                style={{
+                  width: '100%',
+                  padding: 12,
+                  border: '2px solid #e2e8f0',
+                  borderRadius: 8,
+                  fontSize: 14,
+                  outline: 'none',
+                  transition: 'border-color 0.2s',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+              />
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: 8, 
+                color: '#374151', 
+                fontWeight: 500,
+                fontSize: 14
+              }}>
+                새 비밀번호
+              </label>
+              <input
+                type="password"
+                value={newPw}
+                onChange={(e) => setNewPw(e.target.value)}
+                required
+                placeholder="새 비밀번호를 입력하세요 (6자 이상)"
+                style={{
+                  width: '100%',
+                  padding: 12,
+                  border: '2px solid #e2e8f0',
+                  borderRadius: 8,
+                  fontSize: 14,
+                  outline: 'none',
+                  transition: 'border-color 0.2s',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+              />
+            </div>
+
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: 8, 
+                color: '#374151', 
+                fontWeight: 500,
+                fontSize: 14
+              }}>
+                새 비밀번호 확인
+              </label>
+              <input
+                type="password"
+                value={confirmPw}
+                onChange={(e) => setConfirmPw(e.target.value)}
+                required
+                placeholder="새 비밀번호를 다시 입력하세요"
+                style={{
+                  width: '100%',
+                  padding: 12,
+                  border: '2px solid #e2e8f0',
+                  borderRadius: 8,
+                  fontSize: 14,
+                  outline: 'none',
+                  transition: 'border-color 0.2s',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+              />
+            </div>
+
+            {err && (
+              <div style={{
+                background: '#fef2f2',
+                border: '1px solid #fecaca',
+                borderRadius: 8,
+                padding: 12,
+                marginBottom: 16,
+                color: '#dc2626',
+                fontSize: 14
+              }}>
+                ⚠️ {err}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: 12 }}>
+              <button
+                type="submit"
+                disabled={isSubmitting || !oldPw || !newPw || !confirmPw}
+                style={{
+                  flex: 1,
+                  background: isSubmitting || !oldPw || !newPw || !confirmPw ? '#9ca3af' : '#3b82f6',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: 8,
+                  fontSize: 16,
+                  fontWeight: 600,
+                  cursor: isSubmitting || !oldPw || !newPw || !confirmPw ? 'not-allowed' : 'pointer',
+                  transition: 'background-color 0.2s'
+                }}
+              >
+                {isSubmitting ? '변경 중...' : '비밀번호 변경'}
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/settings')}
+                style={{
+                  flex: 1,
+                  background: '#6b7280',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: 8,
+                  fontSize: 16,
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                취소
+              </button>
+            </div>
+          </form>
         </div>
-      )}
+
+        {/* 보안 팁 */}
+        <div style={{
+          background: '#f8fafc',
+          border: '1px solid #e2e8f0',
+          borderRadius: 12,
+          padding: 16,
+          marginBottom: 24
+        }}>
+          <h3 style={{ margin: '0 0 8px 0', color: '#1e293b', fontSize: 14 }}>
+            🔒 보안 팁
+          </h3>
+          <ul style={{ margin: 0, paddingLeft: 20, fontSize: 12, color: '#6b7280', lineHeight: 1.6 }}>
+            <li>8자 이상의 비밀번호를 사용하세요</li>
+            <li>숫자, 특수문자를 포함하세요</li>
+            <li>다른 사이트와 다른 비밀번호를 사용하세요</li>
+            <li>정기적으로 비밀번호를 변경하세요</li>
+          </ul>
+        </div>
+
+        {/* 쿠팡 배너 */}
+        <div style={{ marginTop: 40 }}>
+          <CoupangBanner />
+        </div>
+      </div>
     </div>
   );
 };
 
-export default ChangePasswordPage; 
+export default ChangePasswordPage;

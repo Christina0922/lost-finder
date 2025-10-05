@@ -1,36 +1,64 @@
 // C:\LostFinderProject\client\src\pages\HomePage.tsx
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import type { User } from '../types';
-import CoupangBanner from '../components/CoupangBanner';
-import './HomePage.css';
+import TopBar from '../components/TopBar';
 
-interface HomePageProps {
+interface Props {
   currentUser?: User | null;
+  onLogout: () => void;
 }
 
-const HomePage: React.FC<HomePageProps> = ({ currentUser = null }) => {
-  const navigate = useNavigate();
+const Card: React.FC<{ to: string; icon: string; title: string; subtitle: string; }> = ({ to, icon, title, subtitle }) => (
+  <Link
+    to={to}
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 12,
+      padding: 16,
+      borderRadius: 12,
+      background: '#fff',
+      color: '#111827',
+      textDecoration: 'none',
+      boxShadow: '0 1px 5px rgba(0,0,0,.12)'
+    }}
+  >
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <span style={{ fontSize: 26 }}>{icon}</span>
+      <div>
+        <div style={{ fontWeight: 800 }}>{title}</div>
+        <div style={{ fontSize: 12, color: '#6b7280' }}>{subtitle}</div>
+      </div>
+    </div>
+    <span style={{ opacity: .6 }}>→</span>
+  </Link>
+);
+
+const HomePage: React.FC<Props> = ({ currentUser, onLogout }) => {
+  const name = currentUser?.username || currentUser?.name || currentUser?.email || '게스트';
 
   return (
-    <div className="home-page">
-      <header className="home-header">
-        <h1>LostFinder</h1>
-        <div>{currentUser ? `${currentUser.username} 님` : '게스트'}</div>
-      </header>
+    <div style={{ paddingBottom: 92 /* 쿠팡 배너 높이만큼 여백 */ }}>
+      <TopBar isLoggedIn={!!currentUser} onLogout={onLogout} />
 
-      <div className="home-actions">
-        <button onClick={() => navigate('/list')}>분실물 목록</button>
-        <button onClick={() => navigate('/add')}>분실물 등록</button>
+      <div style={{ padding: '16px 16px 24px' }}>
+        <p style={{ color: '#6b7280', textAlign: 'center', margin: '8px 0 16px' }}>
+          잃어버린 물건을 쉽게 찾으세요
+        </p>
+
+        <div style={{ display: 'grid', gap: 12 }}>
+          <Card to="/add"     icon="➕" title="분실물 등록하기"  subtitle="분실물을 등록하세요" />
+          <Card to="/list"    icon="📋" title="목록 보기"       subtitle="등록된 분실물을 확인하세요" />
+          <Card to="/reviews" icon="💬" title="분실물 후기 보기" subtitle="성공 사례 먼저 읽기" />
+          <Card to="/game"    icon="🎮" title="기다리면서 게임하기" subtitle="잠깐 쉬며 마음 진정" />
+        </div>
+
+        <div style={{ textAlign: 'center', marginTop: 20, color: '#374151', fontWeight: 700 }}>
+          {name} 님
+        </div>
       </div>
-
-      <CoupangBanner coupangLinks={[
-        "https://link.coupang.com/a/cIFtru", // 🚨 뇌울림 3.0 PRO 도난방지 경보기
-        "https://link.coupang.com/a/cIFumx", // 📍 갤럭시 스마트태그2 위치추적
-        "https://link.coupang.com/a/cIFuZl", // 🔒 레오바니 자물쇠
-        "https://link.coupang.com/a/cIFvsF", // 🍏 Apple 에어태그
-        "https://link.coupang.com/a/cIFv4K"  // 🧷 스프링 고리형 스트랩 (5개)
-      ]} />
     </div>
   );
 };
