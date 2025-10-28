@@ -3,7 +3,7 @@ export const API_BASE =
   (import.meta as any).env?.VITE_API_BASE_URL ||
   (window as any).REACT_APP_API_BASE_URL ||
   (process.env as any).REACT_APP_API_BASE_URL ||
-  "http://localhost:5000";
+  "http://172.30.1.44:5000";
 
 // 공통 요청 유틸 (기본적으로 캐시 방지)
 async function request(path: string, options: RequestInit = {}) {
@@ -99,7 +99,7 @@ export const AuthAPI = {
     request("/api/login", { method: "POST", body: JSON.stringify({ email, password }) }),
 
   requestReset: (email: string) =>
-    request("/api/forgot-password/email", { method: "POST", body: JSON.stringify({ email }) }),
+    request("/auth/request-reset", { method: "POST", body: JSON.stringify({ email }) }),
 
   verifyResetToken: (email: string, token: string) =>
     request("/api/forgot-password/verify", {

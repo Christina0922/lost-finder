@@ -8,6 +8,7 @@ interface MapComponentProps {
     title: string;
     description?: string;
   };
+  address?: string; // 주소 입력 지원
 }
 
 // 카카오맵 API 키
@@ -16,11 +17,51 @@ const KAKAO_MAP_API_KEY = process.env.REACT_APP_KAKAO_MAP_API_KEY as string;
 const MapComponent: React.FC<MapComponentProps> = ({
   center = { lat: 37.5665, lng: 126.9780 }, // 서울 시청 좌표
   zoom = 15, // 더 적절한 줌 레벨
-  marker
+  marker,
+  address
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [error, setError] = useState<string>('');
+  const [actualCenter, setActualCenter] = useState(center);
+
+  // 주소를 좌표로 변환하는 함수
+  const geocodeAddress = (address: string): Promise<{ lat: number; lng: number }> => {
+    return new Promise((resolve, reject) => {
+      if (!window.kakao || !window.kakao.maps || !window.kakao.maps.services) {
+        reject(new Error('카카오맵 API가 로드되지 않음'));
+        return;
+      }
+
+      const geocoder = new window.kakao.maps.services.Geocoder();
+      geocoder.addressSearch(address, (result: any, status: any) => {
+        if (status === window.kakao.maps.services.Status.OK) {
+          const coords = {
+            lat: parseFloat(result[0].y),
+            lng: parseFloat(result[0].x)
+          };
+          resolve(coords);
+        } else {
+          reject(new Error('주소 검색 실패'));
+        }
+      });
+    });
+  };
+
+  // 주소가 있으면 좌표로 변환
+  useEffect(() => {
+    if (address && address.trim()) {
+      geocodeAddress(address.trim())
+        .then(coords => {
+          console.log('주소 좌표 변환 성공:', coords);
+          setActualCenter(coords);
+        })
+        .catch(error => {
+          console.error('주소 좌표 변환 실패:', error);
+          setError('주소를 찾을 수 없습니다');
+        });
+    }
+  }, [address]);
 
   useEffect(() => {
     console.log('MapComponent 마운트됨');
@@ -99,7 +140,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
       console.log('카카오맵 인스턴스 생성 시작');
       
       const map = new window.kakao.maps.Map(mapRef.current, {
-        center: new window.kakao.maps.LatLng(center.lat, center.lng),
+        center: new window.kakao.maps.LatLng(actualCenter.lat, actualCenter.lng),
         level: zoom
       });
 

@@ -4,6 +4,20 @@
 .env.development.local
 .env.test.local
 .env.production.local
+*.env
+
+# 개인정보 및 민감한 파일
+**/private/
+**/secrets/
+**/keys/
+*.key
+*.pem
+*.p12
+*.jks
+token.txt
+
+# 테스트 이메일 파일
+test-emails/
 
 # 로그 파일
 logs

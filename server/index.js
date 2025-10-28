@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import authRouter from './routes/auth.js';
 import dotenv from 'dotenv';
 
 // 환경변수 로드
@@ -24,7 +25,7 @@ let lostItems = [
     item_type: '지갑',
     description: '검은색 가죽 지갑',
     location: '서울대학교 정문',
-    image_urls: [],
+    image_urls: ['http://localhost:5000/uploads/wallet-sample.jpg'],
     author_id: 1,
     created_at: new Date().toISOString(),
     comments: []
@@ -35,7 +36,7 @@ let lostItems = [
     item_type: '핸드폰',
     description: '아이폰 14 프로',
     location: '강남역 2번 출구',
-    image_urls: [],
+    image_urls: ['http://localhost:5000/uploads/phone-sample.jpg'],
     author_id: 1,
     created_at: new Date().toISOString(),
     comments: []
@@ -46,9 +47,9 @@ let lostItems = [
 app.use(express.urlencoded({ extended: true })); // x-www-form-urlencoded
 app.use(express.json());                           // application/json
 
-/** CORS (프론트 localhost:3000과 쿠키 공유) */
+/** CORS (프론트 localhost:5173과 쿠키 공유) */
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: 'http://localhost:5173',
   credentials: true,
 }));
 app.use(cookieParser());
@@ -81,6 +82,9 @@ const upload = multer({
 /** 정적 파일 서빙 (업로드된 이미지) */
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+/** 인증 라우트 */
+app.use('/auth', authRouter);
+
 /** 건강 체크 */
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
@@ -111,22 +115,36 @@ app.post('/api/login', async (req, res) => {
     return res.status(400).json({ message: '이메일/비밀번호가 없습니다.' });
   }
 
-  // 🔒 실제 검증은 DB/서비스 로직으로 교체하세요.
-  // 여기선 동작 확인용으로만 간단 비교.
-  const VALID_EMAIL = process.env.TEST_EMAIL || 'test@example.com';
-  const VALID_PW    = process.env.TEST_PW    || 'testpassword123';
-
-  if (email !== VALID_EMAIL || password !== VALID_PW) {
-    console.log('❌ 로그인 실패:', { email, password, VALID_EMAIL, VALID_PW });
-    return res.status(401).json({ message: '이메일 또는 비밀번호가 올바르지 않습니다.' });
-  }
-
-  // 성공: 세션/토큰 등 원하는 방식으로 발급
-  const user = { id: 1, email, name: 'YJ' };
-  res.cookie('token', 'dummy', { httpOnly: true, sameSite: 'lax' });
-  console.log('✅ 로그인 성공:', { email });
-  console.log('=== 로그인 요청 완료 ===');
-  return res.json({ ok: true, user });
+  // 실제 데이터베이스에서 사용자 확인
+  const { db } = await import('./db.js');
+  
+  db.get(
+    `SELECT id, email, password, username FROM users WHERE email=?`,
+    [email],
+    (err, user) => {
+      if (err) {
+        console.log('❌ DB 오류:', err);
+        return res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+      }
+      
+      if (!user) {
+        console.log('❌ 사용자를 찾을 수 없음:', email);
+        return res.status(401).json({ message: '이메일 또는 비밀번호가 올바르지 않습니다.' });
+      }
+      
+      if (user.password !== password) {
+        console.log('❌ 비밀번호 불일치:', { email, provided: password, stored: user.password });
+        return res.status(401).json({ message: '이메일 또는 비밀번호가 올바르지 않습니다.' });
+      }
+      
+      // 성공: 세션/토큰 등 원하는 방식으로 발급
+      const userData = { id: user.id, email: user.email, name: user.username };
+      res.cookie('token', 'dummy', { httpOnly: true, sameSite: 'lax' });
+      console.log('✅ 로그인 성공:', { email, userId: user.id });
+      console.log('=== 로그인 요청 완료 ===');
+      return res.json({ ok: true, user: userData });
+    }
+  );
 });
 
 /** 비밀번호 찾기 - 이메일로 임시 비밀번호 발송 */
@@ -328,6 +346,37 @@ app.get('/lost/:id', async (req, res) => {
   }
 });
 
+/** 분실물 삭제 */
+app.delete('/lost/:id', async (req, res) => {
+  console.log('=== 분실물 삭제 요청 ===');
+  console.log('분실물 ID:', req.params.id);
+  
+  try {
+    const itemId = parseInt(req.params.id);
+    const itemIndex = lostItems.findIndex(item => item.id === itemId);
+    
+    if (itemIndex === -1) {
+      console.log(`❌ 분실물을 찾을 수 없음: ID ${itemId}`);
+      return res.status(404).json({ message: '분실물을 찾을 수 없습니다.' });
+    }
+    
+    // 분실물 삭제
+    const deletedItem = lostItems.splice(itemIndex, 1)[0];
+    
+    console.log(`✅ 분실물 삭제 성공: ${deletedItem.item_type} - ${deletedItem.location}`);
+    console.log(`📊 현재 총 분실물 개수: ${lostItems.length}개`);
+    
+    return res.json({ 
+      ok: true, 
+      message: '분실물이 성공적으로 삭제되었습니다.',
+      deletedItem: deletedItem
+    });
+  } catch (error) {
+    console.error('분실물 삭제 실패:', error);
+    return res.status(500).json({ message: '분실물 삭제 중 오류가 발생했습니다.' });
+  }
+});
+
 /** 댓글 등록 */
 app.post('/api/items/:id/comments', async (req, res) => {
   console.log('=== 댓글 등록 요청 ===');
@@ -366,6 +415,14 @@ app.post('/api/items/:id/comments', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`API server listening on http://localhost:${PORT}`);
+const HOST = process.env.HOST || '0.0.0.0';
+const NODE_ENV = process.env.NODE_ENV || 'development';
+
+app.listen(PORT, HOST, () => {
+  console.log(`🚀 API server listening on http://${HOST}:${PORT}`);
+  if (NODE_ENV === 'development') {
+    console.log(`📱 Local access: http://localhost:${PORT}`);
+    console.log(`🌐 Network access: http://172.30.1.44:${PORT}`);
+  }
+  console.log(`🔒 Environment: ${NODE_ENV}`);
 });

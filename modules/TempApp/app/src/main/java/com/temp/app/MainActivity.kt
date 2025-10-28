@@ -1,30 +1,38 @@
 package com.temp.app
 
+import android.content.Context
 import android.os.Bundle
-import android.util.Log
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import android.webkit.WebSettings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
 import com.temp.app.ui.theme.TempAppTheme
-import net.daum.mf.map.api.MapView
-import net.daum.mf.map.api.MapPoint
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        
+        // 앱 데이터 완전 삭제 (개발용)
+        try {
+            deleteDatabase("webview.db")
+            deleteDatabase("webviewCache.db")
+        } catch (e: Exception) {
+            // 데이터베이스가 없으면 무시
+        }
+        
         setContent {
             TempAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    KakaoMapScreen(
+                    WebViewScreen(
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -34,69 +42,45 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun KakaoMapScreen(modifier: Modifier = Modifier) {
+fun WebViewScreen(modifier: Modifier = Modifier) {
     AndroidView(
         factory = { context ->
-            MapView(context).apply {
-                // 지도 초기 설정
-                setMapViewEventListener(object : net.daum.mf.map.api.MapView.MapViewEventListener {
-                    override fun onMapViewInitialized(mapView: MapView?) {
-                        Log.d("KakaoMap", "지도가 초기화되었습니다!")
-                        // 서울 시청으로 지도 중심 이동
-                        mapView?.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(37.5665, 126.9780), true)
-                        mapView?.setZoomLevel(7, true)
+            WebView(context).apply {
+                webViewClient = object : WebViewClient() {
+                    override fun onPageFinished(view: WebView?, url: String?) {
+                        super.onPageFinished(view, url)
+                        // 페이지 로드 완료 후 JavaScript로 강제 새로고침
+                        view?.evaluateJavascript("window.location.reload(true);", null)
                     }
-                    
-                    override fun onMapViewCenterPointMoved(mapView: MapView?, mapPoint: net.daum.mf.map.api.MapPoint?) {
-                        Log.d("KakaoMap", "지도 중심점이 이동했습니다: $mapPoint")
-                    }
-                    
-                    override fun onMapViewZoomLevelChanged(mapView: MapView?, zoomLevel: Int) {
-                        Log.d("KakaoMap", "줌 레벨이 변경되었습니다: $zoomLevel")
-                    }
-                    
-                    override fun onMapViewSingleTapped(mapView: MapView?, mapPoint: net.daum.mf.map.api.MapPoint?) {
-                        Log.d("KakaoMap", "지도를 한 번 탭했습니다: $mapPoint")
-                    }
-                    
-                    override fun onMapViewDoubleTapped(mapView: MapView?, mapPoint: net.daum.mf.map.api.MapPoint?) {
-                        Log.d("KakaoMap", "지도를 두 번 탭했습니다: $mapPoint")
-                    }
-                    
-                    override fun onMapViewLongPressed(mapView: MapView?, mapPoint: net.daum.mf.map.api.MapPoint?) {
-                        Log.d("KakaoMap", "지도를 길게 눌렀습니다: $mapPoint")
-                    }
-                    
-                    override fun onMapViewDragStarted(mapView: MapView?, mapPoint: net.daum.mf.map.api.MapPoint?) {
-                        Log.d("KakaoMap", "지도 드래그가 시작되었습니다: $mapPoint")
-                    }
-                    
-                    override fun onMapViewDragEnded(mapView: MapView?, mapPoint: net.daum.mf.map.api.MapPoint?) {
-                        Log.d("KakaoMap", "지도 드래그가 끝났습니다: $mapPoint")
-                    }
-                    
-                    override fun onMapViewMoveFinished(mapView: MapView?, mapPoint: net.daum.mf.map.api.MapPoint?) {
-                        Log.d("KakaoMap", "지도 이동이 끝났습니다: $mapPoint")
-                    }
-                })
+                }
+                
+                settings.apply {
+                    javaScriptEnabled = true
+                    domStorageEnabled = true
+                    loadWithOverviewMode = true
+                    useWideViewPort = true
+                    builtInZoomControls = true
+                    displayZoomControls = false
+                    setSupportZoom(true)
+                    mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                    cacheMode = WebSettings.LOAD_NO_CACHE // 캐시 완전 비활성화
+                    setAppCacheEnabled(false) // 앱 캐시 비활성화
+                    databaseEnabled = false // 데이터베이스 캐시 비활성화
+                }
+                
+                // 모든 캐시 완전 클리어
+                clearCache(true)
+                clearHistory()
+                clearFormData()
+                
+                // React 앱 로드 (개발 서버) - 실제 PC IP 주소 사용
+                val timestamp = System.currentTimeMillis()
+                loadUrl("http://172.30.1.44:3000?t=$timestamp")
+                
+                // 프로덕션용 (실제 서버)
+                // loadUrl("https://your-domain.com")
             }
         },
         modifier = modifier.fillMaxSize()
     )
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    TempAppTheme {
-        Greeting("Android")
-    }
 }

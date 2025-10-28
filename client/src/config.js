@@ -1,12 +1,14 @@
 // 클라이언트 설정 파일
 const config = {
   development: {
-    apiBaseUrl: 'http://localhost:5000/api',
-    serverUrl: 'http://localhost:5000'
+    apiBaseUrl: process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api',
+    serverUrl: process.env.REACT_APP_SERVER_URL || 'http://localhost:5000',
+    kakaoMapApiKey: process.env.REACT_APP_KAKAO_MAP_API_KEY || 'e19a463823bdbefb87c2c66c3fb6ab59'
   },
   production: {
-    apiBaseUrl: process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api',
-    serverUrl: process.env.REACT_APP_SERVER_URL || 'http://localhost:5000'
+    apiBaseUrl: process.env.REACT_APP_API_BASE_URL || 'https://your-domain.com/api',
+    serverUrl: process.env.REACT_APP_SERVER_URL || 'https://your-domain.com',
+    kakaoMapApiKey: process.env.REACT_APP_KAKAO_MAP_API_KEY || 'your-production-api-key'
   }
 };
 

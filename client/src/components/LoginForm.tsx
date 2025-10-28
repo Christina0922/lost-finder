@@ -60,6 +60,41 @@ const LoginForm: React.FC<Props> = ({ onLogin }) => {
       >
         {busy ? '로그인 중…' : '로그인'}
       </button>
+
+      <div style={{ textAlign: 'center', marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <button
+          type="button"
+          onClick={() => navigate('/forgot-password')}
+          style={{ 
+            background: 'none', 
+            border: 'none', 
+            color: '#6b7280', 
+            textDecoration: 'underline', 
+            cursor: 'pointer',
+            fontSize: 14
+          }}
+        >
+          비밀번호 찾기
+        </button>
+        
+        <div style={{ fontSize: 14, color: '#6b7280' }}>
+          계정이 없으신가요?{' '}
+          <button
+            type="button"
+            onClick={() => navigate('/signup')}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              color: '#3b82f6', 
+              textDecoration: 'underline', 
+              cursor: 'pointer',
+              fontSize: 14
+            }}
+          >
+            회원가입
+          </button>
+        </div>
+      </div>
     </form>
   );
 };
