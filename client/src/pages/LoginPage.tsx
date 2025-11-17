@@ -18,11 +18,37 @@ const LoginPage: React.FC<Props> = ({ currentUser, onLogout, onLogin }) => {
   }
 
   return (
-    <div style={{ paddingBottom: 92 }}>
+    <div style={{ paddingBottom: 92, minHeight: '100vh' }}>
       {/* ✅ 로그인 전이므로 TopBar에 isLoggedIn={false} → 로그아웃 버튼 숨김 */}
       <TopBar isLoggedIn={false} onLogout={onLogout} />
-      <div style={{ padding: '16px 16px 24px' }}>
-        <h2 style={{ textAlign: 'center' }}>로그인</h2>
+      <div style={{ 
+        padding: '40px 16px', 
+        maxWidth: 480, 
+        width: '100%',
+        minWidth: 0,
+        margin: '0 auto',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        boxSizing: 'border-box' // padding 포함한 너비 계산
+      }}>
+        <h2 style={{ 
+          textAlign: 'center', 
+          fontSize: 28,
+          fontWeight: 700,
+          marginBottom: 8,
+          color: '#111827'
+        }}>
+          로그인
+        </h2>
+        <p style={{
+          textAlign: 'center',
+          color: '#6b7280',
+          marginBottom: 32,
+          fontSize: 14
+        }}>
+          계정에 로그인하여 분실물을 관리하세요
+        </p>
         <LoginForm onLogin={onLogin} />
       </div>
     </div>

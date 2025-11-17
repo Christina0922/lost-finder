@@ -1,0 +1,7 @@
+# Git 속성 설정
+*.db filter=git-crypt diff=git-crypt
+*.sqlite filter=git-crypt diff=git-crypt
+*.sqlite3 filter=git-crypt diff=git-crypt
+*.env filter=git-crypt diff=git-crypt
+server/uploads/** filter=git-crypt diff=git-crypt
+

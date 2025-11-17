@@ -16,6 +16,20 @@
 *.jks
 token.txt
 
+# 데이터베이스 파일 (개인정보 포함)
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+server/users.db
+server/game.db
+server/lostfinder.sqlite3
+
+# 업로드된 파일 (개인정보 포함 가능)
+server/uploads/*
+!server/uploads/.gitkeep
+client/build/
+
 # 테스트 이메일 파일
 test-emails/
 

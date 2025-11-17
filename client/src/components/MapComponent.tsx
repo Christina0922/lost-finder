@@ -11,8 +11,9 @@ interface MapComponentProps {
   address?: string; // 주소 입력 지원
 }
 
-// 카카오맵 API 키
-const KAKAO_MAP_API_KEY = process.env.REACT_APP_KAKAO_MAP_API_KEY as string;
+// 카카오맵 API 키 - config에서 가져오거나 기본값 사용
+import config from '../config';
+const KAKAO_MAP_API_KEY = process.env.REACT_APP_KAKAO_MAP_API_KEY || config.kakaoMapApiKey || '';
 
 const MapComponent: React.FC<MapComponentProps> = ({
   center = { lat: 37.5665, lng: 126.9780 }, // 서울 시청 좌표

@@ -3,7 +3,7 @@ const config = {
   development: {
     apiBaseUrl: process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api',
     serverUrl: process.env.REACT_APP_SERVER_URL || 'http://localhost:5000',
-    kakaoMapApiKey: process.env.REACT_APP_KAKAO_MAP_API_KEY || 'e19a463823bdbefb87c2c66c3fb6ab59'
+    kakaoMapApiKey: process.env.REACT_APP_KAKAO_MAP_API_KEY || ''
   },
   production: {
     apiBaseUrl: process.env.REACT_APP_API_BASE_URL || 'https://your-domain.com/api',

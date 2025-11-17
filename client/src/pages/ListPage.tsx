@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import type { LostItem, User } from '../types';
-import { getAllLostItems, deleteLostItem } from '../utils/api';
+import { getAllLostItems, deleteLostItem, API_BASE } from '../utils/api';
 import LazyImage from '../components/LazyImage';
 import CoupangBanner from '../components/CoupangBanner';
 import TopBar from '../components/TopBar';
@@ -20,8 +20,14 @@ const ListPage: React.FC<Props> = ({ currentUser }) => {
   const location = useLocation();
 
   const fetchList = useCallback(async () => {
-    const data = await getAllLostItems();
-    setItems(Array.isArray(data) ? data : []);
+    try {
+      const data = await getAllLostItems();
+      setItems(Array.isArray(data) ? data : []);
+    } catch (error) {
+      // 에러가 발생해도 조용히 처리 (getAllLostItems가 이미 빈 배열 반환)
+      console.warn('목록 로드 중 오류:', error);
+      setItems([]);
+    }
   }, []);
 
   // 최초 로드 + refresh 쿼리 변경 시 재조회
@@ -100,9 +106,40 @@ const ListPage: React.FC<Props> = ({ currentUser }) => {
         <ul className="list">
           {filtered.map((it) => {
             const mine = isOwner(it);
+            
+            // 이미지 URL 처리: image_urls 배열의 첫 번째 이미지 사용
+            let imageUrl = '';
+            if (it.image_urls && it.image_urls.length > 0) {
+              imageUrl = it.image_urls[0];
+              // 상대 경로인 경우 전체 URL로 변환
+              if (imageUrl.startsWith('/uploads/')) {
+                imageUrl = `${API_BASE}${imageUrl}`;
+              }
+            } else if ((it as any).image_url) {
+              imageUrl = (it as any).image_url;
+              if (imageUrl.startsWith('/uploads/')) {
+                imageUrl = `${API_BASE}${imageUrl}`;
+              }
+            }
+            
             return (
               <li key={it.id} className="card">
-                <LazyImage src={(it as any).image_url || ''} alt={it.description || it.title || ''} />
+                {imageUrl ? (
+                  <LazyImage src={imageUrl} alt={it.description || it.title || it.item_type || '분실물'} />
+                ) : (
+                  <div style={{
+                    width: '100%',
+                    height: 150,
+                    backgroundColor: '#f3f4f6',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#9ca3af',
+                    fontSize: 14
+                  }}>
+                    이미지 없음
+                  </div>
+                )}
                 <div className="meta">
                   <strong>{it.title || it.description || it.item_type || '분실물'}</strong>
                   {it.location && <p>위치: {it.location}</p>}

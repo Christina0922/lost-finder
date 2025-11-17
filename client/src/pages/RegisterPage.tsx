@@ -49,24 +49,38 @@ const RegisterPage: React.FC<Props> = ({ currentUser, onLogout }) => {
     e.preventDefault();
     setErr(null);
     setBusy(true);
+    
+    // 필수 필드 검증
+    if (!itemType.trim() || !location.trim()) {
+      setErr('분실물 종류와 위치는 필수입니다.');
+      setBusy(false);
+      return;
+    }
+    
     try {
       const formData = new FormData();
-      formData.append('item_type', itemType);
-      formData.append('location', location);
-      formData.append('description', description);
+      formData.append('item_type', itemType.trim());
+      formData.append('location', location.trim());
+      formData.append('description', description.trim());
       
       // 파일 추가
       selectedFiles.forEach(file => {
         formData.append('images', file);
       });
 
-      await createLostItem(formData);
+      console.log('📤 분실물 등록 시도:', { itemType, location, description, fileCount: selectedFiles.length });
+      
+      const result = await createLostItem(formData);
+      
+      console.log('✅ 분실물 등록 성공:', result);
 
       // ✅ 등록 성공 시 목록으로 이동 + 새로고침 트리거 쿼리
       const ts = Date.now();
       navigate(`/list?refresh=${ts}`, { replace: true });
     } catch (e: any) {
-      setErr(e?.message || '등록에 실패했습니다.');
+      console.error('❌ 분실물 등록 실패:', e);
+      const errorMessage = e?.message || '등록에 실패했습니다. 서버가 실행 중인지 확인해주세요.';
+      setErr(errorMessage);
     } finally {
       setBusy(false);
     }

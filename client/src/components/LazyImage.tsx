@@ -44,7 +44,7 @@ const LazyImage = ({
   }, []);
 
   useEffect(() => {
-    if (isInView) {
+    if (isInView && src) {
       const img = new Image();
       img.onload = () => {
         setImageSrc(src);
@@ -52,12 +52,16 @@ const LazyImage = ({
         onLoad?.();
       };
       img.onerror = () => {
-        setImageSrc('https://via.placeholder.com/200x150?text=이미지+오류');
+        // 이미지 로드 실패 시 기본 플레이스홀더 표시
+        setImageSrc('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM5Y2EzYWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7lm77niYfliqDovb3lpLHotKU8L3RleHQ+PC9zdmc+');
         onError?.();
       };
       img.src = src;
+    } else if (!src) {
+      // src가 없으면 기본 플레이스홀더 유지
+      setImageSrc(placeholder);
     }
-  }, [isInView, src, onLoad, onError]);
+  }, [isInView, src, onLoad, onError, placeholder]);
 
   return (
     <img

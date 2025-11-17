@@ -7,6 +7,19 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import authRouter from './routes/auth.js';
 import dotenv from 'dotenv';
+import {
+  gameDb,
+  getUserProfile,
+  updateUserCoins,
+  addCoins,
+  useCoins,
+  getKoreanPuzzle,
+  getEnglishPuzzle,
+  saveProgress,
+  recordHintUsage,
+  purchaseAdRemoval,
+  purchaseCoins,
+} from './game-db.js';
 
 // 환경변수 로드
 dotenv.config();
@@ -47,9 +60,9 @@ let lostItems = [
 app.use(express.urlencoded({ extended: true })); // x-www-form-urlencoded
 app.use(express.json());                           // application/json
 
-/** CORS (프론트 localhost:5173과 쿠키 공유) */
+/** CORS (프론트 localhost:3000과 쿠키 공유) */
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: 'http://localhost:3000',
   credentials: true,
 }));
 app.use(cookieParser());
@@ -94,57 +107,102 @@ app.get('/api/health', (req, res) => res.json({ ok: true }));
  * - 실제 검증 로직은 기존대로 바꾸시면 됩니다(샘플은 단순 비교).
  */
 app.post('/api/login', async (req, res) => {
-  console.log('=== 로그인 요청 시작 ===');
-  console.log('요청 URL:', req.url);
-  console.log('요청 메서드:', req.method);
-  console.log('Content-Type:', req.headers['content-type']);
-  console.log('요청 본문 (raw):', req.body);
-  console.log('요청 본문 타입:', typeof req.body);
-  
-  const b = req.body || {};
-  const email = b.email ?? b.user_email ?? b.username;
-  const password = b.password ?? b.pw;
-  
-  console.log('파싱된 데이터:', { email, password });
-  console.log('email 존재 여부:', !!email);
-  console.log('password 존재 여부:', !!password);
+  // 모든 오류를 잡아서 처리
+  try {
+    console.log('=== 로그인 요청 시작 ===');
+    
+    const b = req.body || {};
+    const email = b.email ?? b.user_email ?? b.username;
+    const password = b.password ?? b.pw;
+    
+    console.log('파싱된 데이터:', { email: email ? email.substring(0, 20) + '...' : '(없음)', password: password ? '***' : '(없음)' });
 
-  if (!email || !password) {
-    console.log('❌ 이메일/비밀번호 누락');
-    console.log('=== 로그인 요청 실패 ===');
-    return res.status(400).json({ message: '이메일/비밀번호가 없습니다.' });
-  }
-
-  // 실제 데이터베이스에서 사용자 확인
-  const { db } = await import('./db.js');
-  
-  db.get(
-    `SELECT id, email, password, username FROM users WHERE email=?`,
-    [email],
-    (err, user) => {
-      if (err) {
-        console.log('❌ DB 오류:', err);
-        return res.status(500).json({ message: '서버 오류가 발생했습니다.' });
-      }
-      
-      if (!user) {
-        console.log('❌ 사용자를 찾을 수 없음:', email);
-        return res.status(401).json({ message: '이메일 또는 비밀번호가 올바르지 않습니다.' });
-      }
-      
-      if (user.password !== password) {
-        console.log('❌ 비밀번호 불일치:', { email, provided: password, stored: user.password });
-        return res.status(401).json({ message: '이메일 또는 비밀번호가 올바르지 않습니다.' });
-      }
-      
-      // 성공: 세션/토큰 등 원하는 방식으로 발급
-      const userData = { id: user.id, email: user.email, name: user.username };
-      res.cookie('token', 'dummy', { httpOnly: true, sameSite: 'lax' });
-      console.log('✅ 로그인 성공:', { email, userId: user.id });
-      console.log('=== 로그인 요청 완료 ===');
-      return res.json({ ok: true, user: userData });
+    if (!email || !password) {
+      console.log('❌ 이메일/비밀번호 누락');
+      return res.status(400).json({ message: '이메일/비밀번호가 없습니다.' });
     }
-  );
+
+    try {
+      // 실제 데이터베이스에서 사용자 확인
+      const { db } = await import('./db.js');
+      const { hashPassword } = await import('./utils/hash.js');
+      
+      const pwHash = hashPassword(password || '');
+      
+      // Promise로 래핑하여 에러 처리 개선
+      await new Promise((resolve, reject) => {
+        try {
+          // name 또는 username 컬럼 모두 지원 (실제로는 username만 있음)
+          db.get(
+            `SELECT id, email, username FROM users WHERE email=? AND password_hash=?`,
+            [email, pwHash],
+            (err, user) => {
+              try {
+                if (err) {
+                  console.error('❌ DB 오류:', err.message);
+                  // DB 오류는 비밀번호 오류로 처리하여 보안 유지
+                  if (!res.headersSent) {
+                    res.status(401).json({ message: '이메일 또는 비밀번호가 올바르지 않습니다.' });
+                  }
+                  resolve(null);
+                  return;
+                }
+                
+                if (!user) {
+                  console.log('❌ 사용자를 찾을 수 없음 또는 비밀번호 불일치');
+                  if (!res.headersSent) {
+                    res.status(401).json({ message: '이메일 또는 비밀번호가 올바르지 않습니다.' });
+                  }
+                  resolve(null);
+                  return;
+                }
+                
+                // 성공: 세션/토큰 등 원하는 방식으로 발급
+                // name 또는 username 중 사용 가능한 것 사용
+                const userName = user.name || user.username || user.email?.split('@')[0] || '사용자';
+                const userData = { 
+                  id: String(user.id), // User 타입이 id를 string으로 기대
+                  email: user.email, 
+                  name: userName,
+                  username: userName // 호환성을 위해 둘 다 설정
+                };
+                
+                if (!res.headersSent) {
+                  res.cookie('token', 'dummy', { httpOnly: true, sameSite: 'lax' });
+                  res.json({ ok: true, user: userData });
+                  console.log('✅ 로그인 성공:', { email: email.substring(0, 20) + '...', userId: user.id });
+                }
+                resolve(user);
+              } catch (innerErr) {
+                console.error('❌ 응답 처리 중 오류:', innerErr);
+                if (!res.headersSent) {
+                  res.status(401).json({ message: '이메일 또는 비밀번호가 올바르지 않습니다.' });
+                }
+                resolve(null);
+              }
+            }
+          );
+        } catch (queryErr) {
+          console.error('❌ 쿼리 실행 중 오류:', queryErr);
+          if (!res.headersSent) {
+            res.status(401).json({ message: '이메일 또는 비밀번호가 올바르지 않습니다.' });
+          }
+          resolve(null);
+        }
+      });
+    } catch (importError) {
+      console.error('❌ 모듈 import 오류:', importError);
+      if (!res.headersSent) {
+        return res.status(401).json({ message: '이메일 또는 비밀번호가 올바르지 않습니다.' });
+      }
+    }
+  } catch (outerError) {
+    // 최상위 에러 처리 - 모든 예외를 잡음
+    console.error('❌ 로그인 처리 중 예상치 못한 오류:', outerError);
+    if (!res.headersSent) {
+      return res.status(401).json({ message: '이메일 또는 비밀번호가 올바르지 않습니다.' });
+    }
+  }
 });
 
 /** 비밀번호 찾기 - 이메일로 임시 비밀번호 발송 */
@@ -378,11 +436,12 @@ app.delete('/lost/:id', async (req, res) => {
 });
 
 /** 댓글 등록 */
-app.post('/api/items/:id/comments', async (req, res) => {
+app.post('/lost/:id/comments', async (req, res) => {
   console.log('=== 댓글 등록 요청 ===');
   console.log('요청 본문:', req.body);
+  console.log('분실물 ID:', req.params.id);
   
-  const { id } = req.params;
+  const itemId = parseInt(req.params.id);
   const { text } = req.body;
   
   if (!text || !text.trim()) {
@@ -390,7 +449,13 @@ app.post('/api/items/:id/comments', async (req, res) => {
   }
   
   try {
-    // 실제로는 DB에 댓글 저장
+    // 분실물 찾기
+    const item = lostItems.find(item => item.id === itemId);
+    if (!item) {
+      return res.status(404).json({ message: '분실물을 찾을 수 없습니다.' });
+    }
+    
+    // 댓글 생성
     const comment = {
       id: Date.now(),
       text: text.trim(),
@@ -398,11 +463,15 @@ app.post('/api/items/:id/comments', async (req, res) => {
       created_at: new Date().toISOString()
     };
     
-    console.log(`✅ 댓글 등록 성공: ${text.trim()}`);
-    console.log('📢 분실물 주인에게 알림 전송 시뮬레이션');
+    // 분실물에 댓글 추가
+    if (!item.comments) {
+      item.comments = [];
+    }
+    item.comments.push(comment);
     
-    // 실제로는 분실물 주인에게 알림 발송
-    // await sendNotificationToOwner(itemId, comment);
+    console.log(`✅ 댓글 등록 성공: ${text.trim()}`);
+    console.log(`📊 분실물 ID ${itemId}의 댓글 개수: ${item.comments.length}개`);
+    console.log('📢 분실물 주인에게 알림 전송 시뮬레이션');
     
     return res.json({ 
       ok: true, 
@@ -412,6 +481,238 @@ app.post('/api/items/:id/comments', async (req, res) => {
   } catch (error) {
     console.error('댓글 등록 실패:', error);
     return res.status(500).json({ message: '댓글 등록 중 오류가 발생했습니다.' });
+  }
+});
+
+/** 댓글 등록 (기존 경로 호환성) */
+app.post('/api/items/:id/comments', async (req, res) => {
+  // 기존 경로로도 접근 가능하도록 동일한 로직 사용
+  const itemId = parseInt(req.params.id);
+  const { text } = req.body;
+  
+  if (!text || !text.trim()) {
+    return res.status(400).json({ message: '댓글 내용이 필요합니다.' });
+  }
+  
+  try {
+    const item = lostItems.find(item => item.id === itemId);
+    if (!item) {
+      return res.status(404).json({ message: '분실물을 찾을 수 없습니다.' });
+    }
+    
+    const comment = {
+      id: Date.now(),
+      text: text.trim(),
+      author_name: '익명',
+      created_at: new Date().toISOString()
+    };
+    
+    if (!item.comments) {
+      item.comments = [];
+    }
+    item.comments.push(comment);
+    
+    return res.json({ 
+      ok: true, 
+      message: '댓글이 등록되었습니다.',
+      comment: comment
+    });
+  } catch (error) {
+    console.error('댓글 등록 실패:', error);
+    return res.status(500).json({ message: '댓글 등록 중 오류가 발생했습니다.' });
+  }
+});
+
+// ==================== 게임 API ====================
+
+/** 사용자 프로필 조회 */
+app.get('/api/game/profile/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const profile = await getUserProfile(userId);
+    return res.json({ ok: true, profile });
+  } catch (error) {
+    console.error('프로필 조회 실패:', error);
+    return res.status(500).json({ ok: false, message: '프로필 조회 실패' });
+  }
+});
+
+/** 한글 맞춤법 퍼즐 가져오기 */
+app.get('/api/game/korean/:puzzleId?', async (req, res) => {
+  try {
+    const puzzleId = req.params.puzzleId ? parseInt(req.params.puzzleId) : null;
+    const puzzle = await getKoreanPuzzle(puzzleId);
+    if (!puzzle) {
+      return res.status(404).json({ ok: false, message: '퍼즐을 찾을 수 없습니다.' });
+    }
+    return res.json({ ok: true, puzzle });
+  } catch (error) {
+    console.error('한글 퍼즐 조회 실패:', error);
+    return res.status(500).json({ ok: false, message: '퍼즐 조회 실패' });
+  }
+});
+
+/** 영어 단어 순서 퍼즐 가져오기 */
+app.get('/api/game/english/:puzzleId?', async (req, res) => {
+  try {
+    const puzzleId = req.params.puzzleId ? parseInt(req.params.puzzleId) : null;
+    const puzzle = await getEnglishPuzzle(puzzleId);
+    if (!puzzle) {
+      return res.status(404).json({ ok: false, message: '퍼즐을 찾을 수 없습니다.' });
+    }
+    return res.json({ ok: true, puzzle });
+  } catch (error) {
+    console.error('영어 퍼즐 조회 실패:', error);
+    return res.status(500).json({ ok: false, message: '퍼즐 조회 실패' });
+  }
+});
+
+/** 정답 제출 및 점수 저장 */
+app.post('/api/game/submit', async (req, res) => {
+  try {
+    const { userId, puzzleType, puzzleId, answer, correct } = req.body;
+    
+    if (!userId || !puzzleType || !puzzleId || answer === undefined) {
+      return res.status(400).json({ ok: false, message: '필수 파라미터가 없습니다.' });
+    }
+    
+    const score = correct ? 100 : 0;
+    const result = await saveProgress(userId, puzzleType, puzzleId, correct, score);
+    
+    // 정답이면 코인 보상
+    if (correct) {
+      await addCoins(userId, 10);
+      const profile = await getUserProfile(userId);
+      return res.json({ 
+        ok: true, 
+        correct: true,
+        coinsEarned: 10,
+        profile
+      });
+    }
+    
+    return res.json({ ok: true, correct: false });
+  } catch (error) {
+    console.error('정답 제출 실패:', error);
+    return res.status(500).json({ ok: false, message: '정답 제출 실패' });
+  }
+});
+
+/** 힌트 사용 */
+app.post('/api/game/hint', async (req, res) => {
+  try {
+    const { userId, puzzleType, puzzleId, hintCost = 50 } = req.body;
+    
+    if (!userId || !puzzleType || !puzzleId) {
+      return res.status(400).json({ ok: false, message: '필수 파라미터가 없습니다.' });
+    }
+    
+    const profile = await useCoins(userId, hintCost);
+    await recordHintUsage(userId, puzzleType, puzzleId, hintCost);
+    
+    return res.json({ ok: true, profile });
+  } catch (error) {
+    console.error('힌트 사용 실패:', error);
+    return res.status(500).json({ ok: false, message: error.message || '힌트 사용 실패' });
+  }
+});
+
+/** 코인 구매 */
+app.post('/api/game/purchase/coins', async (req, res) => {
+  try {
+    const { userId, coinAmount, amount } = req.body;
+    
+    if (!userId || !coinAmount || !amount) {
+      return res.status(400).json({ ok: false, message: '필수 파라미터가 없습니다.' });
+    }
+    
+    const profile = await purchaseCoins(userId, coinAmount, amount);
+    return res.json({ ok: true, profile });
+  } catch (error) {
+    console.error('코인 구매 실패:', error);
+    return res.status(500).json({ ok: false, message: '코인 구매 실패' });
+  }
+});
+
+/** 광고 제거 구매 */
+app.post('/api/game/purchase/ad-removal', async (req, res) => {
+  try {
+    const { userId, amount = 5900 } = req.body;
+    
+    if (!userId) {
+      return res.status(400).json({ ok: false, message: '사용자 ID가 필요합니다.' });
+    }
+    
+    const profile = await purchaseAdRemoval(userId, amount);
+    return res.json({ ok: true, profile });
+  } catch (error) {
+    console.error('광고 제거 구매 실패:', error);
+    return res.status(500).json({ ok: false, message: '광고 제거 구매 실패' });
+  }
+});
+
+/** 주소를 좌표로 변환하는 API (카카오맵 프록시) */
+app.get('/api/geocode', async (req, res) => {
+  try {
+    const { address } = req.query;
+    
+    if (!address || !address.trim()) {
+      return res.status(400).json({ ok: false, message: '주소가 필요합니다.' });
+    }
+
+    const apiKey = process.env.KAKAO_MAP_API_KEY || '';
+    if (!apiKey) {
+      return res.status(500).json({ ok: false, message: '카카오맵 API 키가 설정되지 않았습니다.' });
+    }
+    
+    // 먼저 주소 검색 API 시도
+    try {
+      const addressResponse = await fetch(
+        `https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(address.trim())}`,
+        {
+          headers: {
+            'Authorization': `KakaoAK ${apiKey}`,
+          },
+        }
+      );
+
+      const addressData = await addressResponse.json();
+      
+      if (addressData.documents && addressData.documents.length > 0) {
+        const { x, y } = addressData.documents[0];
+        return res.json({ 
+          ok: true, 
+          coords: { lat: parseFloat(y), lng: parseFloat(x) } 
+        });
+      }
+    } catch (addressError) {
+      console.log('주소 검색 실패, 키워드 검색 시도:', addressError.message);
+    }
+
+    // 주소 검색 실패 시 키워드 검색 시도
+    const keywordResponse = await fetch(
+      `https://dapi.kakao.com/v2/local/search/keyword.json?query=${encodeURIComponent(address.trim())}`,
+      {
+        headers: {
+          'Authorization': `KakaoAK ${apiKey}`,
+        },
+      }
+    );
+
+    const keywordData = await keywordResponse.json();
+    
+    if (keywordData.documents && keywordData.documents.length > 0) {
+      const { x, y } = keywordData.documents[0];
+      return res.json({ 
+        ok: true, 
+        coords: { lat: parseFloat(y), lng: parseFloat(x) } 
+      });
+    }
+
+    return res.status(404).json({ ok: false, message: '주소를 찾을 수 없습니다.' });
+  } catch (error) {
+    console.error('좌표 변환 오류:', error);
+    return res.status(500).json({ ok: false, message: '좌표 변환 중 오류가 발생했습니다.' });
   }
 });
 
