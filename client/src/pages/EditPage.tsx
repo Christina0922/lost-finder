@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { EditMode, LostItem, Theme, User } from '../types';
-import { addLostItem, getLostItemById } from '../utils/api';
+import { addLostItem, getLostItemById, updateLostItem } from '../utils/api';
 
 interface EditPageProps {
   mode: EditMode;               // 'edit' | 'create'
@@ -56,10 +56,14 @@ const EditPage: React.FC<EditPageProps> = ({
         comments: [],
       };
 
-      // 전달된 핸들러 우선, 없으면 임시로 addLostItem 사용(서버 업데이트 API 도입 전)
-      const ok = (await onUpdateItem?.(updated)) ?? !!(await addLostItem(updated));
+      // 전달된 핸들러 우선, 없으면 updateLostItem 사용
+      const ok = (await onUpdateItem?.(updated)) ?? !!(await updateLostItem(String(id), {
+        item_type: itemType.trim(),
+        description: description.trim(),
+        location: location.trim()
+      }));
       showToastMessage?.(ok ? '수정되었습니다.' : '수정 실패');
-      if (ok) navigate(`/detail/${updated.id}`);
+      if (ok) navigate(`/detail/${id}`);
       return;
     }
 

@@ -17,21 +17,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
     
-    <!-- 카카오맵 API - API 키는 환경 변수로 설정 필요 -->
-    <!-- <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_API_KEY&autoload=false&libraries=services"></script> -->
-    <script>
-      // 카카오맵 API 로드 실패시 대체 처리
-      window.addEventListener('load', function() {
-        if (typeof window.kakao === 'undefined') {
-          console.log('카카오맵 API 로드 실패, 대체 지도 로드 시도');
-          // 대체 지도 API 로드
-          const script = document.createElement('script');
-          script.src = 'https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=YOUR_NAVER_CLIENT_ID';
-          document.head.appendChild(script);
-        }
-      });
-    </script>
-    
     <style>
       :root { 
         font-family: "Noto Sans KR", system-ui, -apple-system, Segoe UI, Roboto, "Apple SD Gothic Neo", "맑은 고딕", sans-serif; 

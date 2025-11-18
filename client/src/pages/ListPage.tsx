@@ -54,8 +54,17 @@ const ListPage: React.FC<Props> = ({ currentUser }) => {
       const ownerEmail =
         (it as any).owner_email ?? (it as any).author_email ?? (it as any).email;
 
-      return (uid != null && ownerId != null && String(uid) === String(ownerId)) ||
-             (uemail && ownerEmail && String(uemail).toLowerCase() === String(ownerEmail).toLowerCase());
+      // ID 비교 (문자열/숫자 모두 지원)
+      const idMatch = uid != null && ownerId != null && (
+        String(uid) === String(ownerId) || 
+        Number(uid) === Number(ownerId)
+      );
+      
+      // Email 비교
+      const emailMatch = uemail && ownerEmail && 
+        String(uemail).toLowerCase() === String(ownerEmail).toLowerCase();
+
+      return idMatch || emailMatch;
     },
     [currentUser]
   );

@@ -8,7 +8,7 @@ const config = {
   production: {
     apiBaseUrl: process.env.REACT_APP_API_BASE_URL || 'https://your-domain.com/api',
     serverUrl: process.env.REACT_APP_SERVER_URL || 'https://your-domain.com',
-    kakaoMapApiKey: process.env.REACT_APP_KAKAO_MAP_API_KEY || 'your-production-api-key'
+    kakaoMapApiKey: process.env.REACT_APP_KAKAO_MAP_API_KEY || ''
   }
 };
 

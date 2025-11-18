@@ -63,6 +63,19 @@ const RegisterPage: React.FC<Props> = ({ currentUser, onLogout }) => {
       formData.append('location', location.trim());
       formData.append('description', description.trim());
       
+      // 사용자 정보 추가
+      if (currentUser) {
+        if (currentUser.id) {
+          formData.append('author_id', String(currentUser.id));
+        }
+        if (currentUser.email) {
+          formData.append('author_email', currentUser.email);
+        }
+        if (currentUser.name || currentUser.username) {
+          formData.append('author_name', currentUser.name || currentUser.username || '');
+        }
+      }
+      
       // 파일 추가
       selectedFiles.forEach(file => {
         formData.append('images', file);

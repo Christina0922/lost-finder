@@ -31,30 +31,10 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // 분실물 데이터 저장소 (실제로는 DB 사용)
-let lostItems = [
-  {
-    id: 1,
-    title: '지갑', // 클라이언트 호환성을 위해 title 추가
-    item_type: '지갑',
-    description: '검은색 가죽 지갑',
-    location: '서울대학교 정문',
-    image_urls: ['http://localhost:5000/uploads/wallet-sample.jpg'],
-    author_id: 1,
-    created_at: new Date().toISOString(),
-    comments: []
-  },
-  {
-    id: 2,
-    title: '핸드폰', // 클라이언트 호환성을 위해 title 추가
-    item_type: '핸드폰',
-    description: '아이폰 14 프로',
-    location: '강남역 2번 출구',
-    image_urls: ['http://localhost:5000/uploads/phone-sample.jpg'],
-    author_id: 1,
-    created_at: new Date().toISOString(),
-    comments: []
-  }
-];
+let lostItems = [];
+
+// 성공 사례 데이터 저장소
+let successStories = [];
 
 /** ★★★ 핵심: 바디 파서 2종 반드시 활성화 ★★★ */
 app.use(express.urlencoded({ extended: true })); // x-www-form-urlencoded
@@ -320,7 +300,7 @@ app.post('/lost', upload.array('images', 5), async (req, res) => {
   console.log('요청 본문:', req.body);
   console.log('업로드된 파일:', req.files);
   
-  const { item_type, description, location } = req.body;
+  const { item_type, description, location, author_id, author_email, author_name } = req.body;
   
   if (!item_type || !location) {
     return res.status(400).json({ message: '분실물 종류와 위치는 필수입니다.' });
@@ -330,6 +310,13 @@ app.post('/lost', upload.array('images', 5), async (req, res) => {
     // 업로드된 이미지 URL 생성
     const image_urls = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
     
+    // 사용자 ID 처리 (문자열 또는 숫자 모두 지원)
+    let userId = author_id;
+    if (!userId) {
+      // author_id가 없으면 email을 기반으로 사용자 찾기 시도
+      userId = author_email || 'anonymous';
+    }
+    
     // 새로운 분실물 생성
     const newItem = {
       id: Date.now(),
@@ -338,7 +325,9 @@ app.post('/lost', upload.array('images', 5), async (req, res) => {
       description: description?.trim() || '',
       location: location.trim(),
       image_urls: image_urls,
-      author_id: 1, // 임시 사용자 ID
+      author_id: userId,
+      author_email: author_email || null,
+      author_name: author_name || null,
       created_at: new Date().toISOString(),
       comments: []
     };
@@ -401,6 +390,52 @@ app.get('/lost/:id', async (req, res) => {
   } catch (error) {
     console.error('분실물 상세 조회 실패:', error);
     return res.status(500).json({ message: '분실물 상세 조회 중 오류가 발생했습니다.' });
+  }
+});
+
+/** 분실물 수정 */
+app.put('/lost/:id', async (req, res) => {
+  console.log('=== 분실물 수정 요청 ===');
+  console.log('분실물 ID:', req.params.id);
+  console.log('수정 데이터:', req.body);
+  
+  try {
+    const itemId = parseInt(req.params.id);
+    const { item_type, description, location } = req.body;
+    
+    if (!item_type || !location) {
+      return res.status(400).json({ message: '분실물 종류와 위치는 필수입니다.' });
+    }
+    
+    const itemIndex = lostItems.findIndex(item => item.id === itemId);
+    
+    if (itemIndex === -1) {
+      console.log(`❌ 분실물을 찾을 수 없음: ID ${itemId}`);
+      return res.status(404).json({ message: '분실물을 찾을 수 없습니다.' });
+    }
+    
+    // 분실물 수정
+    const updatedItem = {
+      ...lostItems[itemIndex],
+      item_type: item_type.trim(),
+      title: item_type.trim(), // 클라이언트 호환성
+      description: description?.trim() || '',
+      location: location.trim(),
+      updated_at: new Date().toISOString()
+    };
+    
+    lostItems[itemIndex] = updatedItem;
+    
+    console.log(`✅ 분실물 수정 성공: ${item_type} - ${location}`);
+    
+    return res.json({ 
+      ok: true, 
+      message: '분실물이 성공적으로 수정되었습니다.',
+      item: updatedItem
+    });
+  } catch (error) {
+    console.error('분실물 수정 실패:', error);
+    return res.status(500).json({ message: '분실물 수정 중 오류가 발생했습니다.' });
   }
 });
 
@@ -660,12 +695,52 @@ app.get('/api/geocode', async (req, res) => {
       return res.status(400).json({ ok: false, message: '주소가 필요합니다.' });
     }
 
-    const apiKey = process.env.KAKAO_MAP_API_KEY || '';
+    const apiKey = process.env.KAKAO_MAP_API_KEY;
     if (!apiKey) {
-      return res.status(500).json({ ok: false, message: '카카오맵 API 키가 설정되지 않았습니다.' });
+      return res.status(500).json({ ok: false, message: '카카오맵 API 키가 설정되지 않았습니다. .env 파일에 KAKAO_MAP_API_KEY를 설정해주세요.' });
     }
     
-    // 먼저 주소 검색 API 시도
+    // 한글 주소 검색을 위해 키워드 검색을 먼저 시도 (장소명 검색에 유리)
+    try {
+      const keywordResponse = await fetch(
+        `https://dapi.kakao.com/v2/local/search/keyword.json?query=${encodeURIComponent(address.trim())}`,
+        {
+          headers: {
+            'Authorization': `KakaoAK ${apiKey}`,
+          },
+        }
+      );
+
+      const keywordData = await keywordResponse.json();
+      
+      if (keywordData.documents && keywordData.documents.length > 0) {
+        // 검색어와 정확히 일치하는 결과를 우선 찾기
+        const searchTerm = address.trim().toLowerCase();
+        let bestMatch = keywordData.documents[0];
+        
+        // 검색어가 장소명과 정확히 일치하는 결과 찾기
+        for (const doc of keywordData.documents) {
+          const placeName = (doc.place_name || '').toLowerCase();
+          if (placeName === searchTerm || placeName.includes(searchTerm)) {
+            bestMatch = doc;
+            break; // 정확히 일치하면 바로 사용
+          }
+        }
+        
+        const { x, y } = bestMatch;
+        console.log(`✅ 키워드 검색 성공: ${address} -> ${bestMatch.place_name} (${y}, ${x})`);
+        return res.json({ 
+          ok: true, 
+          coords: { lat: parseFloat(y), lng: parseFloat(x) },
+          place_name: bestMatch.place_name,
+          address_name: bestMatch.address_name
+        });
+      }
+    } catch (keywordError) {
+      console.log('키워드 검색 실패, 주소 검색 시도:', keywordError.message);
+    }
+
+    // 키워드 검색 실패 시 주소 검색 API 시도
     try {
       const addressResponse = await fetch(
         `https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(address.trim())}`,
@@ -679,40 +754,116 @@ app.get('/api/geocode', async (req, res) => {
       const addressData = await addressResponse.json();
       
       if (addressData.documents && addressData.documents.length > 0) {
+        // 카카오맵 API가 반환하는 첫 번째 결과 사용 (이미 관련성 순으로 정렬됨)
         const { x, y } = addressData.documents[0];
+        console.log(`✅ 주소 검색 성공: ${address} -> ${addressData.documents[0].address_name} (${y}, ${x})`);
         return res.json({ 
           ok: true, 
-          coords: { lat: parseFloat(y), lng: parseFloat(x) } 
+          coords: { lat: parseFloat(y), lng: parseFloat(x) },
+          address_name: addressData.documents[0].address_name,
+          road_address_name: addressData.documents[0].road_address_name
         });
       }
     } catch (addressError) {
-      console.log('주소 검색 실패, 키워드 검색 시도:', addressError.message);
-    }
-
-    // 주소 검색 실패 시 키워드 검색 시도
-    const keywordResponse = await fetch(
-      `https://dapi.kakao.com/v2/local/search/keyword.json?query=${encodeURIComponent(address.trim())}`,
-      {
-        headers: {
-          'Authorization': `KakaoAK ${apiKey}`,
-        },
-      }
-    );
-
-    const keywordData = await keywordResponse.json();
-    
-    if (keywordData.documents && keywordData.documents.length > 0) {
-      const { x, y } = keywordData.documents[0];
-      return res.json({ 
-        ok: true, 
-        coords: { lat: parseFloat(y), lng: parseFloat(x) } 
-      });
+      console.log('주소 검색 실패:', addressError.message);
     }
 
     return res.status(404).json({ ok: false, message: '주소를 찾을 수 없습니다.' });
   } catch (error) {
     console.error('좌표 변환 오류:', error);
     return res.status(500).json({ ok: false, message: '좌표 변환 중 오류가 발생했습니다.' });
+  }
+});
+
+/** 성공 사례 목록 조회 */
+app.get('/api/success-stories', async (req, res) => {
+  console.log('=== 성공 사례 목록 조회 요청 ===');
+  
+  try {
+    // 최신순으로 정렬
+    const sortedStories = [...successStories].sort((a, b) => 
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+    
+    console.log(`✅ 성공 사례 목록 조회 성공: ${sortedStories.length}개`);
+    
+    return res.json(sortedStories);
+  } catch (error) {
+    console.error('성공 사례 목록 조회 실패:', error);
+    return res.status(500).json({ message: '성공 사례 목록 조회 중 오류가 발생했습니다.' });
+  }
+});
+
+/** 성공 사례 삭제 */
+app.delete('/api/success-stories/:id', async (req, res) => {
+  console.log('=== 성공 사례 삭제 요청 ===');
+  console.log('성공 사례 ID:', req.params.id);
+  
+  try {
+    const storyId = parseInt(req.params.id);
+    const storyIndex = successStories.findIndex(story => story.id === storyId);
+    
+    if (storyIndex === -1) {
+      console.log(`❌ 성공 사례를 찾을 수 없음: ID ${storyId}`);
+      return res.status(404).json({ message: '성공 사례를 찾을 수 없습니다.' });
+    }
+    
+    // 성공 사례 삭제
+    const deletedStory = successStories.splice(storyIndex, 1)[0];
+    
+    console.log(`✅ 성공 사례 삭제 성공: ${deletedStory.title}`);
+    console.log(`📊 현재 총 성공 사례 개수: ${successStories.length}개`);
+    
+    return res.json({ 
+      ok: true, 
+      message: '성공 사례가 성공적으로 삭제되었습니다.',
+      deletedStory: deletedStory
+    });
+  } catch (error) {
+    console.error('성공 사례 삭제 실패:', error);
+    return res.status(500).json({ message: '성공 사례 삭제 중 오류가 발생했습니다.' });
+  }
+});
+
+/** 성공 사례 등록 */
+app.post('/api/success-stories', async (req, res) => {
+  console.log('=== 성공 사례 등록 요청 ===');
+  console.log('요청 본문:', req.body);
+  
+  const { title, content, category } = req.body;
+  
+  if (!title || !content) {
+    return res.status(400).json({ message: '제목과 내용은 필수입니다.' });
+  }
+  
+  try {
+    const authorName = req.body.author_name || '익명';
+    const authorId = req.body.author_id || 1; // 임시 사용자 ID
+    
+    const newStory = {
+      id: Date.now(),
+      title: title.trim(),
+      content: content.trim(),
+      category: category?.trim() || null,
+      author: authorName,
+      author_id: authorId,
+      date: new Date().toISOString().split('T')[0],
+      created_at: new Date().toISOString()
+    };
+    
+    successStories.push(newStory);
+    
+    console.log(`✅ 성공 사례 등록 성공: ${title}`);
+    console.log(`📊 현재 총 성공 사례 개수: ${successStories.length}개`);
+    
+    return res.json({ 
+      ok: true, 
+      message: '성공 사례가 성공적으로 등록되었습니다.',
+      story: newStory
+    });
+  } catch (error) {
+    console.error('성공 사례 등록 실패:', error);
+    return res.status(500).json({ message: '성공 사례 등록 중 오류가 발생했습니다.' });
   }
 });
 

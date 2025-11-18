@@ -1,9 +1,9 @@
 // C:\LostFinderProject\client\src\pages\DetailPage.tsx
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import KakaoMapComponent from '../components/KakaoMapComponent';
 import type { LostItem, Comment, User } from '../types';
-import { getLostItemById, addComment } from '../utils/api';
+import { getLostItemById, addComment, deleteLostItem } from '../utils/api';
 import { getCoords } from '../utils/geocode';
 import CoupangBanner from '../components/CoupangBanner'; // ✅ 추가
 
@@ -13,9 +13,11 @@ interface DetailPageProps {
 
 const DetailPage: React.FC<DetailPageProps> = ({ currentUser }) => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [item, setItem] = useState<LostItem | null>(null);
   const [text, setText] = useState('');
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -40,6 +42,44 @@ const DetailPage: React.FC<DetailPageProps> = ({ currentUser }) => {
       }
     })();
   }, [id]);
+
+  // 본인 소유 여부 판단
+  const isOwner = useCallback(() => {
+    if (!currentUser || !item) return false;
+    const uid = (currentUser as any).id ?? (currentUser as any).user_id ?? (currentUser as any).userId;
+    const uemail = (currentUser as any).email ?? (currentUser as any).username;
+
+    const ownerId = (item as any).user_id ?? (item as any).userId ?? (item as any).owner_id ?? (item as any).author_id;
+    const ownerEmail = (item as any).owner_email ?? (item as any).author_email ?? (item as any).email;
+
+    // ID 비교 (문자열/숫자 모두 지원)
+    const idMatch = uid != null && ownerId != null && (
+      String(uid) === String(ownerId) || 
+      Number(uid) === Number(ownerId)
+    );
+    
+    // Email 비교
+    const emailMatch = uemail && ownerEmail && 
+      String(uemail).toLowerCase() === String(ownerEmail).toLowerCase();
+
+    return idMatch || emailMatch;
+  }, [currentUser, item]);
+
+  const handleDelete = async () => {
+    if (!id || !window.confirm('정말 삭제하시겠어요? 삭제 후 되돌릴 수 없습니다.')) return;
+    
+    try {
+      setIsDeleting(true);
+      await deleteLostItem(id);
+      alert('삭제되었습니다.');
+      navigate('/list');
+    } catch (error: any) {
+      console.error('삭제 실패:', error);
+      alert(error?.message || '삭제 중 오류가 발생했습니다.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const handleAddComment = async () => {
     if (!id || !text.trim()) return;
@@ -69,7 +109,44 @@ const DetailPage: React.FC<DetailPageProps> = ({ currentUser }) => {
 
   return (
     <div style={{ padding: 16 }}>
-      <h2>{item.title || item.item_type || '분실물 상세'}</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+        <h2 style={{ margin: 0 }}>{item.title || item.item_type || '분실물 상세'}</h2>
+        
+        {/* 본인 글일 때만 수정/삭제 버튼 표시 */}
+        {isOwner() && (
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              onClick={() => navigate(`/edit/${id}`)}
+              style={{
+                padding: '8px 16px',
+                borderRadius: '8px',
+                border: '1px solid #d1d5db',
+                background: '#ffffff',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              수정
+            </button>
+            <button
+              onClick={handleDelete}
+              disabled={isDeleting}
+              style={{
+                padding: '8px 16px',
+                borderRadius: '8px',
+                border: '0',
+                background: '#ef4444',
+                color: '#fff',
+                cursor: isDeleting ? 'not-allowed' : 'pointer',
+                fontSize: '14px',
+                opacity: isDeleting ? 0.6 : 1
+              }}
+            >
+              {isDeleting ? '삭제 중...' : '삭제'}
+            </button>
+          </div>
+        )}
+      </div>
 
       <div className="item-info">
         <p><strong>분실물 종류:</strong> {item.item_type || ''}</p>

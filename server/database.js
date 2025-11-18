@@ -85,6 +85,26 @@ function initDatabase() {
       console.log('✅ comments 테이블 생성 완료');
     }
   });
+
+  const createSuccessStoriesTableSQL = `
+    CREATE TABLE IF NOT EXISTS success_stories (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      author_id INTEGER NOT NULL,
+      title TEXT NOT NULL,
+      content TEXT NOT NULL,
+      category TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (author_id) REFERENCES users (id)
+    )
+  `;
+
+  db.run(createSuccessStoriesTableSQL, (err) => {
+    if (err) {
+      console.error('❌ success_stories 테이블 생성 실패:', err.message);
+    } else {
+      console.log('✅ success_stories 테이블 생성 완료');
+    }
+  });
 }
 
 // 사용자 등록
@@ -487,6 +507,59 @@ function getCommentsByItemId(itemId) {
   });
 }
 
+// 성공 사례 등록
+function createSuccessStory(storyData) {
+  return new Promise((resolve, reject) => {
+    const { author_id, title, content, category } = storyData;
+    
+    const sql = `
+      INSERT INTO success_stories (author_id, title, content, category)
+      VALUES (?, ?, ?, ?)
+    `;
+    
+    db.run(sql, [author_id, title, content, category || null], function(err) {
+      if (err) {
+        reject(new Error('성공 사례 등록 중 오류가 발생했습니다.'));
+      } else {
+        resolve({
+          id: this.lastID,
+          author_id,
+          title,
+          content,
+          category: category || null
+        });
+      }
+    });
+  });
+}
+
+// 모든 성공 사례 조회 (작성자 정보 포함)
+function getAllSuccessStories() {
+  return new Promise((resolve, reject) => {
+    const sql = `
+      SELECT 
+        ss.id,
+        ss.title,
+        ss.content,
+        ss.category,
+        ss.created_at,
+        u.id as author_id,
+        u.username as author_name
+      FROM success_stories ss
+      JOIN users u ON ss.author_id = u.id
+      ORDER BY ss.created_at DESC
+    `;
+    
+    db.all(sql, [], (err, rows) => {
+      if (err) {
+        reject(new Error('성공 사례 목록 조회 중 오류가 발생했습니다.'));
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+}
+
 module.exports = {
   registerUser,
   findUserByPhone,
@@ -503,5 +576,7 @@ module.exports = {
   getLostItemById,
   createComment,
   deleteComment,
-  getCommentsByItemId
+  getCommentsByItemId,
+  createSuccessStory,
+  getAllSuccessStories
 }; 
