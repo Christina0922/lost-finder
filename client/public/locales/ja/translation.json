@@ -1,0 +1,191 @@
+{
+  "app": {
+    "title": "Lost Finder",
+    "subtitle": "遺失物探しサービス"
+  },
+  "common": {
+    "login": "ログイン",
+    "signup": "新規登録",
+    "logout": "ログアウト",
+    "register": "登録",
+    "list": "一覧を見る",
+    "cancel": "キャンセル",
+    "submit": "送信",
+    "delete": "削除",
+    "edit": "編集",
+    "save": "保存",
+    "close": "閉じる",
+    "back": "戻る",
+    "loading": "読み込み中...",
+    "error": "エラー",
+    "success": "成功",
+    "confirm": "確認"
+  },
+  "header": {
+    "greeting": "こんにちは、{{username}}さん！",
+    "settings": "設定",
+    "theme": "テーマ",
+    "themeLight": "ライト",
+    "themeDark": "ダーク",
+    "notifications": "通知",
+    "notificationSilent": "サイレント",
+    "notificationVibrate": "バイブレーション",
+    "notificationMelody": "メロディー",
+    "notificationDescription": "※ この設定はLostFinderアプリ内の通知にのみ適用されます。デバイス全体の音声設定は変更されません。",
+    "changePassword": "パスワード変更",
+    "themeChanged": "{{theme}}テーマに変更されました。",
+    "notificationModeChanged": "通知モードが{{mode}}に設定されました。"
+  },
+  "mainPage": {
+    "title": "遺失物探しサービス",
+    "description": "今すぐ登録して探しましょう！",
+    "registerButton": "登録",
+    "listButton": "一覧を見る"
+  },
+  "listPage": {
+    "title": "遺失物一覧",
+    "totalItems": "合計{{count}}件",
+    "pageInfo": "{{current}}ページ / {{total}}ページ",
+    "loading": "遺失物一覧を読み込み中...",
+    "error": "遺失物一覧の読み込みに失敗しました。",
+    "retry": "再試行",
+    "empty": "登録された遺失物がありません。",
+    "registerFirst": "最初の遺失物を登録する",
+    "myItem": "⭐️ 私の登録",
+    "location": "紛失場所",
+    "viewDetail": "詳細とコメントを見る",
+    "loadMore": "もっと見る ({{current}} / {{total}})",
+    "backToTop": "最初に戻る",
+    "allItemsLoaded": "すべてのアイテムを読み込みました（合計{{count}}件）"
+  },
+  "detailPage": {
+    "title": "遺失物詳細",
+    "description": "説明",
+    "location": "場所",
+    "registeredDate": "登録日",
+    "noDate": "日付なし",
+    "comments": "コメント ({{count}}件)",
+    "noComments": "まだコメントがありません。最初のコメントを残してください！",
+    "commentPlaceholder": "情報を残してください... (最低2文字)",
+    "commentSubmit": "コメント投稿",
+    "loginRequired": "コメントを投稿するにはログインが必要です。",
+    "loginButton": "ログイン",
+    "editItem": "投稿を編集",
+    "deleteItem": "投稿を削除",
+    "deleteConfirm": "この投稿を本当に削除しますか？",
+    "deleteCommentConfirm": "このコメントを本当に削除しますか？",
+    "authorBadge": "(投稿者)",
+    "backToList": "一覧に戻る",
+    "notFound": "遺失物が見つかりません。",
+    "noImage": "画像がありません",
+    "commentSuccess": "コメントが正常に投稿されました！",
+    "commentError": "コメントの投稿に失敗しました。",
+    "itemDeleteSuccess": "投稿が正常に削除されました。",
+    "itemDeleteError": "投稿の削除に失敗しました。",
+    "commentDeleteSuccess": "コメントが正常に削除されました。",
+    "commentDeleteError": "コメントの削除に失敗しました。",
+    "commentValidationEmpty": "コメント内容を入力してください。",
+    "commentValidationMin": "コメントは最低2文字以上入力してください。",
+    "commentValidationMax": "コメントは最大500文字まで入力可能です。",
+    "itemNotFound": "遺失物情報が見つかりません。"
+  },
+  "registerPage": {
+    "title": "遺失物を登録",
+    "itemType": "種類",
+    "itemTypePlaceholder": "遺失物の種類を選択してください",
+    "description": "詳細説明",
+    "descriptionPlaceholder": "色、モデル名、特徴などを詳しく記入してください。",
+    "location": "紛失場所",
+    "locationPlaceholder": "例：OO公園正門",
+    "photos": "写真をアップロード（複数可）",
+    "uploading": "画像を最適化中...",
+    "uploadWait": "アップロード待機中...",
+    "registerButton": "登録",
+    "cancelToList": "キャンセルして一覧へ",
+    "loginRequired": "ログインが必要です。",
+    "registered": "登録されました！"
+  },
+  "editPage": {
+    "titleNew": "遺失物を登録",
+    "titleEdit": "遺失物情報を編集",
+    "itemType": "遺失物の種類 *",
+    "itemTypePlaceholder": "遺失物の種類を選択してください",
+    "description": "詳細説明 *",
+    "descriptionPlaceholder": "遺失物の詳細な説明を入力してください...",
+    "location": "紛失場所 *",
+    "locationPlaceholder": "例：東京都渋谷区",
+    "photos": "写真をアップロード",
+    "uploading": "アップロード待機中...",
+    "submitNew": "登録完了",
+    "submitEdit": "編集完了",
+    "cancelToList": "キャンセルして一覧へ",
+    "itemTypeRequired": "遺失物の種類を選択してください。",
+    "registerSuccess": "遺失物が正常に登録されました！",
+    "updateSuccess": "遺失物情報が正常に更新されました！",
+    "loadingError": "遺失物情報の読み込みに失敗しました。"
+  },
+  "loginPage": {
+    "title": "🔐 ログイン",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "loginButton": "ログイン",
+    "loggingIn": "ログイン中...",
+    "noAccount": "アカウントをお持ちでないですか？",
+    "signupLink": "📝 新規登録",
+    "loginError": "ログインに失敗しました。メールアドレスとパスワードを確認してください。"
+  },
+  "signupPage": {
+    "title": "📝 新規登録",
+    "username": "ユーザー名",
+    "email": "メールアドレス",
+    "phone": "電話番号",
+    "password": "パスワード",
+    "confirmPassword": "パスワード確認",
+    "signupButton": "新規登録",
+    "signingUp": "登録中...",
+    "success": "🎉 新規登録が完了しました！",
+    "error": "新規登録に失敗しました。もう一度お試しください。"
+  },
+  "monetization": {
+    "title": "紛失防止のためのおすすめアイテム",
+    "preventFutureLoss": "Prevent Future Loss",
+    "viewOnAmazon": "Amazonで見る",
+    "products": {
+      "airtag": {
+        "name": "Apple AirTag",
+        "description": "リアルタイム位置追跡で紛失物を簡単に見つけられます。"
+      },
+      "tile": {
+        "name": "Tile Tracker",
+        "description": "Bluetoothベースのスマートトラッカーで持ち物を見つけましょう。"
+      },
+      "backpack": {
+        "name": "Anti-theft Backpack",
+        "description": "防犯機能付きの安全なバックパックです。"
+      }
+    }
+  },
+  "offline": {
+    "title": "インターネット接続が必要です",
+    "message": "Wi-Fiまたはモバイルデータをオンにしてください。",
+    "noConnection": "現在インターネットに接続されていません。"
+  },
+  "error": {
+    "occurred": "エラーが発生しました",
+    "refresh": "ページを更新してください。",
+    "serverError": "サーバーへの接続が不安定です。しばらくしてからもう一度お試しください。",
+    "notFound": "要求された情報が見つかりません。",
+    "networkError": "ネットワーク接続を確認してください。"
+  },
+  "itemTypes": {
+    "kickboard": "キックボード",
+    "bicycle": "自転車",
+    "package": "荷物",
+    "other": "その他"
+  },
+  "location": {
+    "nearby": "{{area}}付近",
+    "radius": "地図上半径{{meters}}m以内"
+  }
+}
+

@@ -1,0 +1,1148 @@
+body {
+  margin: 0;
+  padding: 0 0 20px 0;
+  font-family: 'Segoe UI', 'Pretendard', 'Apple SD Gothic Neo', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, #ffeef8 0%, #f0f8ff 50%, #fff5f5 100%);
+  color: #4a4a4a;
+  min-height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+}
+
+body.theme-dark {
+  background-color: #181a1b;
+  color: #f5f6fa;
+}
+
+.App {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  width: 100vw;
+}
+
+h1, h2, h3 {
+  color: #2c3e50;
+}
+
+h2 {
+  color: #FFC107 !important;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.10), 0 1px 0 #fff;
+}
+
+button, .submit-button {
+  background: linear-gradient(45deg, #ff6b9d, #e91e63);
+  color: #fff !important;
+  border: none;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 12px 28px;
+  margin: 0 8px 0 0;
+  box-shadow: 0 4px 15px rgba(233, 30, 99, 0.3);
+  transition: all 0.3s ease;
+}
+button:last-child, .submit-button:last-child {
+  margin-right: 0;
+}
+button:hover, .submit-button:hover {
+  background: linear-gradient(45deg, #e91e63, #ff6b9d);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(233, 30, 99, 0.4);
+}
+
+a, .nav-link {
+  color: #e91e63;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+a:hover, .nav-link:hover {
+  color: #ff6b9d;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* General App Styles */
+.app-main {
+  padding: 10px;
+  min-height: calc(100vh - 80px);
+  width: 100%;
+}
+
+/* Header Styles */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 15px;
+  background-color: #232b43;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid #e0e0e0;
+  height: 48px;
+  gap: 8px;
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.header-right {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 10;
+  padding-right: 8px;
+}
+
+.refresh-button {
+  font-size: 26px;
+}
+
+.logo {
+  font-size: 32px;
+  font-weight: 900;
+  color: #ffe082;
+  text-shadow: 1px 2px 8px #222, 0 1px 0 #fff;
+  letter-spacing: 1px;
+  text-decoration: none;
+}
+
+.nav-link {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  text-decoration: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-size: 16px;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  border: 2px solid rgba(255,255,255,0.1);
+  letter-spacing: 0.5px;
+}
+
+.nav-link:hover {
+  background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.nav-link:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.guest-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.guest-nav a:last-child {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: #ffffff !important;
+  margin-left: 10px;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  border: 2px solid rgba(255,255,255,0.1);
+}
+
+.guest-nav a:last-child:hover {
+  background: linear-gradient(135deg, #20c997 0%, #17a2b8 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* User Navigation Styles */
+.user-nav {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  position: relative;
+  z-index: 10;
+}
+
+.user-nav .header-welcome {
+  white-space: nowrap;
+  color: #ffffff !important;
+  font-weight: 600;
+  background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.notification-container {
+  position: relative;
+}
+
+.notification-bell {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  position: relative;
+  padding: 0;
+}
+
+.notification-count {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(40%, -40%);
+  background-color: #e74c3c;
+  color: white;
+  border-radius: 50%;
+  padding: 2px;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+  min-width: 18px;
+  height: 18px;
+  text-align: center;
+  border: 2px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-dropdown {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  width: 300px;
+  z-index: 1000;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notification-dropdown ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.notification-dropdown li {
+  padding: 12px 15px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.notification-dropdown li:hover {
+  background-color: #f8f8f8;
+}
+
+.notification-dropdown li:last-child {
+  border-bottom: none;
+}
+
+.no-notifications {
+  padding: 20px;
+  text-align: center;
+  color: #888;
+}
+
+.welcome-message {
+  font-size: 14px;
+  color: #555;
+}
+
+.logout-button {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: #ffffff !important;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.3s ease;
+}
+
+.logout-button:hover {
+  background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+/* 서버 상태 표시 스타일 */
+.server-status {
+  margin-left: 16px;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.status-connected {
+  background-color: #d4edda;
+  color: #155724;
+  border-color: #c3e6cb;
+}
+.status-disconnected {
+  background-color: #f8d7da;
+  color: #721c24;
+  border-color: #f5c6cb;
+}
+.status-checking {
+  background-color: #fff3cd;
+  color: #856404;
+  border-color: #ffeaa7;
+}
+
+/* --- 반응형 스타일 --- */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 0 8px;
+    gap: 4px;
+    height: 70px;
+  }
+  
+  .app-main {
+    padding: 5px;
+    min-height: calc(100vh - 70px);
+  }
+
+  .header-left {
+    gap: 4px;
+  }
+
+  .refresh-button {
+    font-size: 20px;
+  }
+
+  .logo {
+    font-size: 18px;
+  }
+  
+  /* 작은 화면에서는 환영 메시지 숨기기 */
+  .user-nav .header-welcome {
+    display: none;
+  }
+
+  /* 작은 화면에서는 서버 상태 텍스트 숨기기 (아이콘만 표시) */
+  .server-status-text {
+    display: none;
+  }
+
+  .guest-nav {
+    gap: 4px;
+  }
+
+  .nav-link {
+    padding: 6px 8px;
+    font-size: 14px;
+  }
+
+  .server-status {
+    margin-left: 4px;
+  }
+
+  .user-nav {
+    gap: 4px;
+  }
+
+  .logout-button {
+    padding: 6px 8px;
+    font-size: 14px;
+  }
+}
+
+.theme-dark .app-header {
+  background-color: #23272a;
+  color: #f5f6fa;
+  border-bottom: 1px solid #333;
+}
+
+.theme-dark .logo {
+  color: #fff;
+}
+
+.theme-dark .nav-link {
+  color: #fff !important;
+  background-color: #007bff;
+}
+
+.theme-dark .nav-link:hover {
+  background-color: #0056b3;
+  color: #fff !important;
+}
+
+.theme-dark .user-nav .header-welcome {
+  color: #fff;
+  background-color: #444;
+}
+
+.theme-dark .notification-dropdown,
+.theme-dark .settings-dropdown {
+  background-color: #23272a;
+  color: #f5f6fa;
+  border: 1px solid #333;
+}
+
+.theme-dark .notification-dropdown li,
+.theme-dark .settings-dropdown label,
+.theme-dark .settings-dropdown span,
+.theme-dark .settings-dropdown div {
+  color: #f5f6fa;
+}
+
+.theme-dark .notification-dropdown li:hover {
+  background-color: #333;
+}
+
+.theme-dark .settings-gear {
+  color: #f5f6fa;
+}
+
+.theme-dark .logout-button {
+  background-color: #444;
+  color: #fff;
+}
+
+.theme-dark .logout-button:hover {
+  background-color: #666;
+}
+
+.theme-dark .settings-dropdown button {
+  background-color: #2980b9;
+  color: #fff;
+  border: none;
+}
+
+.theme-dark .settings-dropdown button[style*='font-weight: bold'] {
+  background-color: #3498db;
+  color: #fff;
+}
+
+.theme-dark .alert-modes label,
+.theme-dark .alert-modes label * {
+  color: #fff !important;
+  opacity: 1 !important;
+  filter: none !important;
+  background: none !important;
+}
+
+.settings-container {
+  display: flex;
+  align-items: center;
+}
+
+.settings-dropdown .alert-modes {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.theme-dark .settings-dropdown,
+.theme-dark .settings-dropdown * {
+  color: #fff !important;
+}
+
+.settings-dropdown {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 320px;
+  max-width: 360px;
+  background: #fff;
+  color: #222;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 1.5px 6px rgba(0,0,0,0.10);
+  padding: 8px 16px 6px 16px;
+  position: absolute;
+  right: 0;
+  top: 40px;
+  z-index: 2000;
+  background: rgba(255,255,255,0.98);
+}
+
+.settings-dropdown .settings-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  padding: 0;
+  justify-content: space-between;
+}
+
+.settings-dropdown .settings-row label,
+.settings-dropdown .settings-row span {
+  min-width: 40px;
+  font-size: 14px;
+  white-space: nowrap;
+  color: inherit;
+}
+
+.settings-dropdown .settings-row .alert-modes {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  min-width: 120px;
+}
+
+.settings-dropdown .settings-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: bold;
+  color: #007bff;
+  text-decoration: none;
+  font-size: 14px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.theme-dark .settings-dropdown .settings-link {
+  color: #4da3ff;
+}
+
+.theme-dark .settings-dropdown .settings-link:hover {
+  background-color: rgba(77, 163, 255, 0.2);
+  color: #66b3ff;
+}
+
+.settings-dropdown .settings-link:hover {
+  background-color: rgba(0, 123, 255, 0.1);
+  color: #0056b3;
+  text-decoration: none;
+}
+
+.app-header, .form-container-wrapper, .form-container, .card, .main-content {
+  background: #232b43;
+  color: #f5f6fa;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+}
+
+input, textarea, select {
+  background: #232b43;
+  color: #f5f6fa;
+  border: 1.5px solid #00c6ad;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #ffb400;
+  background: #1a2236;
+}
+
+.notification-bell, .settings-gear {
+  color: #00c6ad;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #232b43;
+}
+
+/* 알림 라디오 버튼 한 줄 배치 및 정렬 개선 */
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 0;
+}
+.settings-icon {
+  font-size: 20px;
+  margin-right: 2px;
+}
+.settings-label {
+  font-size: 14px;
+  font-weight: 500;
+  min-width: 35px;
+  margin-right: 0;
+  white-space: nowrap;
+}
+.alert-modes {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: center;
+  margin-left: 0;
+}
+.alert-modes label {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+.settings-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+@media (max-width: 600px) {
+  .settings-row {
+    flex-direction: row;
+    gap: 8px;
+    min-height: 36px;
+  }
+  .settings-label {
+    font-size: 14px;
+    min-width: 36px;
+  }
+  .alert-modes {
+    gap: 10px;
+  }
+  .alert-modes label {
+    font-size: 14px;
+    gap: 3px;
+  }
+  .settings-dropdown input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 2px;
+  }
+}
+
+/* 드롭다운 바깥 클릭 시 닫힘을 위한 힌트 클래스 (JS에서 활용 가능) */
+.settings-dropdown.mobile {
+  touch-action: manipulation;
+}
+
+/* 드롭다운 닫기 버튼 */
+.settings-close-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: #e74c3c;
+  border: 2px solid #fff;
+  font-size: 11px;
+  color: #fff;
+  z-index: 10;
+  width: auto;
+  min-width: 40px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+  padding: 0 6px;
+}
+.settings-close-btn:hover {
+  background: #c0392b;
+  color: white;
+  border-color: #c0392b;
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+}
+.theme-dark .settings-close-btn {
+  background: #e74c3c;
+  color: #fff;
+  border-color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+}
+
+.theme-dark .settings-close-btn:hover {
+  background: #c0392b;
+  color: white;
+  border-color: #c0392b;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.7);
+}
+
+/* 입력창/버튼 터치 영역 확대 */
+input, button, .submit-button {
+  min-height: 40px;
+  font-size: 15px;
+}
+
+/* 폰트 일관성 */
+.settings-label, .settings-link, .settings-dropdown label, .settings-dropdown button {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* 다크모드 대비 강화 */
+.theme-dark input, .theme-dark textarea, .theme-dark select {
+  background: #232b43;
+  color: #fff;
+  border: 1px solid #444;
+}
+.theme-dark .form-container, .theme-dark .login-form, .theme-dark .auth-form {
+  background: #232b43;
+  color: #fff;
+}
+.theme-dark .submit-button {
+  background: #00b894;
+  color: #fff;
+}
+.theme-dark .submit-button:hover {
+  background: #00c6ad;
+}
+
+/* 다크 모드 텍스트 가독성 개선 */
+.theme-dark {
+  background-color: #181a1b;
+  color: #f5f6fa;
+}
+
+.theme-dark h1, .theme-dark h2, .theme-dark h3 {
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+.theme-dark .form-container-wrapper h1 {
+  color: #ffe082;
+  text-shadow: 1px 2px 8px #222, 0 1px 0 #fff;
+}
+
+.theme-dark input, .theme-dark textarea, .theme-dark select {
+  background: #2c3e50;
+  color: #fff;
+  border: 1px solid #34495e;
+}
+
+.theme-dark input:focus, .theme-dark textarea:focus, .theme-dark select:focus {
+  background: #34495e;
+  border-color: #3498db;
+  color: #fff;
+}
+
+/* 설정 메뉴 애니메이션 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* 테마 전환 애니메이션 */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 설정창 특별 애니메이션 */
+.settings-modal {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 12px 16px 24px 16px !important; /* 위, 오른쪽/왼쪽, 아래 여백 */
+  border-radius: 16px !important;
+  background-color: white !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+  width: 240px !important;
+  max-height: 85vh !important; /* 최대 높이 제한 */
+  overflow-y: auto !important; /* 스크롤 활성화 */
+  overflow-x: hidden !important;
+}
+
+.settings-modal * {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 버튼 호버 효과 */
+.settings-button {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.settings-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 반응형 폰트 크기 */
+@media (max-width: 480px) {
+  .settings-text {
+    font-size: clamp(12px, 3vw, 14px) !important;
+  }
+  
+  .settings-button-text {
+    font-size: clamp(11px, 3vw, 13px) !important;
+  }
+}
+
+/* 내부 요소 간 여백 조정 */
+.settings-section {
+  margin-bottom: 16px !important; /* 테마, 알림 섹션 간 간격 */
+}
+
+.settings-section:last-of-type {
+  margin-bottom: 24px !important; /* 마지막 알림 설정 이후 여백 */
+}
+
+.settings-button {
+  margin-top: 12px !important;
+  margin-bottom: 12px !important;
+}
+
+/* 로그아웃 버튼 여백 확보 */
+.logout-button {
+  margin-top: 12px !important;
+  margin-bottom: 8px !important; /* 하단 여백 줄임 */
+}
+
+/* 다크모드 설정창 스타일 */
+.theme-dark .settings-modal {
+  background-color: #111827 !important;
+  color: #f9fafb !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+}
+
+/* 닫기 버튼 클릭 영역 확대 */
+.settings-close-button {
+  padding: 12px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  border-radius: 9999px !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.settings-close-button:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* 알림 설명 텍스트 박스 스타일 */
+.alert-description {
+  background-color: #f5f5f5 !important;
+  color: #666 !important;
+  font-size: 12px !important;
+  line-height: 1.5 !important;
+  padding: 8px 12px !important;
+  border-radius: 10px !important;
+  margin-top: 8px !important;
+  margin-bottom: 16px !important; /* 여백 줄임 */
+}
+
+/* 하단 버튼(비밀번호 변경, 로그아웃) 간격 조정 */
+.settings-footer {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important; /* 버튼 간 간격 */
+  margin-bottom: 16px !important; /* 하단 여백 줄임 */
+  padding-bottom: 8px !important; /* 추가 하단 패딩 */
+}
+
+/* 각 버튼 스타일 보완 */
+.settings-footer button {
+  height: 44px !important;
+  border-radius: 12px !important;
+  font-weight: bold !important;
+}
+
+/* 다크모드 알림 설명 텍스트 박스 */
+.theme-dark .alert-description {
+  background-color: #374151 !important;
+  color: #d1d5db !important;
+}
+
+/* 다크모드 닫기 버튼 호버 */
+.theme-dark .settings-close-button:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 모바일 설정창 최적화 */
+@media (max-width: 360px) {
+  .settings-modal {
+    width: 95vw !important;
+    min-width: 280px !important;
+    padding: 16px 12px 20px 12px !important;
+    max-height: 80vh !important; /* 모바일에서는 더 작게 */
+  }
+  
+  .settings-modal button {
+    font-size: clamp(11px, 2.5vw, 13px) !important;
+    padding: 10px 8px !important;
+  }
+  
+  .settings-modal p {
+    font-size: clamp(13px, 3vw, 15px) !important;
+  }
+  
+  .settings-footer {
+    margin-bottom: 12px !important; /* 모바일에서 더 줄임 */
+    padding-bottom: 4px !important;
+  }
+}
+
+/* 설정 메뉴 다크 모드 스타일 */
+.theme-dark .settings-menu {
+  background: #2c3e50;
+  color: #fff;
+  border: 1px solid #34495e;
+}
+
+.theme-dark .settings-menu button {
+  background: #34495e;
+  color: #fff;
+  border: 1px solid #4a5568;
+}
+
+.theme-dark .settings-menu button:hover {
+  background: #4a5568;
+}
+
+.theme-dark .settings-menu button.active {
+  background: #3498db;
+  color: #fff;
+  border-color: #3498db;
+}
+
+.theme-dark .settings-menu label {
+  color: #fff;
+}
+
+.theme-dark .settings-menu input[type="radio"] {
+  accent-color: #3498db;
+}
+
+.theme-dark .settings-menu a {
+  color: #3498db;
+}
+
+.theme-dark .settings-menu a:hover {
+  color: #5dade2;
+}
+
+/* 설정 메뉴 헤더 다크 모드 */
+.theme-dark .settings-header {
+  background: #34495e !important;
+  color: #fff !important;
+  border-bottom-color: #4a5568 !important;
+}
+
+.theme-dark .settings-header h3 {
+  color: #fff !important;
+}
+
+/* 설정 메뉴 내용 다크 모드 */
+.theme-dark .settings-content {
+  background: #2c3e50 !important;
+  color: #fff !important;
+}
+
+.theme-dark .settings-content span {
+  color: #fff !important;
+}
+
+/* 기존 설정 스타일 제거 - Tailwind로 대체됨 */
+
+/* 로그인 타이틀 더 선명하게 */
+.form-container-wrapper h1 {
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: #ffe082;
+  text-shadow: 1px 2px 8px #222, 0 1px 0 #fff;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+/* 로그인 폼 입력란 폭 통일 및 가운데 정렬 */
+.login-form {
+  max-width: 340px;
+  margin: 0 auto;
+}
+.login-form .form-group input[type="text"],
+.login-form .form-group input[type="password"] {
+  width: 100%;
+  max-width: 340px;
+  min-width: 120px;
+  margin: 0 auto;
+  display: block;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .logo {
+    font-size: 22px;
+  }
+  
+  .app-header {
+    height: 36px;
+    padding: 0 5px;
+  }
+  
+  .app-main {
+    padding: 3px;
+    min-height: calc(100vh - 36px);
+  }
+  
+  .nav-link {
+    padding: 4px 6px;
+    font-size: 12px;
+  }
+  
+  .form-container-wrapper h1 {
+    font-size: 1.4rem;
+  }
+  .login-form {
+    max-width: 98vw;
+  }
+  .login-form .form-group input[type="text"],
+  .login-form .form-group input[type="password"] {
+    max-width: 98vw;
+    min-width: 0;
+  }
+}
+
+/* 모바일 전체 화면 최적화 */
+@media (max-width: 480px) {
+  .app-header {
+    height: 32px;
+    padding: 0 3px;
+  }
+  
+  .app-main {
+    padding: 2px;
+    min-height: calc(100vh - 32px);
+  }
+  
+  .logo {
+    font-size: 18px;
+  }
+  
+  .nav-link {
+    padding: 3px 5px;
+    font-size: 11px;
+  }
+  
+  .refresh-button {
+    font-size: 18px;
+  }
+}
+
+/* iOS Safari 전체 화면 지원 */
+@supports (-webkit-touch-callout: none) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  .app-header {
+    padding-top: calc(env(safe-area-inset-top) + 10px);
+  }
+}
+
+/* 안드로이드 Chrome 전체 화면 지원 */
+@media screen and (display-mode: fullscreen) {
+  .app-header {
+    padding-top: 10px;
+  }
+}
+
+/* 불필요한 버튼들 숨기기 */
+button:contains("전화"),
+button:contains("문의"),
+button:contains("저장"),
+button:contains("길찾기"),
+button:contains("공유"),
+button:contains("예약"),
+div:contains("전화"),
+div:contains("문의"),
+div:contains("저장"),
+div:contains("길찾기"),
+div:contains("공유"),
+div:contains("예약") {
+  display: none !important;
+}
+
+/* 추가로 특정 텍스트를 포함하는 요소들 숨기기 */
+*:not(h1):contains("전화"),
+*:not(h1):contains("문의"),
+*:not(h1):contains("저장"),
+*:not(h1):contains("길찾기"),
+*:not(h1):contains("공유"),
+*:not(h1):contains("예약") {
+  display: none !important;
+}
+
+/* 분실물 목록 제목은 제외하고 숨기기 */
+h1:contains("분실물 목록") {
+  display: block !important;
+}
