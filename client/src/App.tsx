@@ -2,18 +2,13 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { HelmetProvider } from 'react-helmet-async';
-import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignupPage';
 import MainPage from './pages/MainPage';
 import ListPage from './pages/ListPage';
 import DetailPage from './pages/DetailPage';
 import EditPage from './pages/EditPage';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
-import ResetPasswordPage from './pages/ResetPasswordPage';
-import ChangePasswordPage from './pages/ChangePasswordPage';
 import SuccessStoriesPage from './pages/SuccessStoriesPage';
 import AdminPanel from './pages/AdminPanel';
-import { AlertMode, getAlertMode, setAlertMode, triggerAlert } from './utils/notification';
+import { AlertMode, getAlertMode, setAlertMode as saveAlertMode, triggerAlert } from './utils/notification';
 import './App.css';
 
 // Error Boundary Component
@@ -176,7 +171,7 @@ const Header: React.FC<{
       </Link>
       
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        {currentUser ? (
+        {currentUser && (
           <>
             <span style={{ fontSize: '0.9rem' }}>
               {t('header.greeting', { username: currentUser.username })}
@@ -198,33 +193,6 @@ const Header: React.FC<{
             >
               ⚙️
             </button>
-          </>
-        ) : (
-          <>
-            <Link to="/login" style={{
-              textDecoration: 'none',
-              color: theme === 'dark' ? '#f9fafb' : '#1f2937',
-              padding: '0.5rem 1rem',
-              borderRadius: '0.375rem',
-              backgroundColor: theme === 'dark' ? '#374151' : '#e5e7eb',
-              fontSize: '0.875rem',
-              fontWeight: '500',
-              transition: 'background-color 0.2s ease'
-            }}>
-              {t('common.login')}
-            </Link>
-            <Link to="/signup" style={{
-              textDecoration: 'none',
-              color: '#ffffff',
-              padding: '0.5rem 1rem',
-              borderRadius: '0.375rem',
-              backgroundColor: '#ef4444',
-              fontSize: '0.875rem',
-              fontWeight: '500',
-              transition: 'background-color 0.2s ease'
-            }}>
-              {t('common.signup')}
-            </Link>
           </>
         )}
         
@@ -853,7 +821,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     try {
-      localStorage.setItem('alertMode', alertMode);
+      saveAlertMode(alertMode);
       console.log('알림 설정 저장됨:', alertMode);
     } catch (error) {
       console.error('알림 설정 저장 실패:', error);
@@ -865,159 +833,6 @@ const App: React.FC = () => {
     document.body.style.backgroundColor = theme === 'dark' ? '#111827' : '#ffffff';
     document.body.style.color = theme === 'dark' ? '#f9fafb' : '#1f2937';
   }, [theme]);
-
-  const handleSignup = async (username: string, email: string, phone: string, password: string): Promise<boolean> => {
-    try {
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, phone, password })
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        setCurrentUser(data.user);
-        localStorage.setItem('currentUser', JSON.stringify(data.user));
-        return true;
-      } else {
-        alert(data.error || '회원가입에 실패했습니다.');
-        return false;
-      }
-    } catch (error) {
-      console.error('Signup error:', error);
-      alert('서버 연결에 실패했습니다.');
-      return false;
-    }
-  };
-
-  const handleLogin = async (email: string, password: string): Promise<boolean> => {
-    try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: email, password })
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        setCurrentUser(data.user);
-        localStorage.setItem('currentUser', JSON.stringify(data.user));
-        return true;
-      } else {
-        alert(data.error || '로그인에 실패했습니다.');
-        return false;
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-      alert('서버 연결에 실패했습니다.');
-      return false;
-    }
-  };
-
-  const handleSendVerificationCode = async (phone: string): Promise<boolean> => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/send-verification-code`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone })
-      });
-
-      if (response.ok) {
-        alert('인증번호가 전송되었습니다.');
-        return true;
-      } else {
-        const error = await response.json();
-        alert(error.message || '인증번호 전송에 실패했습니다.');
-        return false;
-      }
-    } catch (error) {
-      console.error('Send verification code error:', error);
-      alert('서버 연결에 실패했습니다.');
-      return false;
-    }
-  };
-
-  const handleVerifyAndResetPassword = async (phone: string, code: string): Promise<string | null> => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/verify-and-reset-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, code })
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        alert(`임시 비밀번호가 생성되었습니다: ${result.tempPassword}`);
-        return result.tempPassword;
-      } else {
-        const error = await response.json();
-        alert(error.message || '인증에 실패했습니다.');
-        return null;
-      }
-    } catch (error) {
-      console.error('Verify and reset password error:', error);
-      alert('서버 연결에 실패했습니다.');
-      return null;
-    }
-  };
-
-  const handleRequestPasswordResetByEmail = async (email: string): Promise<boolean> => {
-    try {
-      const response = await fetch(`/api/request-password-reset`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-
-      if (response.ok) {
-        alert('비밀번호 재설정 링크가 이메일로 전송되었습니다.');
-        return true;
-      } else {
-        const error = await response.json();
-        alert(error.message || '비밀번호 재설정 요청에 실패했습니다.');
-        return false;
-      }
-    } catch (error) {
-      console.error('Request password reset error:', error);
-      alert('서버 연결에 실패했습니다.');
-      return false;
-    }
-  };
-
-  const handleRequestPasswordResetBySMS = async (phone: string): Promise<boolean> => {
-    try {
-      const response = await fetch(`/api/request-password-reset-sms`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone })
-      });
-
-      if (response.ok) {
-        alert('비밀번호 재설정 SMS가 발송되었습니다.');
-        return true;
-      } else {
-        const error = await response.json();
-        alert(error.message || 'SMS 비밀번호 재설정 요청에 실패했습니다.');
-        return false;
-      }
-    } catch (error) {
-      console.error('Request SMS password reset error:', error);
-      alert('서버 연결에 실패했습니다.');
-      return false;
-    }
-  };
-
-  const handleChangePassword = (newPassword: string): boolean => {
-    if (!currentUser) return false;
-    
-    const updatedUser = { ...currentUser, password: newPassword };
-    setCurrentUser(updatedUser);
-    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-    alert('비밀번호가 변경되었습니다.');
-    return true;
-  };
 
   const handleLogout = () => {
     setCurrentUser(null);
@@ -1201,39 +1016,6 @@ const App: React.FC = () => {
     }
   };
 
-  // 에러 처리 함수
-  const handleError = (error: any, context: string) => {
-    console.error(`${context} 오류:`, error);
-    
-    let message = '서버와의 연결이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.';
-    
-    if (error.response?.status === 404) {
-      message = '요청하신 정보를 찾을 수 없습니다.';
-    } else if (error.response?.status === 500) {
-      message = '서버 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
-    } else if (error.code === 'NETWORK_ERROR') {
-      message = '네트워크 연결을 확인해 주세요.';
-    }
-    
-    // Toast 메시지 표시
-    setToast({ message, type: 'error' });
-    
-    // 추가로 alert도 표시 (중요한 작업의 경우)
-    if (context.includes('등록') || context.includes('수정') || context.includes('삭제')) {
-      alert(message);
-    }
-  };
-
-  // API 호출 래퍼 함수
-  const safeApiCall = async (apiFunction: () => Promise<any>, context: string) => {
-    try {
-      return await apiFunction();
-    } catch (error) {
-      handleError(error, context);
-      throw error;
-    }
-  };
-
   return (
     <HelmetProvider>
       <ErrorBoundary>
@@ -1265,33 +1047,12 @@ const App: React.FC = () => {
           
           <main style={{ padding: '1rem' }}>
             <Routes>
-              <Route path="/login" element={
-                currentUser ? <Navigate to="/" /> : 
-                <LoginPage onLogin={handleLogin} theme={theme} />
-              } />
-              <Route path="/signup" element={
-                currentUser ? <Navigate to="/" /> : 
-                <SignupPage onSignup={handleSignup} theme={theme} />
-              } />
-              <Route path="/forgot-password" element={
-                currentUser ? <Navigate to="/" /> : 
-                <ForgotPasswordPage 
-                  onSendVerificationCode={handleSendVerificationCode}
-                  onVerifyAndResetPassword={handleVerifyAndResetPassword}
-                  onRequestPasswordResetByEmail={handleRequestPasswordResetByEmail}
-                  onRequestPasswordResetBySMS={handleRequestPasswordResetBySMS}
-                  theme={theme}
-                />
-              } />
-              <Route path="/reset-password" element={
-                currentUser ? <Navigate to="/" /> : 
-                <ResetPasswordPage onPasswordReset={handleChangePassword} theme={theme} />
-              } />
-              <Route path="/change-password" element={
-                currentUser ? 
-                <ChangePasswordPage currentUser={currentUser} onChangePassword={handleChangePassword} /> : 
-                <Navigate to="/login" />
-              } />
+              <Route path="/login" element={<Navigate to="/" />} />
+              <Route path="/signup" element={<Navigate to="/" />} />
+              <Route path="/register" element={<Navigate to="/" />} />
+              <Route path="/forgot-password" element={<Navigate to="/" />} />
+              <Route path="/reset-password" element={<Navigate to="/" />} />
+              <Route path="/change-password" element={<Navigate to="/" />} />
               <Route path="/success-stories" element={
                 <SuccessStoriesPage />
               } />
@@ -1312,16 +1073,13 @@ const App: React.FC = () => {
                 />
               } />
               <Route path="/list" element={
-                currentUser ? 
                 <ListPage 
                   currentUser={currentUser}
                   onDeleteItem={handleDeleteItem}
                   theme={theme}
-                /> : 
-                <Navigate to="/login" />
+                />
               } />
               <Route path="/detail/:id" element={
-                currentUser ? 
                 <DetailPage 
                   currentUser={currentUser}
                   onAddComment={handleAddComment}
@@ -1330,18 +1088,15 @@ const App: React.FC = () => {
                   onUpdateItem={handleUpdateItem}
                   onMarkAsRead={handleMarkAsRead}
                   theme={theme}
-                /> : 
-                <Navigate to="/login" />
+                />
               } />
               <Route path="/edit/:id" element={
-                currentUser ? 
                 <EditPage 
                   currentUser={currentUser}
                   onUpdateItem={handleUpdateItem}
                   onAddItem={handleAddItem}
                   theme={theme}
-                /> : 
-                <Navigate to="/login" />
+                />
               } />
             </Routes>
           </main>

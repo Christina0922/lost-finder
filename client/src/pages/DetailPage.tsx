@@ -249,27 +249,20 @@ const DetailPage: React.FC<DetailPageProps> = ({ currentUser, onAddComment, onDe
             ))
           )}
         
-          {currentUser ? (
-            <form onSubmit={handleCommentSubmit} className="comment-form">
-              <div className="comment-input-container">
-                <textarea
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  placeholder={t('detailPage.commentPlaceholder')}
-                  className="comment-input"
-                  rows={3}
-                />
-                <button type="submit" className="comment-submit-btn">
-                  {t('detailPage.commentSubmit')}
-                </button>
-              </div>
-            </form>
-          ) : (
-            <div className="login-prompt">
-              <p>{t('detailPage.loginRequired')}</p>
-              <button onClick={() => navigate('/login')}>{t('detailPage.loginButton')}</button>
+          <form onSubmit={handleCommentSubmit} className="comment-form">
+            <div className="comment-input-container">
+              <textarea
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder={t('detailPage.commentPlaceholder')}
+                className="comment-input"
+                rows={3}
+              />
+              <button type="submit" className="comment-submit-btn">
+                {t('detailPage.commentSubmit')}
+              </button>
             </div>
-          )}
+          </form>
         </div>
 
         {/* 아마존 어소시에이트 수익화 카드 */}

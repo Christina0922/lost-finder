@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { LostItem, User } from '../App';
@@ -15,14 +15,6 @@ interface RegisterPageProps {
 const RegisterPage: React.FC<RegisterPageProps> = ({ onAddItem, currentUser }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // 로그인하지 않은 경우 로그인 페이지로 리디렉션
-    if (!currentUser) {
-      alert(t('registerPage.loginRequired'));
-      navigate('/login');
-    }
-  }, [currentUser, navigate, t]);
 
   const [itemType, setItemType] = useState('');
   const [description, setDescription] = useState('');
@@ -58,11 +50,6 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onAddItem, currentUser }) =
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (!currentUser) {
-      alert(t('registerPage.loginRequired'));
-      return;
-    }
-
     onAddItem({ item_type: itemType, description, location, image_urls: imageUrls });
 
     // 입력 필드 초기화
@@ -74,11 +61,6 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onAddItem, currentUser }) =
     alert(t('registerPage.registered'));
     navigate('/list'); // 등록 후 목록 페이지로 이동
   };
-
-  // 로그인한 사용자가 없으면 렌더링하지 않음 (리디렉션 전 잠시 보이는 것 방지)
-  if (!currentUser) {
-    return null;
-  }
 
   return (
     <div>
