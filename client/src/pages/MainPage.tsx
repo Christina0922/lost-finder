@@ -26,10 +26,10 @@ const MainPage: React.FC<MainPageProps> = ({ currentUser, lostItems, onAddItem, 
         <h1 className="main-title">{t('mainPage.title')}</h1>
       <p className="main-desc">{t('mainPage.description')}</p>
       <div className="button-group">
-        <Link to="/edit/new" className="btn primary">{t('mainPage.registerButton')}</Link>
-        <Link to="/list" className="btn secondary">{t('mainPage.listButton')}</Link>
+        <Link to="/map" className="btn primary">{t('mainPage.mapButton') || '지도에서 찾기'}</Link>
+        <Link to="/edit/new" className="btn secondary">{t('mainPage.registerButton')}</Link>
+        <Link to="/list" className="btn tertiary">{t('mainPage.listButton')}</Link>
       </div>
-      <hr className="main-divider" />
       {/* ✅ 하단 배너 삽입 */}
       <BottomBanner />
       </div>

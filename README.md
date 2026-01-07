@@ -4,6 +4,7 @@
 
 ## 주요 기능
 
+- ✅ **Google OAuth 로그인** (간편 로그인)
 - ✅ 회원가입/로그인
 - ✅ 분실물 등록 및 관리
 - ✅ 다중 이미지 업로드
@@ -21,6 +22,26 @@
 
 ## 설치 및 실행
 
+### 0. Google OAuth 설정 (필수)
+Google 로그인을 사용하려면 먼저 OAuth Client ID를 발급받아야 합니다.
+자세한 설정 방법은 [GOOGLE_OAUTH_SETUP.md](./GOOGLE_OAUTH_SETUP.md) 파일을 참고하세요.
+
+#### 간단 설정:
+1. [Google Cloud Console](https://console.cloud.google.com/) 접속
+2. 새 프로젝트 생성
+3. OAuth 2.0 Client ID 생성 (웹 애플리케이션)
+4. Client ID 복사
+
+#### 환경 변수 설정:
+```bash
+# client/.env 파일 생성
+echo "REACT_APP_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com" > client/.env
+
+# server/.env 파일 생성
+echo "GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com" > server/.env
+echo "PORT=5000" >> server/.env
+```
+
 ### 1. 백엔드 서버 실행
 ```bash
 cd server
@@ -30,6 +51,7 @@ npm start
 
 ### 2. 프론트엔드 실행
 ```bash
+cd client
 npm install
 npm start
 ```

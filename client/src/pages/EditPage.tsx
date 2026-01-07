@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import type { LostItem, User } from '../App';
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
+import type { LostItem, User } from '../types';
 import { getLostItemById } from '../utils/api';
+import { getDeviceId } from '../utils/deviceId';
 import './RegisterPage.css'; // 등록 페이지와 동일한 스타일 사용
 import { resizeAndCompressImage } from '../utils/image';
 
@@ -15,11 +16,25 @@ interface EditPageProps {
 const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const locationState = useLocation();
+  
+  // MapPage에서 전달된 위치 정보
+  const mapLocationData = locationState.state as {
+    location?: string;
+    lat?: number;
+    lng?: number;
+    place_name?: string;
+    address?: string;
+  } | null;
   
   const [itemToEdit, setItemToEdit] = useState<LostItem | null>(null);
   const [itemType, setItemType] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
+  const [lat, setLat] = useState<number | null>(null);
+  const [lng, setLng] = useState<number | null>(null);
+  const [placeName, setPlaceName] = useState<string | null>(null);
+  const [address, setAddress] = useState<string | null>(null);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -72,7 +87,22 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
       setItemToEdit(null);
       setItemType('');
       setDescription('');
-      setLocation('');
+      
+      // MapPage에서 전달된 위치 정보가 있으면 사용
+      if (mapLocationData) {
+        setLocation(mapLocationData.location || '');
+        setLat(mapLocationData.lat ?? null);
+        setLng(mapLocationData.lng ?? null);
+        setPlaceName(mapLocationData.place_name ?? null);
+        setAddress(mapLocationData.address ?? null);
+      } else {
+        setLocation('');
+        setLat(null);
+        setLng(null);
+        setPlaceName(null);
+        setAddress(null);
+      }
+      
       setImageUrls([]);
       setError(null);
     } else {
@@ -93,6 +123,10 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
           setItemType(itemData.item_type);
           setDescription(itemData.description);
           setLocation(itemData.location);
+          setLat(itemData.lat ?? null);
+          setLng(itemData.lng ?? null);
+          setPlaceName(itemData.place_name ?? null);
+          setAddress(itemData.address ?? null);
           setImageUrls(itemData.image_urls || []);
           setError(null);
         } catch (err) {
@@ -151,10 +185,18 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
         return;
       }
       
+      const deviceId = getDeviceId();
+      
       const newItem = {
         item_type: itemType.trim(),
         description: description.trim(),
         location: location.trim(),
+        lat: lat,
+        lng: lng,
+        place_name: placeName,
+        address: address,
+        lost_at: new Date().toISOString(),
+        created_by_device_id: deviceId,
         image_urls: imageUrls,
       };
       onAddItem(newItem);
@@ -169,6 +211,10 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
         item_type: itemType.trim(),
         description: description.trim(),
         location: location.trim(),
+        lat: lat,
+        lng: lng,
+        place_name: placeName,
+        address: address,
         image_urls: imageUrls,
       };
       onUpdateItem(updatedItem);
@@ -230,6 +276,30 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
         </div>
         <div className="form-group">
           <label htmlFor="location">분실 장소 * (최소 2자)</label>
+          
+          {/* 지도에서 선택한 위치 정보 표시 */}
+          {lat && lng && (
+            <div style={{
+              background: '#e8f5e9',
+              border: '1px solid #4CAF50',
+              borderRadius: '8px',
+              padding: '12px',
+              marginBottom: '10px',
+              fontSize: '14px',
+            }}>
+              <div style={{ fontWeight: 'bold', color: '#2e7d32', marginBottom: '6px' }}>
+                ✓ 지도에서 선택한 위치
+              </div>
+              <div style={{ color: '#555' }}>
+                <div><strong>장소:</strong> {placeName || location}</div>
+                <div><strong>주소:</strong> {address || '주소 정보 없음'}</div>
+                <div style={{ fontSize: '12px', color: '#777', marginTop: '4px' }}>
+                  좌표: {lat.toFixed(6)}, {lng.toFixed(6)}
+                </div>
+              </div>
+            </div>
+          )}
+          
           <input
             type="text"
             id="location"
@@ -240,6 +310,30 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
             placeholder="분실한 정확한 장소를 입력해주세요..."
             className={location.trim().length < 2 && location.trim() !== '' ? 'error' : ''}
           />
+          
+          {/* 지도에서 선택 버튼 */}
+          {id === 'new' && !lat && !lng && (
+            <div style={{ marginTop: '10px' }}>
+              <Link 
+                to="/map" 
+                style={{
+                  display: 'inline-block',
+                  padding: '10px 16px',
+                  background: '#667eea',
+                  color: 'white',
+                  textDecoration: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  transition: 'background 0.2s ease',
+                }}
+                onMouseOver={(e) => e.currentTarget.style.background = '#5568d3'}
+                onMouseOut={(e) => e.currentTarget.style.background = '#667eea'}
+              >
+                🗺️ 지도에서 위치 선택하기
+              </Link>
+            </div>
+          )}
         </div>
         
         <div className="form-group">

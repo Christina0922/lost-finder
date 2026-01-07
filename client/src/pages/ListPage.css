@@ -2,25 +2,27 @@
 .list-page-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 32px 24px;
+  background: transparent;
 }
 
 /* 헤더 영역 */
 .list-header {
-  margin-bottom: 30px;
+  margin-bottom: 40px;
   text-align: center;
 }
 
 .list-header h1 {
-  margin: 0 0 10px 0;
-  color: #1a2236;
-  font-size: 28px;
-  font-weight: 700;
+  margin: 0 0 12px 0;
+  color: #2d3748;
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 .list-stats {
-  color: #666;
-  font-size: 14px;
+  color: #718096;
+  font-size: 15px;
   font-weight: 500;
 }
 
@@ -65,12 +67,12 @@
 /* 카드 아이템 */
 .card-item {
   background-color: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   border: 2px solid transparent;
   cursor: pointer;
@@ -78,29 +80,30 @@
 
 .card-item:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
-  border-color: #007bff;
+  box-shadow: 0 16px 40px rgba(102, 126, 234, 0.15);
+  border-color: #667eea;
 }
 
 /* 본인 등록 아이템 강조 */
 .card-item.my-item {
-  border-color: #ffc107;
-  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
+  border-color: #f5576c;
+  box-shadow: 0 4px 12px rgba(245, 87, 108, 0.2);
 }
 
 .my-item-badge {
   position: absolute;
   top: 12px;
   left: 12px;
-  background-color: #ffc107;
-  color: #333;
-  padding: 6px 12px;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: #ffffff;
+  padding: 6px 14px;
   border-radius: 20px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   z-index: 10;
-  backdrop-filter: blur(4px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(245, 87, 108, 0.3);
+  letter-spacing: 0.02em;
 }
 
 /* 상태 태그 */
@@ -169,16 +172,17 @@
 .card-title {
   font-size: 18px;
   margin: 0 0 8px 0;
-  color: #1a2236;
-  font-weight: 600;
+  color: #2d3748;
+  font-weight: 700;
   line-height: 1.4;
+  letter-spacing: -0.01em;
 }
 
 .card-location {
   margin: 0 0 12px 0;
   font-size: 14px;
-  color: #6b7280;
-  font-weight: 500;
+  color: #718096;
+  font-weight: 400;
   line-height: 1.5;
 }
 
@@ -194,31 +198,38 @@
 .card-edit-button,
 .card-delete-button {
   flex: 1;
-  padding: 8px 12px;
+  padding: 10px 16px;
   border: none;
-  border-radius: 6px;
+  border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
   font-size: 13px;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.02em;
 }
 
 .card-edit-button {
-  background-color: #ffc107;
-  color: #333;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
 }
 
 .card-edit-button:hover {
-  background-color: #e0a800;
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .card-delete-button {
-  background-color: #dc3545;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   color: white;
+  box-shadow: 0 2px 8px rgba(245, 87, 108, 0.2);
 }
 
 .card-delete-button:hover {
-  background-color: #c82333;
+  background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 87, 108, 0.3);
 }
 
 /* 로딩 상태 - Skeleton UI */

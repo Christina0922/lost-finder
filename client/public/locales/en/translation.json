@@ -39,6 +39,7 @@
   "mainPage": {
     "title": "Lost & Found Service",
     "description": "Register and search now!",
+    "mapButton": "Find on Map",
     "registerButton": "Register",
     "listButton": "View List"
   },

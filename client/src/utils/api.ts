@@ -1,4 +1,4 @@
-import type { LostItem, Comment } from '../App';
+import type { LostItem, Comment } from '../types';
 
 // 환경변수에 따라 API URL 설정
 // const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '/api';
@@ -296,7 +296,7 @@ export const getAllUsers = async () => {
 }; 
 
 // 분실물 관련 API
-export const getAllLostItems = async () => {
+export const getAllLostItems = async (): Promise<LostItem[]> => {
   return safeApiCall(async () => {
     const response = await fetch('/api/lost-items');
     
@@ -305,11 +305,11 @@ export const getAllLostItems = async () => {
     }
     
     const data = await response.json();
-    return data;
+    return (data.items || []) as LostItem[];
   }, '분실물 목록 조회');
 };
 
-export const getLostItemById = async (id: number) => {
+export const getLostItemById = async (id: number): Promise<LostItem> => {
   return safeApiCall(async () => {
     const response = await fetch(`/api/lost-items/${id}`);
     
@@ -318,7 +318,7 @@ export const getLostItemById = async (id: number) => {
     }
     
     const data = await response.json();
-    return data;
+    return data.item as LostItem;
   }, '분실물 상세 조회');
 };
 
@@ -426,4 +426,132 @@ export const getCommentsByItemId = async (itemId: number) => {
     const data = await response.json();
     return data;
   }, '댓글 목록 조회');
+};
+
+// Google OAuth 로그인
+export const googleLogin = async (credential: string) => {
+  return safeApiCall(async () => {
+    const response = await fetch(`${API_BASE_URL}/google-login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ credential }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Google 로그인에 실패했습니다.');
+    }
+
+    const data = await response.json();
+    return data;
+  }, 'Google 로그인');
+};
+
+// ==================== Google Places API ====================
+
+export interface PlacePrediction {
+  placeId: string;
+  description: string;
+  mainText: string;
+  secondaryText: string;
+}
+
+export interface PlaceDetails {
+  placeName: string;
+  address: string;
+  lat: number;
+  lng: number;
+}
+
+export interface GeocodedLocation {
+  address: string;
+  lat: number;
+  lng: number;
+}
+
+/**
+ * Places Autocomplete (장소 검색 자동완성)
+ * @param input 검색어
+ * @returns 최대 6개의 자동완성 결과
+ */
+export const searchPlaces = async (input: string): Promise<PlacePrediction[]> => {
+  return safeApiCall(async () => {
+    if (!input || input.trim().length === 0) {
+      return [];
+    }
+
+    const response = await fetch(
+      `${API_BASE_URL}/places/autocomplete?input=${encodeURIComponent(input)}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || '장소 검색에 실패했습니다.');
+    }
+
+    const data = await response.json();
+    return data.predictions || [];
+  }, '장소 검색');
+};
+
+/**
+ * 장소 상세 정보 (선택한 장소의 상세 정보)
+ * @param placeId 장소 ID
+ * @returns 장소명, 주소, 좌표
+ */
+export const getPlaceDetails = async (placeId: string): Promise<PlaceDetails> => {
+  return safeApiCall(async () => {
+    const response = await fetch(
+      `${API_BASE_URL}/places/details?placeId=${placeId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || '장소 정보 조회에 실패했습니다.');
+    }
+
+    const data = await response.json();
+    return data.place;
+  }, '장소 정보 조회');
+};
+
+/**
+ * Geocoding (주소 → 좌표 변환)
+ * @param address 주소
+ * @returns 정확한 주소와 좌표
+ */
+export const geocodeAddress = async (address: string): Promise<GeocodedLocation> => {
+  return safeApiCall(async () => {
+    const response = await fetch(
+      `${API_BASE_URL}/places/geocode?address=${encodeURIComponent(address)}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || '주소 변환에 실패했습니다.');
+    }
+
+    const data = await response.json();
+    return data.location;
+  }, '주소 변환');
 }; 

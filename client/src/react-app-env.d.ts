@@ -7,4 +7,9 @@ declare global {
   }
 }
 
+// uuid 모듈 타입 정의
+declare module 'uuid' {
+  export function v4(): string;
+}
+
 export {};

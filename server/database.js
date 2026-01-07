@@ -35,6 +35,12 @@ function initDatabase() {
       item_type TEXT NOT NULL,
       description TEXT NOT NULL,
       location TEXT NOT NULL,
+      lat REAL,
+      lng REAL,
+      place_name TEXT,
+      address TEXT,
+      lost_at DATETIME,
+      created_by_device_id TEXT,
       image_urls TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -75,6 +81,26 @@ function initDatabase() {
       console.error('❌ lost_items 테이블 생성 실패:', err.message);
     } else {
       console.log('✅ lost_items 테이블 생성 완료');
+      
+      // 기존 테이블에 새 컬럼 추가 (마이그레이션)
+      const addColumns = [
+        { name: 'lat', type: 'REAL' },
+        { name: 'lng', type: 'REAL' },
+        { name: 'place_name', type: 'TEXT' },
+        { name: 'address', type: 'TEXT' },
+        { name: 'lost_at', type: 'DATETIME' },
+        { name: 'created_by_device_id', type: 'TEXT' }
+      ];
+      
+      addColumns.forEach(column => {
+        db.run(`ALTER TABLE lost_items ADD COLUMN ${column.name} ${column.type}`, (err) => {
+          if (err && !err.message.includes('duplicate column name')) {
+            console.error(`❌ ${column.name} 컬럼 추가 실패:`, err.message);
+          } else if (!err) {
+            console.log(`✅ ${column.name} 컬럼 추가 완료`);
+          }
+        });
+      });
     }
   });
 
@@ -269,16 +295,44 @@ function maskPhoneNumber(phone) {
 // 분실물 등록
 function createLostItem(itemData) {
   return new Promise((resolve, reject) => {
-    const { author_id, item_type, description, location, image_urls } = itemData;
+    const { 
+      author_id, 
+      item_type, 
+      description, 
+      location, 
+      lat, 
+      lng, 
+      place_name, 
+      address, 
+      lost_at,
+      created_by_device_id,
+      image_urls 
+    } = itemData;
     const imageUrlsJson = image_urls ? JSON.stringify(image_urls) : null;
     
     const sql = `
-      INSERT INTO lost_items (author_id, item_type, description, location, image_urls)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO lost_items (
+        author_id, item_type, description, location, 
+        lat, lng, place_name, address, lost_at, created_by_device_id, image_urls
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     
-    db.run(sql, [author_id, item_type, description, location, imageUrlsJson], function(err) {
+    db.run(sql, [
+      author_id, 
+      item_type, 
+      description, 
+      location, 
+      lat || null, 
+      lng || null, 
+      place_name || null, 
+      address || null, 
+      lost_at || null,
+      created_by_device_id || null,
+      imageUrlsJson
+    ], function(err) {
       if (err) {
+        console.error('❌ 분실물 등록 실패:', err.message);
         reject(new Error('분실물 등록 중 오류가 발생했습니다.'));
       } else {
         resolve({
@@ -287,6 +341,12 @@ function createLostItem(itemData) {
           item_type,
           description,
           location,
+          lat,
+          lng,
+          place_name,
+          address,
+          lost_at,
+          created_by_device_id,
           image_urls: image_urls || []
         });
       }
@@ -297,17 +357,41 @@ function createLostItem(itemData) {
 // 분실물 수정
 function updateLostItem(itemId, itemData) {
   return new Promise((resolve, reject) => {
-    const { item_type, description, location, image_urls } = itemData;
+    const { 
+      item_type, 
+      description, 
+      location, 
+      lat, 
+      lng, 
+      place_name, 
+      address, 
+      lost_at,
+      image_urls 
+    } = itemData;
     const imageUrlsJson = image_urls ? JSON.stringify(image_urls) : null;
     
     const sql = `
       UPDATE lost_items 
-      SET item_type = ?, description = ?, location = ?, image_urls = ?, updated_at = CURRENT_TIMESTAMP
+      SET item_type = ?, description = ?, location = ?, 
+          lat = ?, lng = ?, place_name = ?, address = ?, lost_at = ?,
+          image_urls = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
     
-    db.run(sql, [item_type, description, location, imageUrlsJson, itemId], function(err) {
+    db.run(sql, [
+      item_type, 
+      description, 
+      location, 
+      lat || null, 
+      lng || null, 
+      place_name || null, 
+      address || null, 
+      lost_at || null,
+      imageUrlsJson, 
+      itemId
+    ], function(err) {
       if (err) {
+        console.error('❌ 분실물 수정 실패:', err.message);
         reject(new Error('분실물 수정 중 오류가 발생했습니다.'));
       } else if (this.changes === 0) {
         reject(new Error('분실물을 찾을 수 없습니다.'));
@@ -355,6 +439,12 @@ function getAllLostItems() {
         li.item_type,
         li.description,
         li.location,
+        li.lat,
+        li.lng,
+        li.place_name,
+        li.address,
+        li.lost_at,
+        li.created_by_device_id,
         li.image_urls,
         li.created_at,
         li.updated_at,
@@ -368,6 +458,7 @@ function getAllLostItems() {
     
     db.all(sql, [], (err, rows) => {
       if (err) {
+        console.error('❌ 분실물 목록 조회 실패:', err.message);
         reject(new Error('분실물 목록 조회 중 오류가 발생했습니다.'));
       } else {
         // image_urls를 JSON에서 배열로 변환
@@ -390,6 +481,12 @@ function getLostItemById(itemId) {
         li.item_type,
         li.description,
         li.location,
+        li.lat,
+        li.lng,
+        li.place_name,
+        li.address,
+        li.lost_at,
+        li.created_by_device_id,
         li.image_urls,
         li.created_at,
         li.updated_at,
@@ -403,6 +500,7 @@ function getLostItemById(itemId) {
     
     db.get(sql, [itemId], (err, row) => {
       if (err) {
+        console.error('❌ 분실물 조회 실패:', err.message);
         reject(new Error('분실물 조회 중 오류가 발생했습니다.'));
       } else if (!row) {
         reject(new Error('분실물을 찾을 수 없습니다.'));

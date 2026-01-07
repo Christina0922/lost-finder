@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import SEOHead from '../components/SEOHead';
-import KakaoMapComponent from '../components/KakaoMapComponent';
+import GoogleMapComponent from '../components/GoogleMapComponent';
 import GlobalMonetizationCard from '../components/GlobalMonetizationCard';
 import DateFormatter from '../components/DateFormatter';
-import { LostItem, Comment, User } from '../App';
+import { LostItem, Comment, User } from '../types';
+import { isMyItem } from '../utils/deviceId';
 import './DetailPage.css';
 
 interface DetailPageProps {
@@ -205,13 +206,67 @@ const DetailPage: React.FC<DetailPageProps> = ({ currentUser, onAddComment, onDe
           <p><strong>{t('detailPage.registeredDate')}:</strong> {item.created_at ? <DateFormatter date={item.created_at} formatType="short" /> : t('detailPage.noDate')}</p>
         </div>
 
-        <div className="map-container">
-          <KakaoMapComponent
-            location={item.location}
-            itemType={item.item_type}
-            description={item.description}
-          />
-        </div>
+        {/* 위치 정보 */}
+        {item.lat && item.lng ? (
+          <>
+            <div className="map-container">
+              <GoogleMapComponent
+                center={{ lat: item.lat, lng: item.lng }}
+                zoom={16}
+                markers={[{
+                  id: item.id,
+                  position: { lat: item.lat, lng: item.lng },
+                  title: item.item_type,
+                  description: item.description,
+                  isMyItem: isMyItem(item.created_by_device_id),
+                }]}
+                height="300px"
+              />
+            </div>
+            <div style={{ marginTop: '16px', textAlign: 'center' }}>
+              <button
+                onClick={() => navigate('/map', { state: { itemId: item.id } })}
+                style={{
+                  padding: '12px 24px',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '10px',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                  boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(102, 126, 234, 0.3)';
+                }}
+              >
+                🗺️ 큰 지도에서 보기
+              </button>
+            </div>
+          </>
+        ) : (
+          <div style={{
+            padding: '30px',
+            background: '#f8f9fa',
+            borderRadius: '12px',
+            textAlign: 'center',
+            color: '#666',
+            marginBottom: '20px',
+          }}>
+            <div style={{ fontSize: '32px', marginBottom: '10px' }}>📍</div>
+            <div style={{ fontSize: '15px' }}>위치 정보가 없습니다</div>
+            <div style={{ fontSize: '13px', marginTop: '6px', color: '#999' }}>
+              이 분실물은 등록 시 지도 위치를 선택하지 않았습니다
+            </div>
+          </div>
+        )}
 
         <div className="comments-section">
           <h3>{t('detailPage.comments', { count: (item.comments || []).length })}</h3>

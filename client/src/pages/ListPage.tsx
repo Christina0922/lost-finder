@@ -2,10 +2,11 @@ import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import SEOHead from '../components/SEOHead';
-import type { LostItem, User } from '../App';
+import type { LostItem, User } from '../types';
 import { getAllLostItems } from '../utils/api';
 import LazyImage from '../components/LazyImage';
 import { formatBlurredLocation } from '../utils/locationBlur';
+import { isMyItem } from '../utils/deviceId';
 import './ListPage.css';
 
 // ListPage가 받을 props의 타입을 정의합니다.
@@ -48,6 +49,9 @@ const ListPage = ({ currentUser, onDeleteItem, theme }: ListPageProps) => {
 
   // 최신 등록순으로 정렬
   const sortedItems = useMemo(() => {
+    if (!Array.isArray(lostItems)) {
+      return [];
+    }
     return [...lostItems].sort((a, b) => {
       const dateA = new Date(a.created_at || '').getTime();
       const dateB = new Date(b.created_at || '').getTime();
@@ -169,13 +173,15 @@ const ListPage = ({ currentUser, onDeleteItem, theme }: ListPageProps) => {
         <>
           {/* 카드형 그리드 레이아웃 (Pinterest 스타일) */}
           <div className="card-grid-container">
-            {displayedItems.map((item: LostItem) => (
+            {displayedItems.map((item: LostItem) => {
+              const isMyPost = currentUser?.id === item.author_id || isMyItem(item.created_by_device_id);
+              return (
               <div 
                 key={item.id} 
-                className={`card-item ${currentUser?.id === item.author_id ? 'my-item' : ''}`}
+                className={`card-item ${isMyPost ? 'my-item' : ''}`}
               >
                 {/* 본인 등록 아이템 강조 표시 */}
-                {currentUser?.id === item.author_id && (
+                {isMyPost && (
                   <div className="my-item-badge">{t('listPage.myItem')}</div>
                 )}
                 
@@ -224,7 +230,8 @@ const ListPage = ({ currentUser, onDeleteItem, theme }: ListPageProps) => {
                   )}
                 </div>
               </div>
-            ))}
+            );
+            })}
           </div>
 
           {/* 무한 스크롤 트리거 */}

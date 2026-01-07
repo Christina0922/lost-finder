@@ -16,27 +16,27 @@ interface Product {
 const sampleProducts: Product[] = [
   {
     id: 1,
-    title: "🍎 Apple AirTag",
-    description: "가방·지갑·자전거, 분실 걱정 끝!",
-    image: "https://via.placeholder.com/80x80/FF6B6B/FFFFFF?text=AirTag",
+    title: "Apple AirTag",
+    description: "가방, 지갑, 자전거 분실 방지<br/>실시간 위치 추적 가능",
+    image: "https://via.placeholder.com/80x80/667eea/FFFFFF?text=AirTag",
     price: "39,000원",
     link: "https://link.coupang.com/a/cCIDpH",
     category: "분실방지"
   },
   {
     id: 2,
-    title: "🔑 스마트 키홀더",
-    description: "키 찾기, 한 번에! 실시간 위치 추적",
-    image: "https://via.placeholder.com/80x80/4ECDC4/FFFFFF?text=Key",
+    title: "스마트 키홀더",
+    description: "키 찾기 한 번에 해결<br/>실시간 위치 추적 기능",
+    image: "https://via.placeholder.com/80x80/667eea/FFFFFF?text=Key",
     price: "15,900원",
     link: "https://link.coupang.com/a/cCIDpH",
     category: "분실방지"
   },
   {
     id: 3,
-    title: "💼 RFID 방지 지갑",
-    description: "카드 정보, 도난 걱정 없이 안전하게!",
-    image: "https://via.placeholder.com/80x80/45B7D1/FFFFFF?text=Wallet",
+    title: "RFID 방지 지갑",
+    description: "카드 정보 보호<br/>도난 방지 기능 탑재",
+    image: "https://via.placeholder.com/80x80/667eea/FFFFFF?text=Wallet",
     price: "29,800원",
     link: "https://link.coupang.com/a/cCIDpH",
     category: "보안"
@@ -57,40 +57,75 @@ export default function BottomBanner() {
   const currentProduct = sampleProducts[currentProductIndex];
 
   return (
-    <div className="w-full bg-gray-100 px-2 py-2 mt-2 mb-4 rounded-2xl shadow-md space-y-2 text-center bottom-banner">
-      {/* ✨ 감동 후기 섹션 */}
+    <div className="w-full px-2 py-2 mt-2 mb-4 rounded-2xl shadow-md space-y-2 text-center bottom-banner" style={{
+      background: 'linear-gradient(135deg, #f8f9ff 0%, #f5f7ff 100%)',
+      border: '1px solid rgba(102, 126, 234, 0.1)'
+    }}>
+      {/* 감동 후기 섹션 */}
       <div>
-        <p className="text-lg font-semibold bottom-banner-title" style={{ textAlign: 'center', marginBottom: 6, marginTop: 6 }}>
-          ✨ 감동 후기 모음
+        <p className="text-lg font-semibold bottom-banner-title" style={{ 
+          textAlign: 'center', 
+          marginBottom: 8, 
+          marginTop: 8,
+          color: '#4a5568',
+          fontSize: '1.1rem'
+        }}>
+          감동 후기 모음
         </p>
-        <p className="bottom-banner-desc" style={{ textAlign: 'center', marginBottom: 12 }}>
-          "찾으셨나요?"<br />
+        <p className="bottom-banner-desc" style={{ 
+          textAlign: 'center', 
+          marginBottom: 16,
+          color: '#718096',
+          fontSize: '0.95rem',
+          lineHeight: '1.6'
+        }}>
+          찾으셨나요?<br />
           한 줄 후기를 남겨주세요.<br />
           누군가에게 큰 힘이 됩니다.
         </p>
         <Link to="/success-stories">
-          <button className="mt-2 px-5 py-2 text-white font-bold rounded-lg" style={{
-            background: 'linear-gradient(45deg, #ff6b9d, #e91e63)',
+          <button style={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            color: '#ffffff',
             border: 'none',
-            borderRadius: '20px',
+            borderRadius: '12px',
             fontWeight: 600,
-            fontSize: '0.95rem',
-            padding: '10px 24px',
-            boxShadow: '0 4px 15px rgba(233, 30, 99, 0.3)',
-            transition: 'all 0.3s ease'
+            fontSize: '1.47rem',
+            padding: '14px 32px',
+            boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            cursor: 'pointer',
+            textDecoration: 'none'
+          } as React.CSSProperties}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.boxShadow = '0 8px 16px rgba(102, 126, 234, 0.4)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
           }}>
-            감동 후기 보러가기
+            후기 보러가기
           </button>
         </Link>
-        {/* 후기/게임 구분선 */}
-        <hr style={{ border: '0', borderTop: '2px solid #bbb', margin: '12px 0 8px 0', width: '100%' }} />
+        {/* 구분선 */}
+        <hr style={{ 
+          border: '0', 
+          borderTop: '1px solid rgba(102, 126, 234, 0.15)', 
+          margin: '20px 0', 
+          width: '100%' 
+        }} />
       </div>
 
       {/* 퍼즐 게임 안내 */}
       <div>
-        <p className="text-lg font-semibold" style={{ textAlign: 'center', marginBottom: 6 }}></p>
-        <p className="text-gray-600" style={{ fontSize: "0.95rem", marginBottom: 6, color: "#555", lineHeight: 1.4, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-          기다리는 동안, 잠시 머리를 식힐 수 있는<br />퍼즐 게임 한 판 어때요? 🧩
+        <p className="text-gray-600" style={{ 
+          fontSize: "0.95rem", 
+          marginBottom: 12, 
+          color: "#718096", 
+          lineHeight: 1.6
+        }}>
+          기다리는 동안 잠시 머리를 식힐 수 있는<br />퍼즐 게임은 어떠세요?
         </p>
         <a
           href="https://3match-game-865e.vercel.app"
@@ -98,63 +133,116 @@ export default function BottomBanner() {
           rel="noopener noreferrer"
           title="외부 사이트로 이동합니다"
         >
-          <button className="mt-1 px-4 py-2 text-white font-bold rounded-lg" style={{
-            background: 'linear-gradient(45deg, #ff6b9d, #e91e63)',
-            border: 'none',
-            borderRadius: '20px',
+          <button style={{
+            background: '#ffffff',
+            color: '#667eea !important',
+            border: '2px solid #667eea',
+            borderRadius: '12px',
             fontWeight: 600,
-            fontSize: '0.95rem',
-            padding: '10px 24px',
-            boxShadow: '0 4px 15px rgba(233, 30, 99, 0.3)',
-            transition: 'all 0.3s ease'
+            fontSize: '1.47rem',
+            padding: '14px 32px',
+            boxShadow: '0 2px 8px rgba(102, 126, 234, 0.1)',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            cursor: 'pointer',
+            textDecoration: 'none',
+            WebkitTextFillColor: '#667eea'
+          } as any}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = '#667eea';
+            e.currentTarget.style.color = '#ffffff';
+            (e.currentTarget.style as any).webkitTextFillColor = '#ffffff';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.boxShadow = '0 8px 16px rgba(102, 126, 234, 0.3)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = '#ffffff';
+            e.currentTarget.style.color = '#667eea';
+            (e.currentTarget.style as any).webkitTextFillColor = '#667eea';
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 2px 8px rgba(102, 126, 234, 0.1)';
           }}>
-            퍼즐 맞추러 가기
+            퍼즐 게임하기
           </button>
         </a>
       </div>
 
-      {/* 게임/상품 구분선 */}
-      <hr style={{ border: '0', borderTop: '2px solid #bbb', margin: '10px 0 12px 0', width: '100%' }} />
+      {/* 구분선 */}
+      <hr style={{ 
+        border: '0', 
+        borderTop: '1px solid rgba(102, 126, 234, 0.15)', 
+        margin: '20px 0', 
+        width: '100%' 
+      }} />
 
-      {/* 🛍️ 추천 상품 섹션 - 자동 전환 */}
+      {/* 추천 상품 섹션 */}
       <div className="relative">
-        <p className="text-lg font-semibold text-center mb-1">
-          🛍️ 추천 상품
+        <p className="text-lg font-semibold text-center mb-2" style={{
+          color: '#4a5568',
+          fontSize: '1.1rem'
+        }}>
+          추천 상품
         </p>
-        <p className="text-sm text-gray-600 text-center mb-1">
-          분실물 걱정 줄이는 인기템 모아봤어요!
+        <p className="text-sm text-gray-600 text-center mb-3" style={{
+          color: '#718096',
+          fontSize: '0.9rem'
+        }}>
+          분실물 걱정 줄이는 인기템 모아봤어요
         </p>
         {/* 상품 광고 카드 */}
-        <div className="mt-1 p-2 bg-yellow-100 border-2 border-yellow-400 rounded-xl text-base leading-relaxed shadow-md mx-auto" style={{maxWidth:'340px',margin:'0 auto'}}>
+        <div className="mt-2 p-4 rounded-xl text-base leading-relaxed mx-auto" style={{
+          maxWidth:'340px',
+          margin:'0 auto',
+          background: 'transparent'
+        }}>
           <div
-            className="text-blue-700 font-bold text-center"
-            style={{ color: '#1d4ed8', fontWeight: 600, fontSize: '14px' }}
+            className="text-center"
+            style={{ 
+              color: '#4a5568', 
+              fontWeight: 500, 
+              fontSize: '14px',
+              marginBottom: '12px',
+              lineHeight: '1.6'
+            }}
             dangerouslySetInnerHTML={{
-              __html: currentProduct.description.replace(/<[^>]*>/g, '')
+              __html: currentProduct.description
             }}
           />
-          <br />
           <a
             href={currentProduct.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block mt-2"
+            className="inline-block"
             title="외부 사이트로 이동합니다"
           >
-            <span className="px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg text-sm hover:bg-purple-700 transition-colors duration-200 shadow-lg" style={{ 
-              display: 'inline-block', 
-              marginBottom: '8px',
+            <button style={{ 
+              display: 'inline-block',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: '#ffffff',
+              fontWeight: 600,
+              borderRadius: '12px',
               fontSize: '14px',
-              padding: '12px 20px',
+              padding: '10px 24px',
+              border: 'none',
               whiteSpace: 'nowrap',
-              minWidth: '220px',
-              textAlign: 'center'
+              minWidth: '200px',
+              textAlign: 'center',
+              boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              cursor: 'pointer',
+              textDecoration: 'none'
+            } as React.CSSProperties}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 8px 16px rgba(102, 126, 234, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
             }}>
-              지금 쿠팡에서 확인하기
-            </span>
+              쿠팡에서 확인하기
+            </button>
           </a>
         </div>
-        {/* 상품 인디케이터 제거 - 현재는 슬라이드 기능이 없으므로 사용자 혼란 방지 */}
       </div>
     </div>
   );

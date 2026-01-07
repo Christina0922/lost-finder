@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 // Twilio 제거 - CoolSMS만 사용
 const nodemailer = require('nodemailer');
+const { OAuth2Client } = require('google-auth-library');
 const { 
   registerUser, 
   findUserByPhone, 
@@ -23,6 +24,9 @@ const {
 } = require('./database');
 require('dotenv').config();
 const coolsms = require('coolsms-node-sdk');
+
+// Google OAuth Client 초기화
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -420,6 +424,77 @@ apiRouter.post('/login', async (req, res) => {
     res.status(500).json({ 
       success: false, 
       error: '로그인 중 오류가 발생했습니다.' 
+    });
+  }
+});
+
+// Google OAuth 로그인 API
+apiRouter.post('/google-login', async (req, res) => {
+  try {
+    const { credential } = req.body;
+    
+    if (!credential) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Google 인증 정보가 필요합니다.' 
+      });
+    }
+
+    // Google 토큰 검증
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    
+    const payload = ticket.getPayload();
+    const { email, name, sub: googleId, picture } = payload;
+
+    // 이메일로 기존 사용자 확인
+    let user = null;
+    try {
+      user = await findUserByEmail(email);
+      console.log(`✅ 기존 Google 사용자 로그인: ${email}`);
+    } catch (error) {
+      // 새 사용자 등록
+      try {
+        user = await registerUser({
+          username: name || email.split('@')[0],
+          email: email,
+          phone: '', // Google 로그인은 전화번호 없음
+          password: `google_${googleId}_${Date.now()}`, // 임의의 안전한 비밀번호
+          googleId: googleId,
+          picture: picture
+        });
+        console.log(`✅ 새 Google 사용자 등록: ${email}`);
+        logAuthEvent('google_register', email, true, 'Google 계정으로 신규 가입');
+      } catch (registerError) {
+        console.error('❌ Google 사용자 등록 실패:', registerError.message);
+        return res.status(500).json({ 
+          success: false, 
+          error: 'Google 계정으로 가입하는 중 오류가 발생했습니다.' 
+        });
+      }
+    }
+
+    logAuthEvent('google_login', email, true, 'Google OAuth 로그인 성공');
+    res.json({ 
+      success: true, 
+      message: 'Google 로그인 성공',
+      user: { 
+        id: user.id, 
+        username: user.username, 
+        email: user.email, 
+        phone: user.phone || '',
+        picture: picture
+      }
+    });
+  } catch (error) {
+    console.error('❌ Google 로그인 실패:', error.message);
+    logAuthEvent('google_login', req.body.email || 'unknown', false, error.message);
+    res.status(401).json({ 
+      success: false, 
+      error: 'Google 로그인 검증에 실패했습니다.',
+      details: error.message
     });
   }
 });
@@ -1271,6 +1346,178 @@ apiRouter.delete('/comments/:id', async (req, res) => {
     res.status(500).json({ 
       success: false, 
       error: error.message 
+    });
+  }
+});
+
+// ==================== Google Places API 프록시 ====================
+
+// Places Autocomplete (장소 검색 자동완성)
+apiRouter.get('/places/autocomplete', async (req, res) => {
+  try {
+    const { input } = req.query;
+    
+    if (!input) {
+      return res.status(400).json({ 
+        success: false, 
+        error: '검색어를 입력해주세요.' 
+      });
+    }
+
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    if (!apiKey) {
+      console.error('❌ GOOGLE_MAPS_API_KEY 환경변수가 설정되지 않았습니다.');
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Google Maps API 키가 설정되지 않았습니다.' 
+      });
+    }
+
+    const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&key=${apiKey}&language=ko&components=country:kr`;
+    
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.status === 'OK') {
+      // 결과를 최대 6개로 제한
+      const predictions = data.predictions.slice(0, 6).map(p => ({
+        placeId: p.place_id,
+        description: p.description,
+        mainText: p.structured_formatting?.main_text || '',
+        secondaryText: p.structured_formatting?.secondary_text || ''
+      }));
+
+      res.json({ 
+        success: true, 
+        predictions 
+      });
+    } else if (data.status === 'ZERO_RESULTS') {
+      res.json({ 
+        success: true, 
+        predictions: [] 
+      });
+    } else {
+      console.error('❌ Places Autocomplete API 오류:', data.status, data.error_message);
+      res.status(500).json({ 
+        success: false, 
+        error: data.error_message || 'Places API 오류가 발생했습니다.' 
+      });
+    }
+  } catch (error) {
+    console.error('❌ Places Autocomplete 프록시 오류:', error.message);
+    res.status(500).json({ 
+      success: false, 
+      error: '장소 검색 중 오류가 발생했습니다.' 
+    });
+  }
+});
+
+// Place Details (선택한 장소의 상세 정보)
+apiRouter.get('/places/details', async (req, res) => {
+  try {
+    const { placeId } = req.query;
+    
+    if (!placeId) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'placeId를 입력해주세요.' 
+      });
+    }
+
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    if (!apiKey) {
+      console.error('❌ GOOGLE_MAPS_API_KEY 환경변수가 설정되지 않았습니다.');
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Google Maps API 키가 설정되지 않았습니다.' 
+      });
+    }
+
+    const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${apiKey}&language=ko&fields=name,formatted_address,geometry`;
+    
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.status === 'OK') {
+      const result = data.result;
+      res.json({ 
+        success: true, 
+        place: {
+          placeName: result.name,
+          address: result.formatted_address,
+          lat: result.geometry.location.lat,
+          lng: result.geometry.location.lng
+        }
+      });
+    } else {
+      console.error('❌ Place Details API 오류:', data.status, data.error_message);
+      res.status(500).json({ 
+        success: false, 
+        error: data.error_message || 'Place Details API 오류가 발생했습니다.' 
+      });
+    }
+  } catch (error) {
+    console.error('❌ Place Details 프록시 오류:', error.message);
+    res.status(500).json({ 
+      success: false, 
+      error: '장소 정보 조회 중 오류가 발생했습니다.' 
+    });
+  }
+});
+
+// Geocoding (주소 → 좌표 변환)
+apiRouter.get('/places/geocode', async (req, res) => {
+  try {
+    const { address } = req.query;
+    
+    if (!address) {
+      return res.status(400).json({ 
+        success: false, 
+        error: '주소를 입력해주세요.' 
+      });
+    }
+
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    if (!apiKey) {
+      console.error('❌ GOOGLE_MAPS_API_KEY 환경변수가 설정되지 않았습니다.');
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Google Maps API 키가 설정되지 않았습니다.' 
+      });
+    }
+
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}&language=ko`;
+    
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.status === 'OK') {
+      const result = data.results[0];
+      res.json({ 
+        success: true, 
+        location: {
+          address: result.formatted_address,
+          lat: result.geometry.location.lat,
+          lng: result.geometry.location.lng
+        }
+      });
+    } else if (data.status === 'ZERO_RESULTS') {
+      res.json({ 
+        success: false, 
+        error: '주소를 찾을 수 없습니다.' 
+      });
+    } else {
+      console.error('❌ Geocoding API 오류:', data.status, data.error_message);
+      res.status(500).json({ 
+        success: false, 
+        error: data.error_message || 'Geocoding API 오류가 발생했습니다.' 
+      });
+    }
+  } catch (error) {
+    console.error('❌ Geocoding 프록시 오류:', error.message);
+    res.status(500).json({ 
+      success: false, 
+      error: '주소 변환 중 오류가 발생했습니다.' 
     });
   }
 });
