@@ -19,6 +19,7 @@ const LazyImage = ({
 }: LazyImageProps) => {
   const [imageSrc, setImageSrc] = useState(placeholder);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 
@@ -49,15 +50,40 @@ const LazyImage = ({
       img.onload = () => {
         setImageSrc(src);
         setIsLoaded(true);
+        setHasError(false);
         onLoad?.();
       };
       img.onerror = () => {
-        setImageSrc('https://via.placeholder.com/200x150?text=이미지+오류');
+        setHasError(true);
+        setIsLoaded(false);
         onError?.();
       };
       img.src = src;
     }
   }, [isInView, src, onLoad, onError]);
+
+  // 에러 발생 시 placeholder UI 표시
+  if (hasError) {
+    return (
+      <div
+        ref={imgRef}
+        className={`${className} image-error-placeholder`}
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#f3f4f6',
+          color: '#9ca3af',
+        }}
+      >
+        <div style={{ fontSize: '32px', marginBottom: '8px' }}>🖼️</div>
+        <div style={{ fontSize: '12px', fontWeight: 600 }}>이미지 로드 실패</div>
+      </div>
+    );
+  }
 
   return (
     <img

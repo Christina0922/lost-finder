@@ -1266,12 +1266,48 @@ apiRouter.post('/lost-items', async (req, res) => {
 apiRouter.put('/lost-items/:id', async (req, res) => {
   try {
     const itemId = parseInt(req.params.id);
-    const { item_type, description, location, image_urls } = req.body;
+    const { 
+      item_type, 
+      description, 
+      location, 
+      image_urls,
+      lat,
+      lng,
+      place_name,
+      address,
+      lost_at,
+      device_id // 클라이언트에서 전송한 device_id
+    } = req.body;
+    
+    console.log('📥 [수정 요청] ID:', itemId, 'deviceId:', device_id);
     
     if (!item_type || !description || !location) {
       return res.status(400).json({
         success: false,
-        error: '필수 필드가 누락되었습니다.'
+        message: '필수 필드가 누락되었습니다.'
+      });
+    }
+    
+    // deviceId 검증: 해당 글의 created_by_device_id와 일치하는지 확인
+    try {
+      const existingItem = await getLostItemById(itemId);
+      
+      if (device_id && existingItem.created_by_device_id && 
+          device_id !== existingItem.created_by_device_id) {
+        console.error('❌ [수정 거부] deviceId 불일치:', { 
+          request: device_id, 
+          stored: existingItem.created_by_device_id 
+        });
+        return res.status(403).json({
+          success: false,
+          message: '수정 권한이 없습니다.'
+        });
+      }
+    } catch (err) {
+      console.error('❌ [수정 실패] 아이템 조회 오류:', err.message);
+      return res.status(404).json({
+        success: false,
+        message: '분실물을 찾을 수 없습니다.'
       });
     }
     
@@ -1279,18 +1315,24 @@ apiRouter.put('/lost-items/:id', async (req, res) => {
       item_type,
       description,
       location,
-      image_urls: image_urls || []
+      image_urls: image_urls || [],
+      lat: lat || null,
+      lng: lng || null,
+      place_name: place_name || null,
+      address: address || null,
+      lost_at: lost_at || null
     });
     
-    console.log('✅ 분실물 수정 성공:', itemId);
+    console.log('✅ [수정 성공] ID:', itemId);
     res.json({ 
       success: true, 
       message: '분실물이 성공적으로 수정되었습니다.' 
     });
   } catch (error) {
-    console.error('❌ 분실물 수정 실패:', error.message);
+    console.error('❌ [수정 실패] 예외:', error.message);
     res.status(500).json({ 
       success: false, 
+      message: '서버 오류가 발생했습니다.',
       error: error.message 
     });
   }
@@ -1300,17 +1342,45 @@ apiRouter.put('/lost-items/:id', async (req, res) => {
 apiRouter.delete('/lost-items/:id', async (req, res) => {
   try {
     const itemId = parseInt(req.params.id);
+    const { device_id } = req.body; // 클라이언트에서 전송한 device_id
+    
+    console.log('📥 [삭제 요청] ID:', itemId, 'deviceId:', device_id);
+    
+    // deviceId 검증: 해당 글의 created_by_device_id와 일치하는지 확인
+    try {
+      const existingItem = await getLostItemById(itemId);
+      
+      if (device_id && existingItem.created_by_device_id && 
+          device_id !== existingItem.created_by_device_id) {
+        console.error('❌ [삭제 거부] deviceId 불일치:', { 
+          request: device_id, 
+          stored: existingItem.created_by_device_id 
+        });
+        return res.status(403).json({
+          success: false,
+          message: '삭제 권한이 없습니다.'
+        });
+      }
+    } catch (err) {
+      console.error('❌ [삭제 실패] 아이템 조회 오류:', err.message);
+      return res.status(404).json({
+        success: false,
+        message: '분실물을 찾을 수 없습니다.'
+      });
+    }
+    
     await deleteLostItem(itemId);
     
-    console.log('✅ 분실물 삭제 성공:', itemId);
+    console.log('✅ [삭제 성공] ID:', itemId);
     res.json({ 
       success: true, 
       message: '분실물이 성공적으로 삭제되었습니다.' 
     });
   } catch (error) {
-    console.error('❌ 분실물 삭제 실패:', error.message);
+    console.error('❌ [삭제 실패] 예외:', error.message);
     res.status(500).json({ 
       success: false, 
+      message: '서버 오류가 발생했습니다.',
       error: error.message 
     });
   }

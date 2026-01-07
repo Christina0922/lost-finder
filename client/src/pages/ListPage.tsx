@@ -192,16 +192,25 @@ const ListPage = ({ currentUser, onDeleteItem, theme }: ListPageProps) => {
                 
                 {/* 이미지 (가장 크게 강조) */}
                 <Link to={`/detail/${item.id}`} className="card-image-link">
-                  <LazyImage 
-                    src={(item.image_urls && item.image_urls[0]) || 'https://via.placeholder.com/400x300'} 
-                    alt={item.item_type} 
-                    className="card-image"
-                    placeholder="https://via.placeholder.com/400x300?text=Loading..."
-                  />
-                  {item.image_urls && item.image_urls.length > 1 && (
-                    <span className="image-count-badge">
-                      +{item.image_urls.length - 1}
-                    </span>
+                  {item.image_urls && item.image_urls.length > 0 && item.image_urls[0] ? (
+                    <>
+                      <LazyImage 
+                        src={item.image_urls[0]} 
+                        alt={item.item_type} 
+                        className="card-image"
+                        placeholder="https://via.placeholder.com/400x300?text=Loading..."
+                      />
+                      {item.image_urls.length > 1 && (
+                        <span className="image-count-badge">
+                          +{item.image_urls.length - 1}
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <div className="card-image-placeholder">
+                      <div className="placeholder-icon">📷</div>
+                      <div className="placeholder-text">사진 없음</div>
+                    </div>
                   )}
                 </Link>
                 
@@ -212,19 +221,27 @@ const ListPage = ({ currentUser, onDeleteItem, theme }: ListPageProps) => {
                     {formatBlurredLocation(item.location, t)}
                   </p>
                   
-                  {currentUser && currentUser.id === item.author_id && (
+                  {isMyPost && (
                     <div className="card-actions">
                       <button 
-                        onClick={() => handleEditClick(item.id)} 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleEditClick(item.id);
+                        }} 
                         className="card-edit-button"
                       >
-                        {t('common.edit')}
+                        ✏️ {t('common.edit') || '수정'}
                       </button>
                       <button 
-                        onClick={() => handleDeleteClick(item.id)} 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleDeleteClick(item.id);
+                        }} 
                         className="card-delete-button"
                       >
-                        {t('common.delete')}
+                        🗑️ {t('common.delete') || '삭제'}
                       </button>
                     </div>
                   )}

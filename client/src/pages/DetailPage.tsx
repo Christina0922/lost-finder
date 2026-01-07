@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import SEOHead from '../components/SEOHead';
-import GoogleMapComponent from '../components/GoogleMapComponent';
 import GlobalMonetizationCard from '../components/GlobalMonetizationCard';
 import DateFormatter from '../components/DateFormatter';
 import { LostItem, Comment, User } from '../types';
@@ -208,49 +207,109 @@ const DetailPage: React.FC<DetailPageProps> = ({ currentUser, onAddComment, onDe
 
         {/* 위치 정보 */}
         {item.lat && item.lng ? (
-          <>
-            <div className="map-container">
-              <GoogleMapComponent
-                center={{ lat: item.lat, lng: item.lng }}
-                zoom={16}
-                markers={[{
-                  id: item.id,
-                  position: { lat: item.lat, lng: item.lng },
-                  title: item.item_type,
-                  description: item.description,
-                  isMyItem: isMyItem(item.created_by_device_id),
-                }]}
-                height="300px"
+          <div style={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            borderRadius: '16px',
+            padding: '20px',
+            color: 'white',
+            marginTop: '20px',
+            marginBottom: '20px',
+            boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+          }}>
+            <h3 style={{ 
+              margin: '0 0 16px 0', 
+              fontSize: '18px', 
+              fontWeight: '800',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}>
+              📍 분실 위치
+            </h3>
+            
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.15)',
+              borderRadius: '12px',
+              padding: '12px',
+              marginBottom: '12px',
+            }}>
+              <div style={{ fontSize: '16px', fontWeight: '700', marginBottom: '4px' }}>
+                {item.place_name || item.location}
+              </div>
+              {item.address && (
+                <div style={{ fontSize: '13px', opacity: 0.9 }}>
+                  {item.address}
+                </div>
+              )}
+            </div>
+
+            {/* OpenStreetMap (API 키 불필요, 무료) */}
+            <div style={{
+              borderRadius: '12px',
+              overflow: 'hidden',
+              marginBottom: '12px',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+            }}>
+              <iframe
+                width="100%"
+                height="300"
+                frameBorder="0"
+                scrolling="no"
+                marginHeight={0}
+                marginWidth={0}
+                src={`https://www.openstreetmap.org/export/embed.html?bbox=${item.lng-0.01},${item.lat-0.01},${item.lng+0.01},${item.lat+0.01}&layer=mapnik&marker=${item.lat},${item.lng}`}
+                style={{ border: 0 }}
+                title="위치 지도"
               />
             </div>
-            <div style={{ marginTop: '16px', textAlign: 'center' }}>
-              <button
-                onClick={() => navigate('/map', { state: { itemId: item.id } })}
+
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <a
+                href={`https://map.naver.com/v5/?c=${item.lng},${item.lat},16,0,0,0,dh`}
+                target="_blank"
+                rel="noopener noreferrer"
                 style={{
-                  padding: '12px 24px',
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  flex: 1,
+                  padding: '12px',
+                  background: '#03C75A',
                   color: 'white',
                   border: 'none',
                   borderRadius: '10px',
-                  fontSize: '15px',
-                  fontWeight: '600',
+                  fontSize: '14px',
+                  fontWeight: '700',
+                  textAlign: 'center',
+                  textDecoration: 'none',
                   cursor: 'pointer',
-                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                  boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(102, 126, 234, 0.3)';
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                 }}
               >
-                🗺️ 큰 지도에서 보기
-              </button>
+                🗺️ 네이버 지도
+              </a>
+              <a
+                href={`https://www.google.com/maps?q=${item.lat},${item.lng}&z=17&hl=ko`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  background: 'white',
+                  color: '#667eea',
+                  border: 'none',
+                  borderRadius: '10px',
+                  fontSize: '14px',
+                  fontWeight: '700',
+                  textAlign: 'center',
+                  textDecoration: 'none',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                }}
+              >
+                🗺️ Google
+              </a>
             </div>
-          </>
+          </div>
         ) : (
           <div style={{
             padding: '30px',
@@ -258,10 +317,11 @@ const DetailPage: React.FC<DetailPageProps> = ({ currentUser, onAddComment, onDe
             borderRadius: '12px',
             textAlign: 'center',
             color: '#666',
+            marginTop: '20px',
             marginBottom: '20px',
           }}>
             <div style={{ fontSize: '32px', marginBottom: '10px' }}>📍</div>
-            <div style={{ fontSize: '15px' }}>위치 정보가 없습니다</div>
+            <div style={{ fontSize: '15px', fontWeight: '600' }}>위치 정보가 없습니다</div>
             <div style={{ fontSize: '13px', marginTop: '6px', color: '#999' }}>
               이 분실물은 등록 시 지도 위치를 선택하지 않았습니다
             </div>

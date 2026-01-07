@@ -363,14 +363,17 @@ export const createLostItem = async (item: Omit<LostItem, 'id' | 'comments' | 'a
   }, '분실물 등록');
 };
 
-export const updateLostItem = async (id: number, item: Partial<LostItem>) => {
+export const updateLostItem = async (id: number, item: Partial<LostItem>, deviceId?: string) => {
   return safeApiCall(async () => {
     const response = await fetch(`/api/lost-items/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(item),
+      body: JSON.stringify({
+        ...item,
+        device_id: deviceId // deviceId 추가
+      }),
     });
 
     if (!response.ok) {
@@ -383,10 +386,16 @@ export const updateLostItem = async (id: number, item: Partial<LostItem>) => {
   }, '분실물 수정');
 };
 
-export const deleteLostItem = async (id: number) => {
+export const deleteLostItem = async (id: number, deviceId?: string) => {
   return safeApiCall(async () => {
     const response = await fetch(`/api/lost-items/${id}`, {
       method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        device_id: deviceId // deviceId 추가
+      }),
     });
 
     if (!response.ok) {
