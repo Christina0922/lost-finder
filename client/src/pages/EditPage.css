@@ -1,0 +1,500 @@
+/* 등록 화면 - 서비스급 디자인 */
+
+.edit-page-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8f9ff 0%, #f5f7ff 100%);
+  padding: 24px 16px;
+}
+
+.edit-page-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.edit-page-title {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 700;
+  color: #4a5568;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.edit-page-subtitle {
+  font-size: 0.95rem;
+  color: #718096;
+  font-weight: 400;
+}
+
+.edit-form {
+  max-width: 600px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 32px 24px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* 폼 그룹 */
+.edit-form-group {
+  margin-bottom: 24px;
+}
+
+.edit-form-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+
+.edit-form-label .required {
+  color: #e53e3e;
+  margin-left: 2px;
+}
+
+.edit-form-helper {
+  font-size: 0.85rem;
+  color: #718096;
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+.edit-form-error {
+  font-size: 0.85rem;
+  color: #e53e3e;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 입력 필드 기본 스타일 */
+.edit-input,
+.edit-textarea,
+.edit-select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #2d3748;
+  background: #ffffff;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.edit-input::placeholder,
+.edit-textarea::placeholder {
+  color: #a0aec0;
+  font-weight: 400;
+}
+
+/* 포커스 상태 */
+.edit-input:focus,
+.edit-textarea:focus,
+.edit-select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* 오류 상태 - 오류 발생 시에만 빨강 */
+.edit-input.has-error,
+.edit-textarea.has-error,
+.edit-select.has-error {
+  border-color: #fc8181;
+  background: #fff5f5;
+}
+
+.edit-input.has-error:focus,
+.edit-textarea.has-error:focus,
+.edit-select.has-error:focus {
+  border-color: #e53e3e;
+  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+}
+
+/* Textarea */
+.edit-textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.character-counter {
+  text-align: right;
+  font-size: 0.85rem;
+  color: #a0aec0;
+  margin-top: 6px;
+}
+
+.character-counter.warning {
+  color: #ed8936;
+}
+
+.character-counter.error {
+  color: #e53e3e;
+}
+
+/* Select */
+.edit-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5568' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+}
+
+/* 지도 선택 영역 */
+.location-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.location-selected-box {
+  background: linear-gradient(135deg, #e6f7ff 0%, #f0f9ff 100%);
+  border: 2px solid #667eea;
+  border-radius: 12px;
+  padding: 16px;
+  position: relative;
+}
+
+.location-selected-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: #4c51bf;
+  font-size: 0.95rem;
+}
+
+.location-selected-content {
+  color: #2d3748;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.location-selected-item {
+  margin-bottom: 6px;
+}
+
+.location-selected-item strong {
+  color: #4a5568;
+  font-weight: 600;
+  min-width: 50px;
+  display: inline-block;
+}
+
+.location-coordinates {
+  font-size: 0.8rem;
+  color: #718096;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.location-change-btn {
+  margin-top: 12px;
+  padding: 8px 16px;
+  background: #ffffff;
+  color: #667eea;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.location-change-btn:hover {
+  background: #667eea;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.location-map-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  text-decoration: none;
+}
+
+.location-map-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+}
+
+/* 사진 업로드 */
+.photo-upload-section {
+  margin-top: 8px;
+}
+
+.photo-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #ffffff;
+  color: #667eea;
+  border: 2px solid #667eea;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.photo-upload-btn:hover:not(:disabled) {
+  background: #667eea;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.photo-upload-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.photo-upload-helper {
+  font-size: 0.85rem;
+  color: #718096;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.photo-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.photo-preview-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.photo-preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-remove-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  background: rgba(220, 38, 38, 0.9);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.photo-remove-btn:hover {
+  background: #dc2626;
+  transform: scale(1.1);
+}
+
+.uploading-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #667eea;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-top: 12px;
+}
+
+/* 버튼 그룹 */
+.edit-button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.edit-submit-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.edit-submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+}
+
+.edit-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.edit-cancel-btn {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  color: #718096;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: block;
+  text-align: center;
+}
+
+.edit-cancel-btn:hover {
+  color: #4a5568;
+  background: #f7fafc;
+}
+
+/* 토스트 메시지 */
+.toast-notification {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 90%;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  z-index: 9999;
+  animation: slideDown 0.3s ease-out;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.toast-notification.success {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  color: #155724;
+  border: 2px solid #28a745;
+}
+
+.toast-notification.error {
+  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+  color: #721c24;
+  border: 2px solid #dc3545;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* 모바일 최적화 */
+@media (max-width: 600px) {
+  .edit-page-container {
+    padding: 16px 12px;
+  }
+
+  .edit-form {
+    padding: 24px 16px;
+    border-radius: 12px;
+  }
+
+  .edit-form-group {
+    margin-bottom: 20px;
+  }
+
+  .edit-input,
+  .edit-textarea,
+  .edit-select {
+    font-size: 16px; /* iOS 자동 줌 방지 */
+    padding: 14px;
+  }
+
+  .photo-preview-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 8px;
+  }
+
+  .edit-submit-btn {
+    padding: 14px;
+    font-size: 1rem;
+  }
+
+  .location-map-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 14px 20px;
+  }
+}
+
+/* 키보드 대응 (모바일) */
+@supports (-webkit-touch-callout: none) {
+  .edit-button-group {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* 로딩 상태 */
+.loading-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e2e8f0;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+

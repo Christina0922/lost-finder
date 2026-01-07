@@ -51,148 +51,65 @@ const GlobalMonetizationCard: React.FC<GlobalMonetizationCardProps> = ({ classNa
 
   return (
     <div className={`global-monetization-card ${className || ''}`} style={{
-      marginTop: '3rem',
-      marginBottom: '2rem',
-      padding: '2rem',
-      backgroundColor: '#f9fafb',
-      borderRadius: '12px',
-      border: '1px solid #e5e7eb',
+      marginTop: '2rem',
+      marginBottom: '1rem',
+      padding: '1rem',
+      backgroundColor: '#fef3c7',
+      borderRadius: '8px',
+      border: '1px solid #fde68a',
     }}>
-      <h2 style={{
-        fontSize: '1.5rem',
-        fontWeight: 'bold',
-        marginBottom: '1.5rem',
-        color: '#1f2937',
-        textAlign: 'center',
-      }}>
-        {t('monetization.title')}
-      </h2>
-      
       <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-        gap: '1.5rem',
-        marginTop: '2rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '1rem',
+        flexWrap: 'wrap',
       }}>
-        {products.map((product) => (
-          <div
-            key={product.id}
-            onClick={() => handleProductClick(product.amazonAffiliateLink)}
-            style={{
-              backgroundColor: '#ffffff',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              border: '2px solid #e5e7eb',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-4px)';
-              e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,0,0,0.15)';
-              e.currentTarget.style.borderColor = '#FF9900';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
-              e.currentTarget.style.borderColor = '#e5e7eb';
-            }}
-          >
-            <div style={{
-              width: '100%',
-              height: '200px',
-              backgroundColor: '#f3f4f6',
-              borderRadius: '8px',
-              marginBottom: '1rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              overflow: 'hidden',
-            }}>
-              <img
-                src={product.imageUrl}
-                alt={product.name}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                }}
-                onError={(e) => {
-                  e.currentTarget.src = 'https://via.placeholder.com/300x200?text=Product+Image';
-                }}
-              />
-            </div>
-            
-            <h3 style={{
-              fontSize: '1.125rem',
-              fontWeight: '600',
-              marginBottom: '0.5rem',
-              color: '#1f2937',
-            }}>
-              {product.name}
-            </h3>
-            
-            <p style={{
-              fontSize: '0.875rem',
-              color: '#6b7280',
-              marginBottom: '1rem',
-              flexGrow: 1,
-              lineHeight: '1.5',
-            }}>
-              {product.description}
-            </p>
-            
-            {product.price && (
-              <div style={{
-                fontSize: '1.25rem',
-                fontWeight: 'bold',
-                color: '#FF9900',
-                marginBottom: '1rem',
-              }}>
-                {product.price}
-              </div>
-            )}
-            
-            <button
+        <div style={{
+          fontSize: '0.875rem',
+          color: '#92400e',
+          fontWeight: '500',
+        }}>
+          💡 {t('monetization.preventFutureLoss')} - 분실 방지 제품 추천
+        </div>
+        
+        <div style={{
+          display: 'flex',
+          gap: '0.75rem',
+          flexWrap: 'wrap',
+        }}>
+          {products.map((product) => (
+            <a
+              key={product.id}
+              href={product.amazonAffiliateLink}
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
-                backgroundColor: '#FF9900',
-                color: '#ffffff',
-                border: 'none',
-                padding: '0.75rem 1.5rem',
-                borderRadius: '8px',
-                fontSize: '0.875rem',
+                fontSize: '0.75rem',
+                color: '#667eea',
+                textDecoration: 'none',
                 fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'background-color 0.2s ease',
-                width: '100%',
+                padding: '0.25rem 0.75rem',
+                backgroundColor: '#ffffff',
+                borderRadius: '6px',
+                border: '1px solid #e5e7eb',
+                transition: 'all 0.2s ease',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#e68900';
+                e.currentTarget.style.backgroundColor = '#667eea';
+                e.currentTarget.style.color = '#ffffff';
+                e.currentTarget.style.borderColor = '#667eea';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#FF9900';
+                e.currentTarget.style.backgroundColor = '#ffffff';
+                e.currentTarget.style.color = '#667eea';
+                e.currentTarget.style.borderColor = '#e5e7eb';
               }}
             >
-              {t('monetization.viewOnAmazon')}
-            </button>
-          </div>
-        ))}
-      </div>
-      
-      <div style={{
-        marginTop: '1.5rem',
-        padding: '1rem',
-        backgroundColor: '#fef3c7',
-        borderRadius: '8px',
-        fontSize: '0.875rem',
-        color: '#92400e',
-        textAlign: 'center',
-      }}>
-        <p style={{ margin: 0 }}>
-          💡 {t('monetization.preventFutureLoss')} - {t('monetization.title')}
-        </p>
+              {product.name}
+            </a>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -1203,32 +1203,60 @@ apiRouter.get('/lost-items/:id', async (req, res) => {
 // 분실물 등록
 apiRouter.post('/lost-items', async (req, res) => {
   try {
-    const { author_id, item_type, description, location, image_urls } = req.body;
+    const { 
+      author_id, 
+      item_type, 
+      description, 
+      location, 
+      image_urls,
+      lat,
+      lng,
+      place_name,
+      address,
+      lost_at,
+      created_by_device_id
+    } = req.body;
     
-    if (!author_id || !item_type || !description || !location) {
+    console.log('📥 [등록 요청] 받은 데이터:', {
+      item_type,
+      location,
+      has_coordinates: !!(lat && lng),
+      created_by_device_id
+    });
+    
+    if (!item_type || !description || !location) {
+      console.log('❌ [등록 실패] 필수 필드 누락');
       return res.status(400).json({
         success: false,
-        error: '필수 필드가 누락되었습니다.'
+        message: '필수 필드가 누락되었습니다.'
       });
     }
     
     const newItem = await createLostItem({
-      author_id,
+      author_id: author_id || 1, // 임시 사용자 ID (로그인 없이 사용 가능)
       item_type,
       description,
       location,
-      image_urls: image_urls || []
+      image_urls: image_urls || [],
+      lat: lat || null,
+      lng: lng || null,
+      place_name: place_name || null,
+      address: address || null,
+      lost_at: lost_at || new Date().toISOString(),
+      created_by_device_id: created_by_device_id || null
     });
     
-    console.log('✅ 분실물 등록 성공:', newItem.id);
+    console.log('✅ [등록 성공] ID:', newItem.id);
     res.status(201).json({ 
       success: true, 
+      message: '분실물이 성공적으로 등록되었습니다',
       item: newItem 
     });
   } catch (error) {
-    console.error('❌ 분실물 등록 실패:', error.message);
+    console.error('❌ [등록 실패] 예외:', error.message);
     res.status(500).json({ 
       success: false, 
+      message: '서버 오류가 발생했습니다',
       error: error.message 
     });
   }

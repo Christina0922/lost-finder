@@ -448,11 +448,11 @@ function getAllLostItems() {
         li.image_urls,
         li.created_at,
         li.updated_at,
-        u.id as author_id,
-        u.username as author_name,
-        u.email as author_email
+        li.author_id,
+        COALESCE(u.username, '익명') as author_name,
+        COALESCE(u.email, '') as author_email
       FROM lost_items li
-      JOIN users u ON li.author_id = u.id
+      LEFT JOIN users u ON li.author_id = u.id
       ORDER BY li.created_at DESC
     `;
     
@@ -461,6 +461,7 @@ function getAllLostItems() {
         console.error('❌ 분실물 목록 조회 실패:', err.message);
         reject(new Error('분실물 목록 조회 중 오류가 발생했습니다.'));
       } else {
+        console.log(`✅ 분실물 목록 조회 성공: ${rows.length}개 항목`);
         // image_urls를 JSON에서 배열로 변환
         const items = rows.map(row => ({
           ...row,
@@ -490,11 +491,11 @@ function getLostItemById(itemId) {
         li.image_urls,
         li.created_at,
         li.updated_at,
-        u.id as author_id,
-        u.username as author_name,
-        u.email as author_email
+        li.author_id,
+        COALESCE(u.username, '익명') as author_name,
+        COALESCE(u.email, '') as author_email
       FROM lost_items li
-      JOIN users u ON li.author_id = u.id
+      LEFT JOIN users u ON li.author_id = u.id
       WHERE li.id = ?
     `;
     
@@ -503,8 +504,10 @@ function getLostItemById(itemId) {
         console.error('❌ 분실물 조회 실패:', err.message);
         reject(new Error('분실물 조회 중 오류가 발생했습니다.'));
       } else if (!row) {
+        console.error('❌ 분실물 조회 실패: 분실물을 찾을 수 없습니다. (ID:', itemId, ')');
         reject(new Error('분실물을 찾을 수 없습니다.'));
       } else {
+        console.log('✅ 분실물 조회 성공:', { id: row.id, item_type: row.item_type });
         // image_urls를 JSON에서 배열로 변환
         const item = {
           ...row,

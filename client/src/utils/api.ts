@@ -295,6 +295,27 @@ export const getAllUsers = async () => {
   }
 }; 
 
+/**
+ * 등록 응답에서 ID를 안전하게 추출
+ * 서버 구현에 따라 키가 다를 수 있어서 다양한 경우를 지원
+ */
+export const extractCreatedId = (data: any): string | number | null => {
+  const id =
+    data?.item?.id ??
+    data?.id ??
+    data?._id ??
+    data?.itemId ??
+    data?.createdId ??
+    data?.result?.id ??
+    data?.result?._id ??
+    data?.data?.id ??
+    data?.data?._id;
+
+  if (id === 0) return 0;
+  if (id === undefined || id === null) return null;
+  return id;
+};
+
 // 분실물 관련 API
 export const getAllLostItems = async (): Promise<LostItem[]> => {
   return safeApiCall(async () => {
