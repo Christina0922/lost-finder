@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "com.temp.app-debug-31:/drawable-anydpi_shortcut_legacy_background.xml.flat",
+        "source": "com.temp.app-main-33:/drawable-anydpi/shortcut_legacy_background.xml"
+    },
+    {
+        "merged": "com.temp.app-debug-31:/xml_filepaths.xml.flat",
+        "source": "com.temp.app-main-33:/xml/filepaths.xml"
+    },
+    {
+        "merged": "com.temp.app-debug-31:/layout_activity_main.xml.flat",
+        "source": "com.temp.app-main-33:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.temp.app-debug-31:/xml_shortcuts.xml.flat",
+        "source": "com.temp.app-main-33:/xml/shortcuts.xml"
+    }
+]

@@ -59,14 +59,18 @@ export default function BottomBanner() {
   return (
     <div className="w-full px-2 py-2 mt-2 mb-4 rounded-2xl shadow-md space-y-2 text-center bottom-banner" style={{
       background: 'linear-gradient(135deg, #f8f9ff 0%, #f5f7ff 100%)',
-      border: '1px solid rgba(102, 126, 234, 0.1)'
+      border: '1px solid rgba(102, 126, 234, 0.1)',
+      paddingTop: '7.53px',
+      paddingBottom: '7.53px',
+      marginTop: '7.53px',
+      marginBottom: '15.05px'
     }}>
       {/* 감동 후기 섹션 */}
       <div>
         <p className="text-lg font-semibold bottom-banner-title" style={{ 
           textAlign: 'center', 
-          marginBottom: 8, 
-          marginTop: 8,
+          marginBottom: 7.53, 
+          marginTop: 7.53,
           color: '#4a5568',
           fontSize: '1.1rem'
         }}>
@@ -74,7 +78,7 @@ export default function BottomBanner() {
         </p>
         <p className="bottom-banner-desc" style={{ 
           textAlign: 'center', 
-          marginBottom: 16,
+          marginBottom: 15.05,
           color: '#718096',
           fontSize: '0.95rem',
           lineHeight: '1.6'
@@ -91,7 +95,7 @@ export default function BottomBanner() {
             borderRadius: '12px',
             fontWeight: 600,
             fontSize: '1.47rem',
-            padding: '14px 32px',
+            padding: '13.17px 30.11px',
             boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             cursor: 'pointer',
@@ -112,7 +116,7 @@ export default function BottomBanner() {
         <hr style={{ 
           border: '0', 
           borderTop: '1px solid rgba(102, 126, 234, 0.15)', 
-          margin: '20px 0', 
+          margin: '18.82px 0', 
           width: '100%' 
         }} />
       </div>
@@ -121,7 +125,7 @@ export default function BottomBanner() {
       <div>
         <p className="text-gray-600" style={{ 
           fontSize: "0.95rem", 
-          marginBottom: 12, 
+          marginBottom: 11.29, 
           color: "#718096", 
           lineHeight: 1.6
         }}>
@@ -140,7 +144,7 @@ export default function BottomBanner() {
             borderRadius: '12px',
             fontWeight: 600,
             fontSize: '1.47rem',
-            padding: '14px 32px',
+            padding: '13.17px 30.11px',
             boxShadow: '0 2px 8px rgba(102, 126, 234, 0.1)',
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             cursor: 'pointer',
@@ -170,7 +174,7 @@ export default function BottomBanner() {
       <hr style={{ 
         border: '0', 
         borderTop: '1px solid rgba(102, 126, 234, 0.15)', 
-        margin: '20px 0', 
+        margin: '18.82px 0', 
         width: '100%' 
       }} />
 
@@ -178,13 +182,15 @@ export default function BottomBanner() {
       <div className="relative">
         <p className="text-lg font-semibold text-center mb-2" style={{
           color: '#4a5568',
-          fontSize: '1.1rem'
+          fontSize: '1.1rem',
+          marginBottom: '7.53px'
         }}>
           추천 상품
         </p>
         <p className="text-sm text-gray-600 text-center mb-3" style={{
           color: '#718096',
-          fontSize: '0.9rem'
+          fontSize: '0.9rem',
+          marginBottom: '11.29px'
         }}>
           분실물 걱정 줄이는 인기템 모아봤어요
         </p>
@@ -192,7 +198,9 @@ export default function BottomBanner() {
         <div className="mt-2 p-4 rounded-xl text-base leading-relaxed mx-auto" style={{
           maxWidth:'340px',
           margin:'0 auto',
-          background: 'transparent'
+          background: 'transparent',
+          marginTop: '7.53px',
+          padding: '15.05px'
         }}>
           <div
             className="text-center"
@@ -200,7 +208,7 @@ export default function BottomBanner() {
               color: '#4a5568', 
               fontWeight: 500, 
               fontSize: '14px',
-              marginBottom: '12px',
+              marginBottom: '11.29px',
               lineHeight: '1.6'
             }}
             dangerouslySetInnerHTML={{
@@ -221,7 +229,7 @@ export default function BottomBanner() {
               fontWeight: 600,
               borderRadius: '12px',
               fontSize: '14px',
-              padding: '10px 24px',
+              padding: '9.41px 22.58px',
               border: 'none',
               whiteSpace: 'nowrap',
               minWidth: '200px',

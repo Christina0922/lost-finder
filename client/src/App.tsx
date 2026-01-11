@@ -6,9 +6,11 @@ import MainPage from './pages/MainPage';
 import ListPage from './pages/ListPage';
 import DetailPage from './pages/DetailPage';
 import EditPage from './pages/EditPage';
+import MapPage from './pages/MapPage';
 import SuccessStoriesPage from './pages/SuccessStoriesPage';
 import AdminPanel from './pages/AdminPanel';
 import { AlertMode, getAlertMode, setAlertMode as saveAlertMode, triggerAlert } from './utils/notification';
+import { initializeDeviceId } from './utils/deviceId';
 import './App.css';
 
 // Error Boundary Component
@@ -43,39 +45,9 @@ class ErrorBoundary extends React.Component<
   }
 }
 
-// Type definitions
-export interface User {
-  id: number;
-  username: string;
-  email: string;
-  password: string;
-  phoneNumber?: string;
-  isTemporaryPassword?: boolean;
-  role?: 'user' | 'admin';
-}
-
-export interface Comment { 
-  id: number; 
-  author_id: number; 
-  author_name?: string;
-  author_email?: string;
-  text: string; 
-  created_at?: string;
-}
-
-export interface LostItem {
-  id: number;
-  author_id: number;
-  author_name?: string;
-  author_email?: string;
-  item_type: string;
-  description: string;
-  location: string;
-  image_urls: string[];
-  created_at?: string;
-  updated_at?: string;
-  comments?: Comment[];
-}
+// Type definitions - import from types
+import type { User, Comment, LostItem } from './types';
+export type { User, Comment, LostItem };
 
 export interface Notification {
   id: number;
@@ -761,6 +733,9 @@ const App: React.FC = () => {
   // Load user and settings from localStorage on app start
   useEffect(() => {
     try {
+      // Device ID 초기화 (로그인 없이 내 글 구분용)
+      initializeDeviceId();
+      
       const savedUser = localStorage.getItem('currentUser');
       const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
       const savedAlertMode = localStorage.getItem('alertMode') as AlertMode;
@@ -792,6 +767,12 @@ const App: React.FC = () => {
             item_type: item.item_type,
             description: item.description,
             location: item.location,
+            lat: item.lat,
+            lng: item.lng,
+            place_name: item.place_name,
+            address: item.address,
+            lost_at: item.lost_at,
+            created_by_device_id: item.created_by_device_id,
             image_urls: item.image_urls || [],
             comments: item.comments || []
           }));
@@ -894,8 +875,9 @@ const App: React.FC = () => {
 
       const data = await response.json();
       if (data.success) {
-        const newComment = {
+        const newComment: Comment = {
           id: data.comment.id,
+          item_id: itemId,
           author_id: data.comment.author_id,
           text: data.comment.text
         };
@@ -964,9 +946,11 @@ const App: React.FC = () => {
 
   const handleDeleteItem = async (itemId: number) => {
     try {
+      const deviceId = localStorage.getItem('lostfinder_device_id') || '';
       const response = await fetch(`/api/lost-items/${itemId}`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ device_id: deviceId })
       });
 
       const data = await response.json();
@@ -975,7 +959,7 @@ const App: React.FC = () => {
         setToast({ message: '분실물이 성공적으로 삭제되었습니다!', type: 'success' });
         return true;
       }
-      setToast({ message: '분실물 삭제에 실패했습니다.', type: 'error' });
+      setToast({ message: data.message || '분실물 삭제에 실패했습니다.', type: 'error' });
       return false;
     } catch (error) {
       console.error('분실물 삭제 실패:', error);
@@ -986,6 +970,7 @@ const App: React.FC = () => {
 
   const handleUpdateItem = async (updatedItem: LostItem) => {
     try {
+      const deviceId = localStorage.getItem('lostfinder_device_id') || '';
       const response = await fetch(`/api/lost-items/${updatedItem.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -993,7 +978,13 @@ const App: React.FC = () => {
           item_type: updatedItem.item_type,
           description: updatedItem.description,
           location: updatedItem.location,
-          image_urls: updatedItem.image_urls
+          image_urls: updatedItem.image_urls,
+          lat: updatedItem.lat,
+          lng: updatedItem.lng,
+          place_name: updatedItem.place_name,
+          address: updatedItem.address,
+          lost_at: updatedItem.lost_at,
+          device_id: deviceId
         })
       });
 
@@ -1007,7 +998,7 @@ const App: React.FC = () => {
         setToast({ message: '분실물이 성공적으로 수정되었습니다!', type: 'success' });
         return true;
       }
-      setToast({ message: '분실물 수정에 실패했습니다.', type: 'error' });
+      setToast({ message: data.message || '분실물 수정에 실패했습니다.', type: 'error' });
       return false;
     } catch (error) {
       console.error('분실물 수정 실패:', error);
@@ -1079,6 +1070,12 @@ const App: React.FC = () => {
                   theme={theme}
                 />
               } />
+              <Route path="/map" element={
+                <MapPage 
+                  lostItems={lostItems}
+                  currentUser={currentUser}
+                />
+              } />
               <Route path="/detail/:id" element={
                 <DetailPage 
                   currentUser={currentUser}
@@ -1096,6 +1093,12 @@ const App: React.FC = () => {
                   onUpdateItem={handleUpdateItem}
                   onAddItem={handleAddItem}
                   theme={theme}
+                />
+              } />
+              <Route path="/map" element={
+                <MapPage 
+                  lostItems={lostItems}
+                  currentUser={currentUser}
                 />
               } />
             </Routes>

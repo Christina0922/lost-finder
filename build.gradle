@@ -17,10 +17,9 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.9.1'
@@ -30,12 +29,7 @@ buildscript {
     }
 }
 
-allprojects {
-    repositories {
-        google()
-        jcenter()
-    }
-}
+// allprojects 블록 제거 - settings.gradle의 dependencyResolutionManagement가 처리함
 
 task clean(type: Delete) {
     delete rootProject.buildDir
