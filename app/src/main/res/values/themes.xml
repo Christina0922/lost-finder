@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- 앱 메인 테마 -->
+    <style name="Theme.LostFinder" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#667eea</item>
+        <item name="colorPrimaryDark">#5568d3</item>
+        <item name="colorAccent">#764ba2</item>
+    </style>
+
+    <!-- 스플래시(앱 실행 직후) 테마 -->
+    <style name="Theme.LostFinder.SplashScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:statusBarColor">@android:color/white</item>
+    </style>
+
+</resources>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="256" viewBox="0 0 800 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .primary { fill: #4A90E2; }
+      .secondary { fill: #357ABD; }
+      .text { fill: #2C3E50; }
+      .accent { fill: #F5A623; }
+    </style>
+  </defs>
+  
+  <!-- 심볼 (왼쪽) -->
+  <g id="symbol" transform="translate(40, 0)">
+    <path class="primary" d="M 128 40 C 100 40, 80 60, 80 88 C 80 110, 95 130, 128 180 C 161 130, 176 110, 176 88 C 176 60, 156 40, 128 40 Z" stroke="#357ABD" stroke-width="4"/>
+    <circle cx="128" cy="88" r="24" fill="#FFFFFF" stroke="#357ABD" stroke-width="3"/>
+    <circle cx="128" cy="88" r="10" class="accent"/>
+    
+    <circle cx="170" cy="170" r="30" fill="none" class="secondary" stroke="#357ABD" stroke-width="6"/>
+    <path d="M 160 160 Q 170 155, 180 160" stroke="#FFFFFF" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.6"/>
+    <path class="secondary" d="M 192 192 L 216 216" stroke="#357ABD" stroke-width="8" stroke-linecap="round"/>
+    
+    <rect x="124" y="70" width="8" height="24" rx="4" class="accent"/>
+    <circle cx="128" cy="100" r="5" class="accent"/>
+  </g>
+  
+  <!-- 텍스트 "LostFinder" -->
+  <text x="280" y="150" font-family="Arial, sans-serif" font-size="72" font-weight="700" class="text">Lost</text>
+  <text x="460" y="150" font-family="Arial, sans-serif" font-size="72" font-weight="700" class="secondary">Finder</text>
+</svg>

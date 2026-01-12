@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+
+    <!-- 돋보기 렌즈 -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#667eea"
+        android:strokeWidth="6"
+        android:pathData="M35,35m-20,0a20,20 0,1,1 40,0a20,20 0,1,1 -40,0" />
+
+    <!-- 돋보기 손잡이 -->
+    <path
+        android:strokeColor="#667eea"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:pathData="M49,49 L70,70" />
+
+    <!-- 느낌표 막대 (분실물 강조) -->
+    <path
+        android:fillColor="#764ba2"
+        android:pathData="M33,25 L37,25 L36,40 L34,40 Z" />
+    
+    <!-- 느낌표 점 -->
+    <path
+        android:fillColor="#764ba2"
+        android:pathData="M35,44m-2.5,0a2.5,2.5 0,1,1 5,0a2.5,2.5 0,1,1 -5,0" />
+
+    <!-- 위치 마커 (오른쪽 하단) -->
+    <path
+        android:fillColor="#FF6B6B"
+        android:pathData="M73,55 L73,68 L76,71 L79,68 L79,55 Q79,52 76,52 Q73,52 73,55 Z" />
+    
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M76,56m-2,0a2,2 0,1,1 4,0a2,2 0,1,1 -4,0" />
+
+</vector>
+

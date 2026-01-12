@@ -1,8 +1,27 @@
 R_DEF: Internal format may change without notice
 local
+color accent
+color background
+color ic_launcher_background
+color primary
+color primary_dark
 color shortcut_background
+color white
+drawable ic_launcher_foreground
+drawable logo_icon
 drawable shortcut_legacy_background
+drawable splash_background
+drawable splash_circle_bg
+drawable splash_logo
+drawable splash_screen_gradient
+id splash_layout
 id webview
 layout activity_main
+mipmap ic_launcher
+mipmap ic_launcher_background
+mipmap ic_launcher_foreground
+mipmap ic_launcher_round
+style Theme.LostFinder
+style Theme.LostFinder.SplashScreen
 xml filepaths
 xml shortcuts

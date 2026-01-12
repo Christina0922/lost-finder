@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .primary { fill: #4A90E2; }
+      .secondary { fill: #357ABD; }
+      .accent { fill: #F5A623; }
+    </style>
+  </defs>
+  
+  <!-- 지도 핀 (메인 심볼) -->
+  <g id="map-pin">
+    <path class="primary" d="
+      M 256 80
+      C 200 80, 160 120, 160 176
+      C 160 220, 190 260, 256 360
+      C 322 260, 352 220, 352 176
+      C 352 120, 312 80, 256 80
+      Z
+    " stroke="#357ABD" stroke-width="8"/>
+    
+    <circle cx="256" cy="176" r="48" fill="#FFFFFF" stroke="#357ABD" stroke-width="6"/>
+    <circle cx="256" cy="176" r="20" class="accent"/>
+  </g>
+  
+  <!-- 돋보기 (보조 심볼) -->
+  <g id="magnifier">
+    <circle cx="340" cy="340" r="60" fill="none" class="secondary" stroke="#357ABD" stroke-width="12"/>
+    <path d="M 320 320 Q 340 310, 360 320" stroke="#FFFFFF" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.6"/>
+    <path class="secondary" d="M 385 385 L 432 432" stroke="#357ABD" stroke-width="16" stroke-linecap="round"/>
+  </g>
+  
+  <!-- 느낌표 (긴급성/발견 강조) -->
+  <g id="exclamation">
+    <rect x="248" y="140" width="16" height="48" rx="8" class="accent"/>
+    <circle cx="256" cy="200" r="10" class="accent"/>
+  </g>
+</svg>

@@ -12,29 +12,38 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // 메인 테마로 전환
+        setTheme(R.style.Theme_LostFinder);
+        
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         webView = findViewById(R.id.webview);
         
-        // WebView 설정
-        WebSettings webSettings = webView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webSettings.setDomStorageEnabled(true);
-        webSettings.setLoadWithOverviewMode(true);
-        webSettings.setUseWideViewPort(true);
-        
-        // 외부 브라우저가 아닌 WebView 내에서 열기
-        webView.setWebViewClient(new WebViewClient());
-        
-        // React 앱 로드 (PC IP 주소:3000)
-        webView.loadUrl("http://192.168.45.31:3000");
+        if (webView != null) {
+            // WebView 설정
+            WebSettings webSettings = webView.getSettings();
+            webSettings.setJavaScriptEnabled(true);
+            webSettings.setDomStorageEnabled(true);
+            webSettings.setLoadWithOverviewMode(true);
+            webSettings.setUseWideViewPort(true);
+            webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+            
+            // 외부 브라우저가 아닌 WebView 내에서 열기
+            webView.setWebViewClient(new WebViewClient());
+            
+            // WebView 보이기
+            webView.setVisibility(android.view.View.VISIBLE);
+            
+            // React 앱 로드 (PC IP 주소:3000)
+            webView.loadUrl("http://172.21.192.1:3000");
+        }
         
         // 뒤로가기 처리 (최신 방식)
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if (webView.canGoBack()) {
+                if (webView != null && webView.canGoBack()) {
                     webView.goBack();
                 } else {
                     setEnabled(false);
@@ -44,4 +53,3 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 }
-
