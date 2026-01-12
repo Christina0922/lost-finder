@@ -115,7 +115,7 @@ export default function BottomBanner() {
         {/* 구분선 */}
         <hr style={{ 
           border: '0', 
-          borderTop: '1px solid rgba(102, 126, 234, 0.15)', 
+          borderTop: '2px solid rgba(102, 126, 234, 0.35)', 
           margin: '18.82px 0', 
           width: '100%' 
         }} />
@@ -173,7 +173,7 @@ export default function BottomBanner() {
       {/* 구분선 */}
       <hr style={{ 
         border: '0', 
-        borderTop: '1px solid rgba(102, 126, 234, 0.15)', 
+        borderTop: '2px solid rgba(102, 126, 234, 0.35)', 
         margin: '18.82px 0', 
         width: '100%' 
       }} />

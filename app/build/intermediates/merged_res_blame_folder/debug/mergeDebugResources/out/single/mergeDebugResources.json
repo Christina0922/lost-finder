@@ -108,6 +108,10 @@
         "source": "com.temp.app-main-33:/xml/filepaths.xml"
     },
     {
+        "merged": "com.temp.app-debug-31:/xml_network_security_config.xml.flat",
+        "source": "com.temp.app-main-33:/xml/network_security_config.xml"
+    },
+    {
         "merged": "com.temp.app-debug-31:/mipmap-xhdpi_ic_launcher.png.flat",
         "source": "com.temp.app-main-33:/mipmap-xhdpi/ic_launcher.png"
     },

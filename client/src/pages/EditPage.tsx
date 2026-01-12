@@ -442,25 +442,14 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
               id="location"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              placeholder={lat && lng ? "장소명이 자동으로 입력됩니다" : "예: 남사중학교 정문"}
+              placeholder="예: 남사중학교 정문"
               className={`edit-input ${errors.location ? 'has-error' : ''}`}
             />
-            
-            {/* 지도에서 선택 버튼 (선택하지 않았을 때만) */}
-            {!lat && !lng && (
-              <Link to="/map" className="location-map-btn">
-                <span>🗺️</span>
-                <span>지도에서 위치 선택하기</span>
-              </Link>
-            )}
           </div>
           
           {errors.location && (
             <div className="edit-form-error">⚠️ {errors.location}</div>
           )}
-          <div className="edit-form-helper">
-            지도에서 정확한 위치를 선택하면 다른 사용자가 쉽게 찾을 수 있습니다
-          </div>
         </div>
 
         {/* 파일 업로드 */}
@@ -478,9 +467,13 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
               disabled={isUploading}
               style={{ display: 'none' }}
             />
-            <label htmlFor="photo-input" className="photo-upload-btn">
+            <label 
+              htmlFor="photo-input" 
+              className={`photo-upload-btn ${isUploading ? 'disabled' : ''}`}
+              style={isUploading ? { pointerEvents: 'none' } : {}}
+            >
               <span>📁</span>
-              <span>파일 추가</span>
+              <span>{isUploading ? '처리 중...' : '파일 추가'}</span>
             </label>
             {isUploading && (
               <div className="uploading-indicator">

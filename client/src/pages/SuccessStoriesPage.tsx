@@ -418,7 +418,7 @@ export default function SuccessStoriesPage() {
         textAlign: 'center', 
         marginTop: '8px', 
         paddingTop: '8px', 
-        borderTop: '1px solid #e9ecef',
+        borderTop: '2px solid rgba(102, 126, 234, 0.35)',
         width: '100%'
       }}>
         <p style={{ 
