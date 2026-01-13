@@ -1,78 +1,78 @@
 1<?xml version="1.0" encoding="utf-8"?>
 2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-3    package="com.temp.app"
-4    android:versionCode="1"
-5    android:versionName="1.0" >
+3    package="com.christina0922.tempapp"
+4    android:versionCode="2"
+5    android:versionName="1.1" >
 6
 7    <uses-sdk
 8        android:minSdkVersion="24"
-9        android:targetSdkVersion="34" />
+9        android:targetSdkVersion="35" />
 10
 11    <uses-permission android:name="android.permission.INTERNET" />
-11-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:5:5-67
-11-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:5:22-64
+11-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:4:5-67
+11-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:4:22-64
 12    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-12-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:6:5-79
-12-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:6:22-76
+12-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:5:5-79
+12-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:5:22-76
 13    <uses-permission
-13-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:7:5-8:38
+13-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:6:5-7:38
 14        android:name="android.permission.READ_EXTERNAL_STORAGE"
-14-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:7:22-77
+14-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:6:22-77
 15        android:maxSdkVersion="32" />
-15-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:8:9-35
+15-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:7:9-35
 16    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-16-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:9:5-76
-16-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:9:22-73
+16-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:8:5-76
+16-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:8:22-73
 17
 18    <permission
 18-->[androidx.core:core:1.9.0] C:\Users\My PC\.gradle\caches\8.11.1\transforms\99f631ac21f8f84f0be8864d0aabbc79\transformed\core-1.9.0\AndroidManifest.xml:22:5-24:47
-19        android:name="com.temp.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+19        android:name="com.christina0922.tempapp.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
 19-->[androidx.core:core:1.9.0] C:\Users\My PC\.gradle\caches\8.11.1\transforms\99f631ac21f8f84f0be8864d0aabbc79\transformed\core-1.9.0\AndroidManifest.xml:23:9-81
 20        android:protectionLevel="signature" />
 20-->[androidx.core:core:1.9.0] C:\Users\My PC\.gradle\caches\8.11.1\transforms\99f631ac21f8f84f0be8864d0aabbc79\transformed\core-1.9.0\AndroidManifest.xml:24:9-44
 21
-22    <uses-permission android:name="com.temp.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+22    <uses-permission android:name="com.christina0922.tempapp.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
 22-->[androidx.core:core:1.9.0] C:\Users\My PC\.gradle\caches\8.11.1\transforms\99f631ac21f8f84f0be8864d0aabbc79\transformed\core-1.9.0\AndroidManifest.xml:26:5-97
 22-->[androidx.core:core:1.9.0] C:\Users\My PC\.gradle\caches\8.11.1\transforms\99f631ac21f8f84f0be8864d0aabbc79\transformed\core-1.9.0\AndroidManifest.xml:26:22-94
 23
 24    <application
-24-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:11:5-29:19
+24-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:10:5-28:19
 25        android:allowBackup="true"
-25-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:12:9-35
+25-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:11:9-35
 26        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
 26-->[androidx.core:core:1.9.0] C:\Users\My PC\.gradle\caches\8.11.1\transforms\99f631ac21f8f84f0be8864d0aabbc79\transformed\core-1.9.0\AndroidManifest.xml:28:18-86
 27        android:extractNativeLibs="false"
 28        android:icon="@mipmap/ic_launcher"
-28-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:14:9-43
+28-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:13:9-43
 29        android:label="LostFinder"
-29-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:13:9-35
+29-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:12:9-35
 30        android:networkSecurityConfig="@xml/network_security_config"
-30-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:19:9-69
+30-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:18:9-69
 31        android:roundIcon="@mipmap/ic_launcher_round"
-31-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:15:9-54
+31-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:14:9-54
 32        android:supportsRtl="true"
-32-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:16:9-35
+32-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:15:9-35
 33        android:theme="@style/Theme.LostFinder"
-33-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:17:9-48
+33-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:16:9-48
 34        android:usesCleartextTraffic="true" >
-34-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:18:9-44
+34-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:17:9-44
 35        <activity
-35-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:20:9-28:20
-36            android:name="com.temp.app.MainActivity"
-36-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:21:13-41
+35-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:19:9-27:20
+36            android:name="com.christina0922.tempapp.MainActivity"
+36-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:20:13-41
 37            android:exported="true"
-37-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:22:13-36
+37-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:21:13-36
 38            android:theme="@style/Theme.LostFinder.SplashScreen" >
-38-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:23:13-65
+38-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:22:13-65
 39            <intent-filter>
-39-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:24:13-27:29
+39-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:23:13-26:29
 40                <action android:name="android.intent.action.MAIN" />
-40-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:25:17-69
-40-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:25:25-66
+40-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:24:17-69
+40-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:24:25-66
 41
 42                <category android:name="android.intent.category.LAUNCHER" />
-42-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:26:17-77
-42-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:26:27-74
+42-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:25:17-77
+42-->D:\1000_b_project\lostfinder\app\src\main\AndroidManifest.xml:25:27-74
 43            </intent-filter>
 44        </activity>
 45
@@ -80,7 +80,7 @@
 46-->[androidx.emoji2:emoji2:1.2.0] C:\Users\My PC\.gradle\caches\8.11.1\transforms\e1179467583d51e3d0300d03f282eb7e\transformed\emoji2-1.2.0\AndroidManifest.xml:24:9-32:20
 47            android:name="androidx.startup.InitializationProvider"
 47-->[androidx.emoji2:emoji2:1.2.0] C:\Users\My PC\.gradle\caches\8.11.1\transforms\e1179467583d51e3d0300d03f282eb7e\transformed\emoji2-1.2.0\AndroidManifest.xml:25:13-67
-48            android:authorities="com.temp.app.androidx-startup"
+48            android:authorities="com.christina0922.tempapp.androidx-startup"
 48-->[androidx.emoji2:emoji2:1.2.0] C:\Users\My PC\.gradle\caches\8.11.1\transforms\e1179467583d51e3d0300d03f282eb7e\transformed\emoji2-1.2.0\AndroidManifest.xml:26:13-68
 49            android:exported="false" >
 49-->[androidx.emoji2:emoji2:1.2.0] C:\Users\My PC\.gradle\caches\8.11.1\transforms\e1179467583d51e3d0300d03f282eb7e\transformed\emoji2-1.2.0\AndroidManifest.xml:27:13-37

@@ -16,5 +16,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "LostFinderProject"
-include(":modules:TempApp")
+rootProject.name = "TempApp"
+include(":app")

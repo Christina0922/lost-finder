@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.temp.app-mergeDebugResources-29:/values-small-v4/values-small-v4.xml",
+            "outputFile": "com.christina0922.tempapp-mergeDebugResources-29:/values-small-v4/values-small-v4.xml",
             "map": [
                 {
                     "source": "C:\\Users\\My PC\\.gradle\\caches\\8.11.1\\transforms\\196f083c93465edc85511cbb6007e9a4\\transformed\\material-1.11.0\\res\\values-small-v4\\values-small-v4.xml",

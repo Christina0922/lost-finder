@@ -4,7 +4,7 @@
     "type": "BUNDLE",
     "kind": "RegularFile"
   },
-  "applicationId": "com.temp.app",
+  "applicationId": "com.christina0922.tempapp",
   "variantName": "release",
   "elements": [
     {
