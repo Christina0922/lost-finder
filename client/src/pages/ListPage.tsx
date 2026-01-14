@@ -133,6 +133,20 @@ const ListPage = ({ currentUser, onDeleteItem, theme }: ListPageProps) => {
   const handleDeleteClick = (itemId: number) => {
     if (window.confirm(t('detailPage.deleteConfirm'))) {
       onDeleteItem(itemId);
+      
+      // ✅ localStorage에서도 삭제
+      try {
+        const stored = localStorage.getItem('lostItems');
+        if (stored) {
+          const localItems: LostItem[] = JSON.parse(stored);
+          const updatedItems = localItems.filter(item => item.id !== itemId);
+          localStorage.setItem('lostItems', JSON.stringify(updatedItems));
+          console.log('[삭제 완료] localStorage 업데이트');
+        }
+      } catch (e) {
+        console.error('[삭제 실패] localStorage 업데이트 오류:', e);
+      }
+      
       // 삭제 후 목록에서 제거
       setLostItems(prev => prev.filter(item => item.id !== itemId));
     }

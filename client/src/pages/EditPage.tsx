@@ -117,10 +117,41 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
       const fetchItem = async () => {
         try {
           setLoading(true);
-          const itemData = await getLostItemById(Number(id));
+          let itemData: LostItem | null = null;
           
-          // 본인 게시물인지 확인
-          if (currentUser?.id !== itemData.author_id) {
+          // ✅ 1. localStorage에서 먼저 찾기
+          try {
+            const stored = localStorage.getItem('lostItems');
+            if (stored) {
+              const localItems: LostItem[] = JSON.parse(stored);
+              itemData = localItems.find(item => item.id === Number(id) || item.id.toString() === id) || null;
+              if (itemData) {
+                console.log('[EditPage] 로컬에서 찾음:', itemData);
+              }
+            }
+          } catch (e) {
+            console.error('[EditPage] localStorage 읽기 실패:', e);
+          }
+          
+          // ✅ 2. localStorage에서 못 찾으면 서버에서 찾기
+          if (!itemData) {
+            try {
+              itemData = await getLostItemById(Number(id));
+              console.log('[EditPage] 서버에서 찾음:', itemData);
+            } catch (err) {
+              throw new Error('게시물을 찾을 수 없습니다');
+            }
+          }
+          
+          if (!itemData) {
+            throw new Error('게시물을 찾을 수 없습니다');
+          }
+          
+          // 본인 게시물인지 확인 (deviceId 기준)
+          const deviceId = getDeviceId();
+          const isMyItem = itemData.created_by_device_id === deviceId || currentUser?.id === itemData.author_id;
+          
+          if (!isMyItem) {
             showToastMessage('수정 권한이 없습니다', 'error');
             navigate('/list');
             return;
@@ -139,8 +170,8 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
         } catch (err) {
           console.error('분실물 조회 실패:', err);
           setError('분실물 정보를 불러오는데 실패했습니다');
-          showToastMessage('게시물을 찾을 수 없습니다', 'error');
-          navigate('/list');
+          showToastMessage(err instanceof Error ? err.message : '게시물을 찾을 수 없습니다', 'error');
+          setTimeout(() => navigate('/list'), 1500);
         } finally {
           setLoading(false);
         }
@@ -292,6 +323,22 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
           address: address,
           image_urls: imageUrls,
         };
+        
+        // ✅ localStorage 업데이트
+        try {
+          const stored = localStorage.getItem('lostItems');
+          if (stored) {
+            const localItems: LostItem[] = JSON.parse(stored);
+            const index = localItems.findIndex(item => item.id === itemToEdit.id);
+            if (index !== -1) {
+              localItems[index] = updatedItem;
+              localStorage.setItem('lostItems', JSON.stringify(localItems));
+              console.log('[수정 완료] localStorage 업데이트');
+            }
+          }
+        } catch (e) {
+          console.error('[수정 실패] localStorage 업데이트 오류:', e);
+        }
         
         onUpdateItem(updatedItem);
         console.log('[수정 성공]');

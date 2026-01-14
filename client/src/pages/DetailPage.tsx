@@ -37,12 +37,35 @@ const DetailPage: React.FC<DetailPageProps> = ({ currentUser, onAddComment, onDe
       
       try {
         setLoading(true);
-        const response = await fetch(`/api/lost-items/${id}`);
-        if (!response.ok) {
+        
+        // ✅ 1. localStorage에서 먼저 찾기
+        try {
+          const stored = localStorage.getItem('lostItems');
+          if (stored) {
+            const localItems: LostItem[] = JSON.parse(stored);
+            const localItem = localItems.find(item => item.id === Number(id) || item.id.toString() === id);
+            if (localItem) {
+              console.log('[DetailPage] 로컬에서 찾음:', localItem);
+              setItem(localItem);
+              setLoading(false);
+              return;
+            }
+          }
+        } catch (e) {
+          console.error('[DetailPage] localStorage 읽기 실패:', e);
+        }
+        
+        // ✅ 2. 서버에서 찾기
+        try {
+          const response = await fetch(`/api/lost-items/${id}`);
+          if (!response.ok) {
+            throw new Error(t('detailPage.notFound'));
+          }
+          const data = await response.json();
+          setItem(data.item);
+        } catch (err) {
           throw new Error(t('detailPage.notFound'));
         }
-        const data = await response.json();
-        setItem(data.item);
       } catch (err) {
         setError(err instanceof Error ? err.message : t('error.occurred'));
       } finally {
@@ -51,7 +74,7 @@ const DetailPage: React.FC<DetailPageProps> = ({ currentUser, onAddComment, onDe
     };
 
     fetchItem();
-  }, [id]);
+  }, [id, t]);
 
   const showToastMessage = (message: string, type: 'success' | 'error' = 'success') => {
     setToastMessage(message);
