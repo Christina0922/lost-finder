@@ -71,6 +71,13 @@ public class MainActivity extends AppCompatActivity {
             }
             
             if (webView != null) {
+            // ✅ 기존 캐시 완전 삭제
+            webView.clearCache(true);
+            webView.clearFormData();
+            webView.clearHistory();
+            android.webkit.CookieManager.getInstance().removeAllCookies(null);
+            android.webkit.CookieManager.getInstance().flush();
+            
             // WebView 설정
             WebSettings webSettings = webView.getSettings();
             webSettings.setJavaScriptEnabled(true);

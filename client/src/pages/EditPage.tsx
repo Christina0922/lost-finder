@@ -241,14 +241,18 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
       try {
         const deviceId = getDeviceId();
         
+        // ✅ 좌표가 없으면 기본 좌표 설정 (서울시청)
+        const defaultLat = lat || 37.5665;
+        const defaultLng = lng || 126.9780;
+        
         const newItem = {
           item_type: itemType.trim(),
           description: description.trim(),
           location: location.trim(),
-          lat: lat,
-          lng: lng,
-          place_name: placeName,
-          address: address,
+          lat: defaultLat,
+          lng: defaultLng,
+          place_name: placeName || location.trim(),
+          address: address || location.trim(),
           lost_at: new Date().toISOString(),
           created_by_device_id: deviceId,
           image_urls: imageUrls,

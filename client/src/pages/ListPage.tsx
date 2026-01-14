@@ -40,6 +40,27 @@ const ListPage = ({ currentUser, onDeleteItem, theme }: ListPageProps) => {
           const stored = localStorage.getItem('lostItems');
           if (stored) {
             localItems = JSON.parse(stored);
+            
+            // ✅ 좌표가 없는 항목에 기본 좌표 추가
+            let updated = false;
+            localItems = localItems.map(item => {
+              if (!item.lat || !item.lng) {
+                updated = true;
+                return {
+                  ...item,
+                  lat: 37.5665,
+                  lng: 126.9780,
+                  place_name: item.place_name || item.location,
+                  address: item.address || item.location,
+                };
+              }
+              return item;
+            });
+            
+            if (updated) {
+              localStorage.setItem('lostItems', JSON.stringify(localItems));
+            }
+            
             console.log('[로컬 데이터 로드]', localItems.length, '개');
           }
         } catch (e) {

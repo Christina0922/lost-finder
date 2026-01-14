@@ -763,6 +763,29 @@ const App: React.FC = () => {
         const stored = localStorage.getItem('lostItems');
         if (stored) {
           localItems = JSON.parse(stored);
+          
+          // ✅ 좌표가 없는 항목에 기본 좌표 추가 (지도 표시용)
+          let updated = false;
+          localItems = localItems.map(item => {
+            if (!item.lat || !item.lng) {
+              updated = true;
+              return {
+                ...item,
+                lat: 37.5665, // 서울시청 기본 좌표
+                lng: 126.9780,
+                place_name: item.place_name || item.location,
+                address: item.address || item.location,
+              };
+            }
+            return item;
+          });
+          
+          // localStorage 업데이트
+          if (updated) {
+            localStorage.setItem('lostItems', JSON.stringify(localItems));
+            console.log('[App] 기본 좌표 추가 완료');
+          }
+          
           console.log('[App] 로컬 데이터 로드:', localItems.length, '개');
         }
       } catch (e) {
