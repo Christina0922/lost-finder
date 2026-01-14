@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- 배경 원 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M100,100m-80,0a80,80 0,1,1 160,0a80,80 0,1,1 -160,0" />
+
+    <!-- 돋보기 렌즈 -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#667eea"
+        android:strokeWidth="8"
+        android:pathData="M80,80m-30,0a30,30 0,1,1 60,0a30,30 0,1,1 -60,0" />
+
+    <!-- 돋보기 손잡이 -->
+    <path
+        android:strokeColor="#667eea"
+        android:strokeWidth="8"
+        android:strokeLineCap="round"
+        android:pathData="M104,104 L130,130" />
+
+    <!-- 느낌표 (분실물 강조) -->
+    <path
+        android:fillColor="#764ba2"
+        android:pathData="M78,65 L82,65 L81,85 L79,85 Z" />
+    
+    <path
+        android:fillColor="#764ba2"
+        android:pathData="M80,90m-3,0a3,3 0,1,1 6,0a3,3 0,1,1 -6,0" />
+
+    <!-- "LostFinder" 텍스트 (아래쪽) -->
+    <group
+        android:translateX="100"
+        android:translateY="150">
+        <path
+            android:fillColor="#667eea"
+            android:pathData="M-45,-5 L-45,10 L-30,10 L-30,5 L-40,5 L-40,-5 Z" />
+        <path
+            android:fillColor="#667eea"
+            android:pathData="M-27,-5 Q-27,-8 -24,-8 Q-21,-8 -21,-5 L-21,10 L-26,10 L-26,-5 Q-26,-6 -24,-6 Q-22,-6 -22,-5 L-22,10" />
+        <path
+            android:fillColor="#667eea"
+            android:pathData="M-18,-5 Q-12,-8 -12,-2 Q-12,2 -15,4 Q-12,6 -12,10 L-17,10 Q-17,7 -18,6 L-18,10 L-23,10 L-23,-5 L-18,-5 M-18,0 L-18,4 Q-17,3 -17,1 Q-17,-1 -18,0 Z" />
+        <path
+            android:fillColor="#764ba2"
+            android:pathData="M-9,-5 L-9,10 L-4,10 L-4,5 L-1,5 L-1,10 L4,10 L4,-5 L-1,-5 L-1,0 L-4,0 L-4,-5 Z" />
+    </group>
+</vector>
+

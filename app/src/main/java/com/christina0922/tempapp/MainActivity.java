@@ -1,7 +1,10 @@
 package com.christina0922.tempapp;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +16,8 @@ import android.webkit.WebSettings;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceError;
 import android.graphics.Bitmap;
+import android.widget.Toast;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -53,11 +58,19 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        webView = findViewById(R.id.webview);
         
-        if (webView != null) {
+        try {
+            setContentView(R.layout.activity_main);
+
+            webView = findViewById(R.id.webview);
+            
+            // 네트워크 연결 확인
+            if (!isNetworkAvailable()) {
+                showNetworkErrorDialog();
+                return;
+            }
+            
+            if (webView != null) {
             // WebView 설정
             WebSettings webSettings = webView.getSettings();
             webSettings.setJavaScriptEnabled(true);
@@ -122,6 +135,15 @@ public class MainActivity extends AppCompatActivity {
                     super.onReceivedError(view, request, error);
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                         Log.e(TAG, "WebView 에러: " + error.getDescription() + " (코드: " + error.getErrorCode() + ")");
+                        
+                        // 메인 페이지 로드 실패 시 사용자에게 알림
+                        if (request.isForMainFrame()) {
+                            runOnUiThread(() -> {
+                                Toast.makeText(MainActivity.this, 
+                                    "페이지 로드 실패. 인터넷 연결을 확인해주세요.", 
+                                    Toast.LENGTH_LONG).show();
+                            });
+                        }
                     }
                 }
                 
@@ -155,6 +177,42 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        } catch (Exception e) {
+            Log.e(TAG, "onCreate 오류: " + e.getMessage(), e);
+            Toast.makeText(this, "앱 초기화 중 오류가 발생했습니다.", Toast.LENGTH_LONG).show();
+        }
+    }
+    
+    // 네트워크 연결 확인
+    private boolean isNetworkAvailable() {
+        try {
+            ConnectivityManager connectivityManager = 
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            
+            if (connectivityManager != null) {
+                NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+                return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+            }
+            return false;
+        } catch (Exception e) {
+            Log.e(TAG, "네트워크 상태 확인 오류: " + e.getMessage());
+            return true; // 오류 시 앱이 계속 실행되도록
+        }
+    }
+    
+    // 네트워크 오류 다이얼로그 표시
+    private void showNetworkErrorDialog() {
+        new AlertDialog.Builder(this)
+            .setTitle("인터넷 연결 없음")
+            .setMessage("인터넷에 연결되어 있지 않습니다.\n인터넷 연결 후 다시 시도해주세요.")
+            .setPositiveButton("재시도", (dialog, which) -> {
+                recreate(); // 액티비티 재시작
+            })
+            .setNegativeButton("종료", (dialog, which) -> {
+                finish();
+            })
+            .setCancelable(false)
+            .show();
     }
 }
 
