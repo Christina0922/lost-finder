@@ -235,21 +235,13 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
         if (response.ok && data.success) {
           console.log('[등록 성공]', data);
           
-          // ✅ 안전하게 ID 추출
-          const createdId = extractCreatedId(data);
-          console.log('[추출된 ID]', createdId);
-          
-          // 성공 토스트는 한 번만 표시
+          // 성공 토스트 표시
           showToastMessage('분실물이 등록되었습니다');
           
-          // ✅ ID가 없으면 목록으로, 있으면 상세 페이지로 이동
+          // ✅ Vercel Serverless는 stateless이므로 항상 목록으로 이동
           setTimeout(() => {
-            if (createdId !== null) {
-              navigate(`/detail/${createdId}`);
-            } else {
-              console.warn('[경고] 서버 응답에 ID가 없습니다. 목록으로 이동합니다.');
-              navigate('/list');
-            }
+            console.log('[리다이렉트] 목록 페이지로 이동');
+            navigate('/list');
           }, 1000);
           return; // ✅ 성공 후 종료 (실패 토스트가 뜨지 않음)
         } else {
