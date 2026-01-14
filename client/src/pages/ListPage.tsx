@@ -28,13 +28,42 @@ const ListPage = ({ currentUser, onDeleteItem, theme }: ListPageProps) => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const observerTarget = useRef<HTMLDivElement>(null);
 
-  // 서버에서 분실물 목록 가져오기
+  // 분실물 목록 가져오기 (localStorage + 서버)
   useEffect(() => {
     const fetchLostItems = async () => {
       try {
         setLoading(true);
-        const items = await getAllLostItems();
-        setLostItems(items);
+        
+        // ✅ 1. localStorage에서 먼저 가져오기
+        let localItems: LostItem[] = [];
+        try {
+          const stored = localStorage.getItem('lostItems');
+          if (stored) {
+            localItems = JSON.parse(stored);
+            console.log('[로컬 데이터 로드]', localItems.length, '개');
+          }
+        } catch (e) {
+          console.error('[로컬 데이터 로드 실패]', e);
+        }
+        
+        // ✅ 2. 서버에서도 가져오기 (백엔드 연결 시 대비)
+        try {
+          const serverItems = await getAllLostItems();
+          console.log('[서버 데이터 로드]', serverItems.length, '개');
+          
+          // 중복 제거 후 합치기 (ID 기준)
+          const allItems = [...localItems, ...serverItems];
+          const uniqueItems = allItems.filter((item, index, self) =>
+            index === self.findIndex((t) => t.id === item.id)
+          );
+          
+          setLostItems(uniqueItems);
+        } catch (err) {
+          // 서버 오류 시 로컬 데이터만 사용
+          console.warn('[서버 데이터 로드 실패, 로컬만 사용]', err);
+          setLostItems(localItems);
+        }
+        
         setError(null);
       } catch (err) {
         console.error('분실물 목록 조회 실패:', err);

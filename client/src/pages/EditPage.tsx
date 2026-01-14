@@ -235,6 +235,21 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
         if (response.ok && data.success) {
           console.log('[등록 성공]', data);
           
+          // ✅ localStorage에 저장 (Vercel stateless 해결)
+          const savedItem = {
+            ...data.item,
+            id: data.item.id || Date.now(),
+          };
+          
+          try {
+            const existingItems = JSON.parse(localStorage.getItem('lostItems') || '[]');
+            existingItems.push(savedItem);
+            localStorage.setItem('lostItems', JSON.stringify(existingItems));
+            console.log('[로컬 저장 성공]', savedItem);
+          } catch (error) {
+            console.error('[로컬 저장 실패]', error);
+          }
+          
           // 성공 토스트 표시
           showToastMessage('분실물이 등록되었습니다');
           

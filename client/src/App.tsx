@@ -754,35 +754,66 @@ const App: React.FC = () => {
     }
   }, []);
 
-  // Load lost items from server when user is logged in
+  // Load lost items from localStorage + server
   const loadLostItems = useCallback(async () => {
-    if (currentUser) {
+    try {
+      // ✅ 1. localStorage에서 먼저 가져오기
+      let localItems: LostItem[] = [];
       try {
-        const response = await fetch('/api/lost-items');
-        if (response.ok) {
-          const data = await response.json();
-          const items: LostItem[] = data.items.map((item: any) => ({
-            id: item.id,
-            author_id: item.author_id,
-            item_type: item.item_type,
-            description: item.description,
-            location: item.location,
-            lat: item.lat,
-            lng: item.lng,
-            place_name: item.place_name,
-            address: item.address,
-            lost_at: item.lost_at,
-            created_by_device_id: item.created_by_device_id,
-            image_urls: item.image_urls || [],
-            comments: item.comments || []
-          }));
-          setLostItems(items);
-        } else {
-          console.error('분실물 목록 로드 실패');
+        const stored = localStorage.getItem('lostItems');
+        if (stored) {
+          localItems = JSON.parse(stored);
+          console.log('[App] 로컬 데이터 로드:', localItems.length, '개');
         }
-      } catch (error) {
-        console.error('분실물 목록 로드 오류:', error);
+      } catch (e) {
+        console.error('[App] 로컬 데이터 로드 실패:', e);
       }
+      
+      // ✅ 2. 서버에서도 가져오기 (백엔드 연결 시 대비)
+      if (currentUser) {
+        try {
+          const response = await fetch('/api/lost-items');
+          if (response.ok) {
+            const data = await response.json();
+            const serverItems: LostItem[] = data.items.map((item: any) => ({
+              id: item.id,
+              author_id: item.author_id,
+              item_type: item.item_type,
+              description: item.description,
+              location: item.location,
+              lat: item.lat,
+              lng: item.lng,
+              place_name: item.place_name,
+              address: item.address,
+              lost_at: item.lost_at,
+              created_by_device_id: item.created_by_device_id,
+              image_urls: item.image_urls || [],
+              comments: item.comments || []
+            }));
+            
+            // 중복 제거 후 합치기
+            const allItems = [...localItems, ...serverItems];
+            const uniqueItems = allItems.filter((item, index, self) =>
+              index === self.findIndex((t) => t.id === item.id)
+            );
+            setLostItems(uniqueItems);
+            console.log('[App] 전체 데이터:', uniqueItems.length, '개');
+          } else {
+            // 서버 실패 시 로컬만 사용
+            setLostItems(localItems);
+            console.warn('[App] 서버 실패, 로컬만 사용');
+          }
+        } catch (error) {
+          setLostItems(localItems);
+          console.error('[App] 서버 로드 오류, 로컬만 사용:', error);
+        }
+      } else {
+        // 로그인 안 했을 때도 로컬 데이터는 표시
+        setLostItems(localItems);
+        console.log('[App] 로그인 없음, 로컬만 사용:', localItems.length, '개');
+      }
+    } catch (error) {
+      console.error('[App] 전체 로드 오류:', error);
     }
   }, [currentUser]);
 
