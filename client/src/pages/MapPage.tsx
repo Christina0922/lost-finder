@@ -22,8 +22,9 @@ export default function MapPage({ lostItems, currentUser }: MapPageProps) {
 
   useEffect(() => {
     // Kakao Map API 스크립트 로드
+    const KAKAO_MAP_API_KEY = '247f5d27ed9dcae0f14e8f9c4d94144b';
     const script = document.createElement('script');
-    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_KAKAO_MAP_API_KEY&autoload=false`;
+    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_API_KEY}&autoload=false`;
     script.async = true;
     
     script.onload = () => {
