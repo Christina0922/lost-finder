@@ -135,8 +135,8 @@ public class MainActivity extends AppCompatActivity {
             // WebView 보이기
             webView.setVisibility(android.view.View.VISIBLE);
             
-            // React 앱 로드
-            String url = "http://192.168.45.31:3000";
+            // React 앱 로드 (프로덕션)
+            String url = "https://lost-finder-client.vercel.app/";
             Log.d(TAG, "URL 로드 중: " + url);
             webView.loadUrl(url);
         } else {
