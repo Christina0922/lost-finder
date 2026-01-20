@@ -32,10 +32,6 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
   const [itemType, setItemType] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
-  const [lat, setLat] = useState<number | null>(null);
-  const [lng, setLng] = useState<number | null>(null);
-  const [placeName, setPlaceName] = useState<string | null>(null);
-  const [address, setAddress] = useState<string | null>(null);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false); // 중복 제출 방지
@@ -93,23 +89,7 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
       setItemToEdit(null);
       setItemType('');
       setDescription('');
-      
-      // MapPage에서 전달된 위치 정보가 있으면 사용
-      if (mapLocationData?.selectedPlace) {
-        const { name, address: addr, lat: latitude, lng: longitude } = mapLocationData.selectedPlace;
-        setLocation(name);
-        setLat(latitude);
-        setLng(longitude);
-        setPlaceName(name);
-        setAddress(addr);
-      } else {
-        setLocation('');
-        setLat(null);
-        setLng(null);
-        setPlaceName(null);
-        setAddress(null);
-      }
-      
+      setLocation('');
       setImageUrls([]);
       setError(null);
     } else {
@@ -161,10 +141,6 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
           setItemType(itemData.item_type);
           setDescription(itemData.description);
           setLocation(itemData.location);
-          setLat(itemData.lat ?? null);
-          setLng(itemData.lng ?? null);
-          setPlaceName(itemData.place_name ?? null);
-          setAddress(itemData.address ?? null);
           setImageUrls(itemData.image_urls || []);
           setError(null);
         } catch (err) {
@@ -241,18 +217,11 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
       try {
         const deviceId = getDeviceId();
         
-        // ✅ 좌표가 없으면 기본 좌표 설정 (서울시청)
-        const defaultLat = lat || 37.5665;
-        const defaultLng = lng || 126.9780;
-        
+        // ✅ 주소만 저장 (좌표는 저장하지 않음)
         const newItem = {
           item_type: itemType.trim(),
           description: description.trim(),
           location: location.trim(),
-          lat: defaultLat,
-          lng: defaultLng,
-          place_name: placeName || location.trim(),
-          address: address || location.trim(),
           lost_at: new Date().toISOString(),
           created_by_device_id: deviceId,
           image_urls: imageUrls,
@@ -321,10 +290,6 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
           item_type: itemType.trim(),
           description: description.trim(),
           location: location.trim(),
-          lat: lat,
-          lng: lng,
-          place_name: placeName,
-          address: address,
           image_urls: imageUrls,
         };
         
@@ -468,41 +433,22 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
             분실 장소 <span className="required">*</span>
           </label>
           
-          <div className="location-section">
-            {/* 지도에서 선택한 위치 표시 */}
-            {lat && lng && (
-              <div className="location-selected-box">
-                <div className="location-selected-header">
-                  ✓ 지도에서 선택한 위치
-                </div>
-                <div className="location-selected-content">
-                  <div className="location-selected-item">
-                    <strong>장소</strong> {placeName || location}
-                  </div>
-                  {address && (
-                    <div className="location-selected-item">
-                      <strong>주소</strong> {address}
-                    </div>
-                  )}
-                  <div className="location-coordinates">
-                    좌표: {lat.toFixed(6)}, {lng.toFixed(6)}
-                  </div>
-                </div>
-                <Link to="/map" className="location-change-btn">
-                  위치 변경하기
-                </Link>
-              </div>
-            )}
-            
-            {/* 텍스트 입력 */}
-            <input
-              type="text"
-              id="location"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder="예: 남사중학교 정문"
-              className={`edit-input ${errors.location ? 'has-error' : ''}`}
-            />
+          <input
+            type="text"
+            id="location"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            placeholder="예: 서울역, 부산 해운대구 해운대해변로 264"
+            className={`edit-input ${errors.location ? 'has-error' : ''}`}
+          />
+          
+          <div style={{ 
+            fontSize: '13px', 
+            color: '#718096', 
+            marginTop: '8px',
+            lineHeight: '1.5'
+          }}>
+            💡 정확한 주소나 장소명을 입력하세요. (예: 서울역, 제주국제공항, 서울 중구 세종대로 18)
           </div>
           
           {errors.location && (

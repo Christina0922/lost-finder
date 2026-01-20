@@ -41,25 +41,8 @@ const ListPage = ({ currentUser, onDeleteItem, theme }: ListPageProps) => {
           if (stored) {
             localItems = JSON.parse(stored);
             
-            // ✅ 좌표가 없는 항목에 기본 좌표 추가
-            let updated = false;
-            localItems = localItems.map(item => {
-              if (!item.lat || !item.lng) {
-                updated = true;
-                return {
-                  ...item,
-                  lat: 37.5665,
-                  lng: 126.9780,
-                  place_name: item.place_name || item.location,
-                  address: item.address || item.location,
-                };
-              }
-              return item;
-            });
-            
-            if (updated) {
-              localStorage.setItem('lostItems', JSON.stringify(localItems));
-            }
+            // ✅ 더 이상 기본 좌표를 자동으로 추가하지 않음
+            // 사용자가 주소 검색을 통해 정확한 좌표를 입력해야 함
             
             console.log('[로컬 데이터 로드]', localItems.length, '개');
           }

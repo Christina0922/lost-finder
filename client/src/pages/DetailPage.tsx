@@ -30,6 +30,38 @@ const DetailPage: React.FC<DetailPageProps> = ({ currentUser, onAddComment, onDe
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error'>('success');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  
+  // 지오코딩 상태
+  const [geocodedLocation, setGeocodedLocation] = useState<{lat: number, lng: number} | null>(null);
+  const [geocodingError, setGeocodingError] = useState<string | null>(null);
+  const [isGeocoding, setIsGeocoding] = useState(false);
+
+  // 주소를 좌표로 변환하는 함수 (서버 API 사용)
+  const geocodeAddress = async (address: string) => {
+    try {
+      setIsGeocoding(true);
+      setGeocodingError(null);
+      
+      console.log(`🔍 [Geocoding] 주소 검색 시작: "${address}"`);
+      
+      // 서버의 geocoding API 호출
+      const response = await fetch(`/api/places/geocode?address=${encodeURIComponent(address)}`);
+      const data = await response.json();
+
+      if (data.success && data.location) {
+        setGeocodedLocation({ lat: data.location.lat, lng: data.location.lng });
+        console.log(`✅ [Geocoding] 성공: lat=${data.location.lat}, lng=${data.location.lng}`);
+      } else {
+        console.log(`❌ [Geocoding] 실패: ${data.error || '알 수 없는 오류'}`);
+        setGeocodingError(data.error || '주소를 찾을 수 없습니다. 주소가 정확한지 확인해주세요.');
+      }
+    } catch (error) {
+      console.error('❌ [Geocoding] 네트워크 오류:', error);
+      setGeocodingError('네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.');
+    } finally {
+      setIsGeocoding(false);
+    }
+  };
 
   useEffect(() => {
     const fetchItem = async () => {
@@ -75,6 +107,13 @@ const DetailPage: React.FC<DetailPageProps> = ({ currentUser, onAddComment, onDe
 
     fetchItem();
   }, [id, t]);
+
+  // 아이템이 로드되면 주소로 지오코딩 실행
+  useEffect(() => {
+    if (item && item.location) {
+      geocodeAddress(item.location);
+    }
+  }, [item]);
 
   const showToastMessage = (message: string, type: 'success' | 'error' = 'success') => {
     setToastMessage(message);
@@ -229,7 +268,7 @@ const DetailPage: React.FC<DetailPageProps> = ({ currentUser, onAddComment, onDe
         </div>
 
         {/* 위치 정보 */}
-        {item.lat && item.lng ? (
+        {item.location ? (
           <div style={{
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             borderRadius: '16px',
@@ -257,81 +296,111 @@ const DetailPage: React.FC<DetailPageProps> = ({ currentUser, onAddComment, onDe
               marginBottom: '12px',
             }}>
               <div style={{ fontSize: '16px', fontWeight: '700', marginBottom: '4px' }}>
-                {item.place_name || item.location}
+                {item.location}
               </div>
-              {item.address && (
-                <div style={{ fontSize: '13px', opacity: 0.9 }}>
-                  {item.address}
+            </div>
+
+            {/* 지오코딩 중 */}
+            {isGeocoding && (
+              <div style={{
+                padding: '20px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                borderRadius: '12px',
+                textAlign: 'center',
+                marginBottom: '12px'
+              }}>
+                <div style={{ fontSize: '14px' }}>🔍 지도 로딩 중...</div>
+              </div>
+            )}
+
+            {/* 지오코딩 실패 */}
+            {!isGeocoding && geocodingError && (
+              <div style={{
+                padding: '20px',
+                background: 'rgba(231, 76, 60, 0.2)',
+                borderRadius: '12px',
+                marginBottom: '12px'
+              }}>
+                <div style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px' }}>
+                  ⚠️ 지도를 표시할 수 없습니다
                 </div>
-              )}
-            </div>
+                <div style={{ fontSize: '14px', opacity: 0.9 }}>
+                  {geocodingError}
+                </div>
+              </div>
+            )}
 
-            {/* OpenStreetMap (API 키 불필요, 무료) */}
-            <div style={{
-              borderRadius: '12px',
-              overflow: 'hidden',
-              marginBottom: '12px',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
-            }}>
-              <iframe
-                width="100%"
-                height="300"
-                frameBorder="0"
-                scrolling="no"
-                marginHeight={0}
-                marginWidth={0}
-                src={`https://www.openstreetmap.org/export/embed.html?bbox=${item.lng-0.01},${item.lat-0.01},${item.lng+0.01},${item.lat+0.01}&layer=mapnik&marker=${item.lat},${item.lng}`}
-                style={{ border: 0 }}
-                title="위치 지도"
-              />
-            </div>
+            {/* 지오코딩 성공 - 지도 표시 */}
+            {!isGeocoding && geocodedLocation && (
+              <>
+                <div style={{
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  marginBottom: '12px',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+                }}>
+                  <iframe
+                    key={`${geocodedLocation.lat}-${geocodedLocation.lng}`}
+                    width="100%"
+                    height="300"
+                    frameBorder="0"
+                    scrolling="no"
+                    marginHeight={0}
+                    marginWidth={0}
+                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${geocodedLocation.lng-0.01},${geocodedLocation.lat-0.01},${geocodedLocation.lng+0.01},${geocodedLocation.lat+0.01}&layer=mapnik&marker=${geocodedLocation.lat},${geocodedLocation.lng}`}
+                    style={{ border: 0 }}
+                    title="위치 지도"
+                  />
+                </div>
 
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <a
-                href={`https://map.naver.com/v5/?c=${item.lng},${item.lat},16,0,0,0,dh`}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  flex: 1,
-                  padding: '12px',
-                  background: '#03C75A',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '10px',
-                  fontSize: '14px',
-                  fontWeight: '700',
-                  textAlign: 'center',
-                  textDecoration: 'none',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                }}
-              >
-                🗺️ 네이버 지도
-              </a>
-              <a
-                href={`https://www.google.com/maps?q=${item.lat},${item.lng}&z=17&hl=ko`}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  flex: 1,
-                  padding: '12px',
-                  background: 'white',
-                  color: '#667eea',
-                  border: 'none',
-                  borderRadius: '10px',
-                  fontSize: '14px',
-                  fontWeight: '700',
-                  textAlign: 'center',
-                  textDecoration: 'none',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                }}
-              >
-                🗺️ Google
-              </a>
-            </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <a
+                    href={`https://map.naver.com/v5/?c=${geocodedLocation.lng},${geocodedLocation.lat},16,0,0,0,dh`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      flex: 1,
+                      padding: '12px',
+                      background: '#03C75A',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '10px',
+                      fontSize: '14px',
+                      fontWeight: '700',
+                      textAlign: 'center',
+                      textDecoration: 'none',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                    }}
+                  >
+                    🗺️ 네이버 지도
+                  </a>
+                  <a
+                    href={`https://www.google.com/maps?q=${geocodedLocation.lat},${geocodedLocation.lng}&z=17&hl=ko`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      flex: 1,
+                      padding: '12px',
+                      background: 'white',
+                      color: '#667eea',
+                      border: 'none',
+                      borderRadius: '10px',
+                      fontSize: '14px',
+                      fontWeight: '700',
+                      textAlign: 'center',
+                      textDecoration: 'none',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                    }}
+                  >
+                    🗺️ Google
+                  </a>
+                </div>
+              </>
+            )}
           </div>
         ) : (
           <div style={{
@@ -344,9 +413,9 @@ const DetailPage: React.FC<DetailPageProps> = ({ currentUser, onAddComment, onDe
             marginBottom: '20px',
           }}>
             <div style={{ fontSize: '32px', marginBottom: '10px' }}>📍</div>
-            <div style={{ fontSize: '15px', fontWeight: '600' }}>위치 정보가 없습니다</div>
+            <div style={{ fontSize: '15px', fontWeight: '600' }}>주소 정보가 없습니다</div>
             <div style={{ fontSize: '13px', marginTop: '6px', color: '#999' }}>
-              이 분실물은 등록 시 지도 위치를 선택하지 않았습니다
+              이 분실물은 등록 시 주소를 입력하지 않았습니다
             </div>
           </div>
         )}

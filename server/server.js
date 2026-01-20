@@ -1,3 +1,5 @@
+require('dotenv').config(); // 환경변수 로드
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -1563,7 +1565,8 @@ apiRouter.get('/places/details', async (req, res) => {
   }
 });
 
-// Geocoding (주소 → 좌표 변환)
+// Geocoding (주소/장소명 → 좌표 변환) - Google Maps Geocoding API 사용
+// 장소명("다이소 신림점"), 주소("서울시 관악구...") 모두 지원
 apiRouter.get('/places/geocode', async (req, res) => {
   try {
     const { address } = req.query;
@@ -1571,48 +1574,69 @@ apiRouter.get('/places/geocode', async (req, res) => {
     if (!address) {
       return res.status(400).json({ 
         success: false, 
-        error: '주소를 입력해주세요.' 
+        error: '주소 또는 장소명을 입력해주세요.' 
       });
     }
 
+    // Google Maps API 키
     const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    
     if (!apiKey) {
       console.error('❌ GOOGLE_MAPS_API_KEY 환경변수가 설정되지 않았습니다.');
       return res.status(500).json({ 
         success: false, 
-        error: 'Google Maps API 키가 설정되지 않았습니다.' 
+        error: 'Google Maps API 키가 설정되지 않았습니다. 관리자에게 문의하세요.' 
       });
     }
 
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}&language=ko`;
+    console.log(`🔍 [Google Geocoding] 검색 시도: "${address}"`);
+
+    // Google Geocoding API 호출
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}&language=ko&region=kr`;
     
     const response = await fetch(url);
     const data = await response.json();
 
-    if (data.status === 'OK') {
+    if (data.status === 'OK' && data.results && data.results.length > 0) {
       const result = data.results[0];
-      res.json({ 
+      
+      // 장소명 추출 (첫 번째 주소 컴포넌트 사용)
+      const placeName = result.address_components[0]?.long_name || address;
+      const fullAddress = result.formatted_address;
+      
+      console.log(`✅ 검색 성공: ${placeName} (${fullAddress})`);
+      
+      return res.json({ 
         success: true, 
         location: {
-          address: result.formatted_address,
+          address: fullAddress,
+          place_name: placeName,
           lat: result.geometry.location.lat,
           lng: result.geometry.location.lng
         }
       });
     } else if (data.status === 'ZERO_RESULTS') {
-      res.json({ 
+      console.log(`❌ 검색 결과 없음: "${address}"`);
+      return res.json({ 
         success: false, 
-        error: '주소를 찾을 수 없습니다.' 
+        error: '입력하신 주소나 장소를 찾을 수 없습니다.\n정확한 주소나 장소명을 입력해주세요.\n(예: 서울역, 서울 중구 세종대로 18)' 
+      });
+    } else if (data.status === 'REQUEST_DENIED') {
+      console.error('❌ Google API 인증 실패:', data.error_message);
+      return res.status(500).json({ 
+        success: false, 
+        error: 'API 인증 오류가 발생했습니다. 관리자에게 문의하세요.' 
       });
     } else {
-      console.error('❌ Geocoding API 오류:', data.status, data.error_message);
-      res.status(500).json({ 
+      console.error(`❌ Google API 오류: ${data.status} -`, data.error_message);
+      return res.status(500).json({ 
         success: false, 
-        error: data.error_message || 'Geocoding API 오류가 발생했습니다.' 
+        error: '주소 검색 중 오류가 발생했습니다. 다시 시도해주세요.' 
       });
     }
+
   } catch (error) {
-    console.error('❌ Geocoding 프록시 오류:', error.message);
+    console.error('❌ Geocoding 오류:', error.message);
     res.status(500).json({ 
       success: false, 
       error: '주소 변환 중 오류가 발생했습니다.' 
