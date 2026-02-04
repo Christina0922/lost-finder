@@ -1,132 +1,145 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LostItem, User } from '../types';
+import type { LostItem as AppLostItem } from '../App';
+import type { User as AppUser } from '../App';
+import GoogleMapComponent, { MarkerData } from '../components/GoogleMapComponent';
+import NaverMapComponent from '../components/NaverMapComponent';
 
 interface MapPageProps {
-  lostItems: LostItem[];
-  currentUser: User | null;
+  lostItems: AppLostItem[];
+  currentUser: AppUser | null;
+  theme?: 'light' | 'dark';
 }
 
-export default function MapPage({ lostItems, currentUser }: MapPageProps) {
+type MapType = 'google' | 'naver';
+
+export default function MapPage({ lostItems, currentUser, theme = 'light' }: MapPageProps) {
   const navigate = useNavigate();
-  const lostItemsCount = lostItems?.length || 0;
+  const [mapType, setMapType] = useState<MapType>('naver'); // 기본값: 네이버 지도
+  const [selectedMarkerId, setSelectedMarkerId] = useState<number | string | null>(null);
+
+  // 분실물 데이터를 마커 데이터로 변환
+  const markers: MarkerData[] = useMemo(() => {
+    return lostItems
+      .filter(item => item.lat && item.lng)
+      .map(item => ({
+        id: item.id,
+        position: {
+          lat: item.lat!,
+          lng: item.lng!,
+        },
+        title: item.title || '분실물',
+        description: item.description || item.locationText || '',
+        isMyItem: currentUser ? String(item.ownerId) === String(currentUser.id) : false,
+      }));
+  }, [lostItems, currentUser]);
+
+  // 지도 중심점 계산 (마커들의 평균 위치 또는 서울 시청)
+  const mapCenter = useMemo(() => {
+    if (markers.length === 0) {
+      return { lat: 37.5665, lng: 126.9780 }; // 서울 시청
+    }
+    
+    const avgLat = markers.reduce((sum, m) => sum + m.position.lat, 0) / markers.length;
+    const avgLng = markers.reduce((sum, m) => sum + m.position.lng, 0) / markers.length;
+    return { lat: avgLat, lng: avgLng };
+  }, [markers]);
+
+  const handleMarkerClick = (markerId: number | string) => {
+    setSelectedMarkerId(markerId);
+    navigate(`/detail/${markerId}`);
+  };
 
   return (
     <div style={{
       width: '100vw',
       height: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
+      flexDirection: 'column',
       position: 'fixed',
       top: 0,
       left: 0,
       zIndex: 9999,
+      background: '#f5f5f5',
     }}>
+      {/* 헤더 */}
       <div style={{
-        background: 'white',
-        padding: '40px',
-        borderRadius: '20px',
-        maxWidth: '600px',
-        textAlign: 'center',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        padding: '16px 20px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        gap: '12px',
       }}>
+        {/* 왼쪽: 네이버 지도 텍스트가 있는 흰 박스 */}
         <div style={{
-          fontSize: '80px',
-          marginBottom: '20px',
-        }}>
-          🗺️
-        </div>
-        
-        <h1 style={{
-          fontSize: '32px',
-          fontWeight: '800',
-          color: '#2d3748',
-          marginBottom: '15px',
-        }}>
-          지도 기능 준비 중
-        </h1>
-        
-        <p style={{
-          fontSize: '18px',
-          color: '#4a5568',
-          marginBottom: '10px',
-          lineHeight: '1.6'
-        }}>
-          분실물 위치를 지도에서 확인할 수 있는<br />
-          기능을 준비하고 있습니다.
-        </p>
-
-        <p style={{
-          fontSize: '16px',
-          color: '#718096',
-          marginBottom: '30px',
-          lineHeight: '1.6'
-        }}>
-          현재 <strong style={{ color: '#667eea', fontSize: '18px' }}>{lostItemsCount}개</strong>의 분실물이 등록되어 있습니다.<br />
-          목록에서 확인하거나 새로운 분실물을 등록해주세요.
-        </p>
-
-        <div style={{
+          background: 'white',
+          borderRadius: '10px',
+          padding: '12px 24px',
           display: 'flex',
-          gap: '12px',
+          alignItems: 'center',
           justifyContent: 'center',
-          flexWrap: 'wrap'
+          whiteSpace: 'nowrap',
         }}>
-          <button
-            onClick={() => navigate('/list')}
-            style={{
-              padding: '15px 30px',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: 'white',
-              border: 'none',
-              borderRadius: '10px',
-              fontSize: '18px',
-              fontWeight: '700',
-              cursor: 'pointer',
-              boxShadow: '0 4px 12px rgba(102,126,234,0.4)',
-              transition: 'transform 0.2s',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-            목록에서 보기
-          </button>
-          
-          <button
-            onClick={() => navigate('/')}
-            style={{
-              padding: '15px 30px',
-              backgroundColor: '#f8f9fa',
-              color: '#2d3748',
-              border: '2px solid #667eea',
-              borderRadius: '10px',
-              fontSize: '18px',
-              fontWeight: '700',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              WebkitFontSmoothing: 'antialiased',
-            } as React.CSSProperties}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#667eea';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.color = 'white';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#f8f9fa';
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.color = '#2d3748';
-            }}
-          >
-            메인으로
-          </button>
+          <span style={{
+            fontSize: '15px',
+            fontWeight: '700',
+            color: '#667eea',
+          }}>
+            네이버 지도
+          </span>
         </div>
+        
+        {/* 오른쪽: 구글 지도 버튼 */}
+        <button
+          onClick={() => setMapType('google')}
+          style={{
+            padding: '12px 24px',
+            background: mapType === 'google' ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.25)',
+            color: mapType === 'google' ? '#667eea' : 'white',
+            border: 'none',
+            borderRadius: '10px',
+            fontSize: '15px',
+            fontWeight: '700',
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+            whiteSpace: 'nowrap',
+            boxShadow: mapType === 'google' ? '0 2px 4px rgba(0,0,0,0.1)' : 'none',
+          }}
+        >
+          구글 지도
+        </button>
       </div>
+
+      {/* 지도 영역 */}
+      <div style={{
+        flex: 1,
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+      }}>
+        {mapType === 'google' ? (
+          <GoogleMapComponent
+            center={mapCenter}
+            zoom={markers.length > 0 ? 13 : 15}
+            markers={markers}
+            onMarkerClick={handleMarkerClick}
+            selectedMarkerId={selectedMarkerId}
+            height="100%"
+          />
+        ) : (
+          <NaverMapComponent
+            center={mapCenter}
+            zoom={markers.length > 0 ? 13 : 15}
+            markers={markers}
+            onMarkerClick={handleMarkerClick}
+            selectedMarkerId={selectedMarkerId}
+            height="100%"
+          />
+        )}
+      </div>
+
     </div>
   );
 }

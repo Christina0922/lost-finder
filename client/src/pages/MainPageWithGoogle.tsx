@@ -98,7 +98,6 @@ const MainPage: React.FC<MainPageProps> = ({ currentUser, lostItems, onAddItem, 
                   theme="filled_blue"
                   size="large"
                   width="350"
-                  locale="ko"
                 />
               </div>
             </GoogleOAuthProvider>

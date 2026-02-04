@@ -66,3 +66,18 @@ Thumbs.db
 
 # Vercel
 .vercel
+
+# ===== Android / Gradle =====
+.gradle/
+**/.gradle/
+app/build/
+**/build/
+
+# ===== Web =====
+node_modules/
+dist/
+build/
+
+# ===== OS / Tool =====
+.DS_Store
+Thumbs.db

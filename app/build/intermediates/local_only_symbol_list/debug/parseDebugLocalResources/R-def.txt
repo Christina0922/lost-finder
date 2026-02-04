@@ -14,8 +14,7 @@ drawable splash_background
 drawable splash_circle_bg
 drawable splash_logo
 drawable splash_screen_gradient
-id splash_layout
-id webview
+id webView
 layout activity_main
 mipmap ic_launcher
 mipmap ic_launcher_background

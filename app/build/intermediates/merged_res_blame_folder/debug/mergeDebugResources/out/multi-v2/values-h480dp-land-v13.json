@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.temp.app-mergeDebugResources-29:/values-h480dp-land-v13/values-h480dp-land-v13.xml",
+            "outputFile": "com.lostfinder.app-mergeDebugResources-30:/values-h480dp-land-v13/values-h480dp-land-v13.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\My PC\\.gradle\\caches\\8.11.1\\transforms\\196f083c93465edc85511cbb6007e9a4\\transformed\\material-1.11.0\\res\\values-h480dp-land-v13\\values-h480dp-land-v13.xml",
+                    "source": "C:\\Users\\My PC\\.gradle\\caches\\transforms-4\\bcd76576039abe4fc242de684dcac461\\transformed\\material-1.12.0\\res\\values-h480dp-land-v13\\values-h480dp-land-v13.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10",
                         "startColumns": "4,4,4,4,4,4,4,4,4",

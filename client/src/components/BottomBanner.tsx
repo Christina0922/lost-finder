@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 // 상품 데이터 타입 정의
 interface Product {
@@ -45,6 +45,7 @@ const sampleProducts: Product[] = [
 
 export default function BottomBanner() {
   const [currentProductIndex, setCurrentProductIndex] = useState(0);
+  const navigate = useNavigate();
 
   // 5초마다 상품 변경
   useEffect(() => {
@@ -87,8 +88,18 @@ export default function BottomBanner() {
           한 줄 후기를 남겨주세요.<br />
           누군가에게 큰 힘이 됩니다.
         </p>
-        <Link to="/success-stories">
-          <button style={{
+        <button 
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('후기 보러가기 클릭 - 경로: /success-stories');
+            try {
+              navigate('/success-stories');
+            } catch (err) {
+              console.error('네비게이션 에러:', err);
+            }
+          }}
+          style={{
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             color: '#ffffff',
             border: 'none',
@@ -99,7 +110,8 @@ export default function BottomBanner() {
             boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             cursor: 'pointer',
-            textDecoration: 'none'
+            textDecoration: 'none',
+            display: 'inline-block'
           } as React.CSSProperties}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'translateY(-2px)';
@@ -109,20 +121,26 @@ export default function BottomBanner() {
             e.currentTarget.style.transform = 'translateY(0)';
             e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
           }}>
-            후기 보러가기
-          </button>
-        </Link>
-        {/* 구분선 */}
-        <hr style={{ 
-          border: '0', 
-          borderTop: '1px solid rgba(102, 126, 234, 0.15)', 
-          margin: '18.82px 0', 
-          width: '100%' 
-        }} />
+          후기 보러가기
+        </button>
       </div>
-
-      {/* 퍼즐 게임 안내 */}
+      {/* 구분선 */}
+      <hr style={{ 
+        border: '0', 
+        height: '1px', 
+        background: 'linear-gradient(to right, transparent, rgba(102, 126, 234, 0.2), transparent)',
+        margin: '15.05px 0'
+      }} />
+      {/* 퍼즐 게임 안내 섹션 */}
       <div>
+        <p className="text-lg font-semibold" style={{
+          textAlign: 'center',
+          marginBottom: 7.53,
+          color: '#4a5568',
+          fontSize: '1.1rem'
+        }}>
+          퍼즐 게임 안내
+        </p>
         <p className="text-gray-600" style={{ 
           fontSize: "0.95rem", 
           marginBottom: 11.29, 
@@ -136,6 +154,7 @@ export default function BottomBanner() {
           target="_blank"
           rel="noopener noreferrer"
           title="외부 사이트로 이동합니다"
+          style={{ textDecoration: 'none', display: 'inline-block' }}
         >
           <button style={{
             background: '#ffffff',
@@ -149,18 +168,23 @@ export default function BottomBanner() {
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             cursor: 'pointer',
             textDecoration: 'none',
-            WebkitTextFillColor: '#667eea'
-          } as any}
+            display: 'inline-block',
+            width: '100%',
+            maxWidth: '350px',
+            textAlign: 'center',
+            WebkitTextFillColor: '#667eea',
+            WebkitBackgroundClip: 'unset'
+          } as React.CSSProperties}
           onMouseEnter={(e) => {
             e.currentTarget.style.background = '#667eea';
-            e.currentTarget.style.color = '#ffffff';
+            e.currentTarget.style.color = '#ffffff !important';
             (e.currentTarget.style as any).webkitTextFillColor = '#ffffff';
             e.currentTarget.style.transform = 'translateY(-2px)';
             e.currentTarget.style.boxShadow = '0 8px 16px rgba(102, 126, 234, 0.3)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.background = '#ffffff';
-            e.currentTarget.style.color = '#667eea';
+            e.currentTarget.style.color = '#667eea !important';
             (e.currentTarget.style as any).webkitTextFillColor = '#667eea';
             e.currentTarget.style.transform = 'translateY(0)';
             e.currentTarget.style.boxShadow = '0 2px 8px rgba(102, 126, 234, 0.1)';
@@ -169,13 +193,12 @@ export default function BottomBanner() {
           </button>
         </a>
       </div>
-
       {/* 구분선 */}
       <hr style={{ 
         border: '0', 
-        borderTop: '1px solid rgba(102, 126, 234, 0.15)', 
-        margin: '18.82px 0', 
-        width: '100%' 
+        height: '1px', 
+        background: 'linear-gradient(to right, transparent, rgba(102, 126, 234, 0.2), transparent)',
+        margin: '15.05px 0'
       }} />
 
       {/* 추천 상품 섹션 */}
@@ -215,14 +238,18 @@ export default function BottomBanner() {
               __html: currentProduct.description
             }}
           />
-          <a
-            href={currentProduct.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block"
-            title="외부 사이트로 이동합니다"
-          >
-            <button style={{ 
+          <button 
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const url = currentProduct.link || "https://link.coupang.com/a/cCIDpH";
+              try {
+                window.open(url, "_blank", "noopener,noreferrer");
+              } catch (err) {
+                console.error('링크 열기 에러:', err);
+              }
+            }}
+            style={{ 
               display: 'inline-block',
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               color: '#ffffff',
@@ -249,7 +276,6 @@ export default function BottomBanner() {
             }}>
               쿠팡에서 확인하기
             </button>
-          </a>
         </div>
       </div>
     </div>

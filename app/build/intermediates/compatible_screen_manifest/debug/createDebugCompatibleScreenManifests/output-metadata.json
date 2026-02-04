@@ -4,7 +4,7 @@
     "type": "COMPATIBLE_SCREEN_MANIFEST",
     "kind": "Directory"
   },
-  "applicationId": "com.temp.app",
+  "applicationId": "com.lostfinder",
   "variantName": "debug",
   "elements": []
 }

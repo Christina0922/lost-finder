@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
-import type { LostItem, User } from '../types';
+import type { LostItem as AppLostItem } from '../App';
+import type { User as AppUser } from '../App';
+import type { LostItem } from '../types';
 import { getLostItemById, extractCreatedId } from '../utils/api';
 import { getDeviceId } from '../utils/deviceId';
 import './EditPage.css';
 import { resizeAndCompressImage } from '../utils/image';
 
 interface EditPageProps {
-  currentUser: User | null;
-  onUpdateItem: (item: LostItem) => void;
-  onAddItem?: (item: Omit<LostItem, 'id' | 'author_id' | 'comments'>) => void;
+  currentUser: AppUser | null;
+  onUpdateItem: (item: AppLostItem) => void;
+  onAddItem?: (item: AppLostItem) => void;
   theme: 'light' | 'dark';
 }
 
@@ -64,21 +66,21 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
   useEffect(() => {
     const newErrors = { ...errors };
     
-    if (itemType && !itemType.trim()) {
+    if (itemType && typeof itemType === 'string' && !itemType.trim()) {
       newErrors.itemType = '분실물 종류를 선택해주세요';
     } else {
       newErrors.itemType = '';
     }
     
-    if (description.length > 0 && description.trim().length < 5) {
+    if (description && typeof description === 'string' && description.length > 0 && description.trim().length < 5) {
       newErrors.description = '최소 5자 이상 입력해주세요';
-    } else if (description.length > 1000) {
+    } else if (description && typeof description === 'string' && description.length > 1000) {
       newErrors.description = '최대 1000자까지 입력 가능합니다';
     } else {
       newErrors.description = '';
     }
     
-    if (location.length > 0 && location.trim().length < 2) {
+    if (location && typeof location === 'string' && location.length > 0 && location.trim().length < 2) {
       newErrors.location = '최소 2자 이상 입력해주세요';
     } else {
       newErrors.location = '';
@@ -120,7 +122,7 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
           const itemData = await getLostItemById(Number(id));
           
           // 본인 게시물인지 확인
-          if (currentUser?.id !== itemData.author_id) {
+          if (currentUser && Number(currentUser.id) !== itemData.author_id) {
             showToastMessage('수정 권한이 없습니다', 'error');
             navigate('/list');
             return;
@@ -187,17 +189,17 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
     }
     
     // 최종 검증
-    if (!itemType.trim()) {
+    if (!itemType || typeof itemType !== 'string' || !itemType.trim()) {
       showToastMessage('분실물 종류를 선택해주세요', 'error');
       return;
     }
     
-    if (!description.trim() || description.trim().length < 5) {
+    if (!description || typeof description !== 'string' || !description.trim() || description.trim().length < 5) {
       showToastMessage('상세 설명을 5자 이상 입력해주세요', 'error');
       return;
     }
     
-    if (!location.trim() || location.trim().length < 2) {
+    if (!location || typeof location !== 'string' || !location.trim() || location.trim().length < 2) {
       showToastMessage('분실 장소를 2자 이상 입력해주세요', 'error');
       return;
     }
@@ -211,9 +213,9 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
         const deviceId = getDeviceId();
         
         const newItem = {
-          item_type: itemType.trim(),
-          description: description.trim(),
-          location: location.trim(),
+          item_type: (itemType || '').trim(),
+          description: (description || '').trim(),
+          location: (location || '').trim(),
           lat: lat,
           lng: lng,
           place_name: placeName,
@@ -223,16 +225,30 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
           image_urls: imageUrls,
         };
         
-        // API 직접 호출
-        const response = await fetch('/api/lost-items', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newItem)
-        });
+        // API 직접 호출 - 서버 연결 오류 처리 개선
+        let response;
+        let data;
         
-        const data = await response.json();
+        try {
+          response = await fetch('/api/lost-items', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newItem)
+          });
+          
+          if (!response.ok) {
+            throw new Error(`서버 오류: ${response.status}`);
+          }
+          
+          data = await response.json();
+        } catch (fetchError) {
+          console.error('[등록 실패] 네트워크 오류:', fetchError);
+          showToastMessage('서버와의 연결이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.', 'error');
+          setIsSubmitting(false);
+          return;
+        }
         
-        if (response.ok && data.success) {
+        if (data && data.success) {
           console.log('[등록 성공]', data);
           
           // ✅ 안전하게 ID 추출
@@ -243,6 +259,21 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
           showToastMessage('분실물이 등록되었습니다');
           
           // ✅ ID가 없으면 목록으로, 있으면 상세 페이지로 이동
+          // onAddItem 콜백도 호출하여 App.tsx의 상태 업데이트
+          if (onAddItem && createdId) {
+            const appLostItem: AppLostItem = {
+              id: String(createdId),
+              title: newItem.item_type || newItem.description || '',
+              description: newItem.description || undefined,
+              locationText: newItem.location || newItem.address || undefined,
+              lat: newItem.lat || undefined,
+              lng: newItem.lng || undefined,
+              createdAt: new Date().toISOString(),
+              ownerId: currentUser ? String(currentUser.id) : undefined,
+            };
+            onAddItem(appLostItem);
+          }
+          
           setTimeout(() => {
             if (createdId !== null) {
               navigate(`/detail/${createdId}`);
@@ -255,14 +286,14 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
         } else {
           // API는 성공했지만 success=false
           console.error('[등록 실패] 서버 응답:', data);
-          showToastMessage(data.message || '등록에 실패했습니다', 'error');
+          showToastMessage(data?.message || '등록에 실패했습니다', 'error');
           setIsSubmitting(false);
           return; // ✅ 실패 후 종료 (폼 유지)
         }
       } catch (error) {
         // 네트워크 오류 또는 예외
         console.error('[등록 실패] 예외 발생:', error);
-        showToastMessage('등록 중 오류가 발생했습니다', 'error');
+        showToastMessage('등록 중 오류가 발생했습니다. 서버 연결을 확인해주세요.', 'error');
         setIsSubmitting(false);
         return;
       }
@@ -276,9 +307,9 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
       try {
         const updatedItem = {
           ...itemToEdit,
-          item_type: itemType.trim(),
-          description: description.trim(),
-          location: location.trim(),
+          item_type: (itemType || '').trim(),
+          description: (description || '').trim(),
+          location: (location || '').trim(),
           lat: lat,
           lng: lng,
           place_name: placeName,
@@ -286,7 +317,18 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
           image_urls: imageUrls,
         };
         
-        onUpdateItem(updatedItem);
+        // App.tsx의 LostItem 타입으로 변환
+        const appLostItem: AppLostItem = {
+          id: String(updatedItem.id),
+          title: updatedItem.item_type || updatedItem.description || '',
+          description: updatedItem.description || undefined,
+          locationText: updatedItem.location || updatedItem.address || undefined,
+          lat: updatedItem.lat || undefined,
+          lng: updatedItem.lng || undefined,
+          createdAt: updatedItem.created_at || undefined,
+          ownerId: String(updatedItem.author_id)
+        };
+        onUpdateItem(appLostItem);
         console.log('[수정 성공]');
         showToastMessage('분실물 정보가 수정되었습니다');
         
@@ -321,7 +363,9 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
     );
   }
 
-  const isFormValid = itemType.trim() && description.trim().length >= 5 && location.trim().length >= 2;
+  const isFormValid = itemType && typeof itemType === 'string' && itemType.trim() && 
+                      description && typeof description === 'string' && description.trim().length >= 5 && 
+                      location && typeof location === 'string' && location.trim().length >= 2;
 
   return (
     <div className="edit-page-container">
@@ -396,8 +440,8 @@ const EditPage = ({ currentUser, onUpdateItem, onAddItem, theme }: EditPageProps
             className={`edit-textarea ${errors.description ? 'has-error' : ''}`}
             maxLength={1000}
           />
-          <div className={`character-counter ${description.length > 900 ? 'warning' : ''} ${description.length === 1000 ? 'error' : ''}`}>
-            {description.length}/1000자
+          <div className={`character-counter ${description && typeof description === 'string' && description.length > 900 ? 'warning' : ''} ${description && typeof description === 'string' && description.length === 1000 ? 'error' : ''}`}>
+            {(description && typeof description === 'string' ? description.length : 0)}/1000자
           </div>
           {errors.description && (
             <div className="edit-form-error">⚠️ {errors.description}</div>
