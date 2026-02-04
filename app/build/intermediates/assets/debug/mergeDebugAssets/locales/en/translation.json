@@ -1,0 +1,192 @@
+{
+  "app": {
+    "title": "Lost Finder",
+    "subtitle": "Lost & Found Service"
+  },
+  "common": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout",
+    "register": "Register",
+    "list": "View List",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "delete": "Delete",
+    "edit": "Edit",
+    "save": "Save",
+    "close": "Close",
+    "back": "Back",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm"
+  },
+  "header": {
+    "greeting": "Hello, {{username}}!",
+    "settings": "Settings",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "notifications": "Notifications",
+    "notificationSilent": "Silent",
+    "notificationVibrate": "Vibrate",
+    "notificationMelody": "Melody",
+    "notificationDescription": "※ This setting applies only to LostFinder app notifications. Your device's system sound settings will not be changed.",
+    "changePassword": "Change Password",
+    "themeChanged": "Theme changed to {{theme}}.",
+    "notificationModeChanged": "Notification mode set to {{mode}}."
+  },
+  "mainPage": {
+    "title": "Lost & Found Service",
+    "description": "Register and search now!",
+    "mapButton": "Find on Map",
+    "registerButton": "Register",
+    "listButton": "View List"
+  },
+  "listPage": {
+    "title": "Lost Items List",
+    "totalItems": "Total {{count}} items",
+    "pageInfo": "Page {{current}} / {{total}}",
+    "loading": "Loading lost items...",
+    "error": "Failed to load lost items.",
+    "retry": "Retry",
+    "empty": "No lost items registered.",
+    "registerFirst": "Register the first lost item",
+    "myItem": "⭐️ My Item",
+    "location": "Lost Location",
+    "viewDetail": "View Details & Comments",
+    "loadMore": "Load More ({{current}} / {{total}})",
+    "backToTop": "Back to Top",
+    "allItemsLoaded": "All items loaded ({{count}} total)"
+  },
+  "detailPage": {
+    "title": "Lost Item Details",
+    "description": "Description",
+    "location": "Location",
+    "registeredDate": "Registered Date",
+    "noDate": "No date",
+    "comments": "Comments ({{count}})",
+    "noComments": "No comments yet. Be the first to comment!",
+    "commentPlaceholder": "Leave information... (min 2 characters)",
+    "commentSubmit": "Post Comment",
+    "loginRequired": "Login required to post comments.",
+    "loginButton": "Login",
+    "editItem": "Edit Post",
+    "deleteItem": "Delete Post",
+    "deleteConfirm": "Are you sure you want to delete this post?",
+    "deleteCommentConfirm": "Are you sure you want to delete this comment?",
+    "authorBadge": "(Author)",
+    "backToList": "Back to List",
+    "notFound": "Lost item not found.",
+    "noImage": "No image",
+    "commentSuccess": "Comment posted successfully!",
+    "commentError": "Failed to post comment.",
+    "itemDeleteSuccess": "Post deleted successfully.",
+    "itemDeleteError": "Failed to delete post.",
+    "commentDeleteSuccess": "Comment deleted successfully.",
+    "commentDeleteError": "Failed to delete comment.",
+    "commentValidationEmpty": "Please enter comment content.",
+    "commentValidationMin": "Comment must be at least 2 characters.",
+    "commentValidationMax": "Comment must be no more than 500 characters.",
+    "itemNotFound": "Lost item information not found."
+  },
+  "registerPage": {
+    "title": "Register Lost Item",
+    "itemType": "Type",
+    "itemTypePlaceholder": "Select lost item type",
+    "description": "Description",
+    "descriptionPlaceholder": "Please provide details such as color, model, features, etc.",
+    "location": "Lost Location",
+    "locationPlaceholder": "e.g., Main entrance of OO Park",
+    "photos": "Upload Photos (multiple allowed)",
+    "uploading": "Optimizing images...",
+    "uploadWait": "Waiting for upload...",
+    "registerButton": "Register",
+    "cancelToList": "Cancel and go to list",
+    "loginRequired": "Login required.",
+    "registered": "Registered!"
+  },
+  "editPage": {
+    "titleNew": "Register Lost Item",
+    "titleEdit": "Edit Lost Item",
+    "itemType": "Item Type *",
+    "itemTypePlaceholder": "Select lost item type",
+    "description": "Description *",
+    "descriptionPlaceholder": "Enter detailed description of the lost item...",
+    "location": "Lost Location *",
+    "locationPlaceholder": "e.g., Gangnam-gu, Yeoksam-dong, Seoul",
+    "photos": "Upload Photos",
+    "uploading": "Waiting for upload...",
+    "submitNew": "Complete Registration",
+    "submitEdit": "Complete Edit",
+    "cancelToList": "Cancel and go to list",
+    "itemTypeRequired": "Please select item type.",
+    "registerSuccess": "Lost item registered successfully!",
+    "updateSuccess": "Lost item information updated successfully!",
+    "loadingError": "Failed to load lost item information."
+  },
+  "loginPage": {
+    "title": "🔐 Login",
+    "email": "Email",
+    "password": "Password",
+    "loginButton": "Login",
+    "loggingIn": "Logging in...",
+    "noAccount": "Don't have an account?",
+    "signupLink": "📝 Sign Up",
+    "loginError": "Login failed. Please check your email and password."
+  },
+  "signupPage": {
+    "title": "📝 Sign Up",
+    "username": "Username",
+    "email": "Email",
+    "phone": "Phone Number",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "signupButton": "Sign Up",
+    "signingUp": "Signing up...",
+    "success": "🎉 Sign up completed!",
+    "error": "Sign up failed. Please try again."
+  },
+  "monetization": {
+    "title": "Recommended Items to Prevent Loss",
+    "preventFutureLoss": "Prevent Future Loss",
+    "viewOnAmazon": "View on Amazon",
+    "products": {
+      "airtag": {
+        "name": "Apple AirTag",
+        "description": "Find your lost items easily with real-time location tracking."
+      },
+      "tile": {
+        "name": "Tile Tracker",
+        "description": "Find your belongings with Bluetooth-based smart tracker."
+      },
+      "backpack": {
+        "name": "Anti-theft Backpack",
+        "description": "Secure backpack with anti-theft features."
+      }
+    }
+  },
+  "offline": {
+    "title": "Internet Connection Required",
+    "message": "Please turn on Wi-Fi or mobile data.",
+    "noConnection": "Currently not connected to the internet."
+  },
+  "error": {
+    "occurred": "An error occurred",
+    "refresh": "Please refresh the page.",
+    "serverError": "Connection to server is unstable. Please try again later.",
+    "notFound": "Requested information not found.",
+    "networkError": "Please check your network connection."
+  },
+  "itemTypes": {
+    "kickboard": "Kickboard",
+    "bicycle": "Bicycle",
+    "package": "Package",
+    "other": "Other"
+  },
+  "location": {
+    "nearby": "Near {{area}}",
+    "radius": "Within {{meters}}m radius on map"
+  }
+}
+
